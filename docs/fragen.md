@@ -158,3 +158,11 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **G12. Lizenz und Hosting der 3D-Modelle.** Die Etikett-Texturen enthalten die vollständigen Dosendesigns. Dürfen die optimierten Modelle öffentlich ausgeliefert werden (jeder kann sie herunterladen)? Empfehlung: ja, das ist bei 3D-Shops üblich, aber ich frage vorher.
 
 **Antworten vom 21.09.2026 (G):** G1 bis G3 und G5 bis G12 wie empfohlen. G4: kein Preis im Hero. Bau der Startseite freigegeben.
+
+## H. Nachträge aus dem Bau der Startseite (21.09.2026)
+
+**H1. Pfand in den Founder Bundles.** Die Bundles enthalten sechs Dosen, im Datenmodell steht bei den Bundle-Produkten kein Pfand. Der Warenkorb summiert deshalb das Pfand aus den Komponenten (6 × 0,25 € = 1,50 €) und behandelt den Bundlepreis (zum Beispiel 35,80 €) als Preis inklusive Pfand, so wie bei den Dosen. Der Gesamtbetrag stimmt in jedem Fall, nur die Aufteilung in Warenwert und Pfand hängt daran, und damit auch die 50-Euro-Grenze für den kostenlosen Versand. Empfehlung: so lassen (Pfand ist im Bundlepreis enthalten). Bitte bestätigen.
+
+**H2. Steuersatz.** Alle Produkte stehen auf dem Regelsatz 19 %. Ist der Eistee mit Protein als Lebensmittel mit 7 % einzustufen? Das ist eine Frage an den Steuerberater; bis zur Antwort rechnet der Shop mit 19 %, so wie Shopify heute. Änderung wäre nur ein Datenwert (`products.tax_class`).
+
+**H3. Bestand.** Laut Antwort C5 läuft die Bestandsführung erst ab dem Import. Migration `20260921160000_inventory_unlimited_until_import` schaltet `track_inventory` bis dahin ab, sonst wäre jede Variante mit Bestand 0 im Warenkorb ausverkauft. Keine Aktion nötig, nur zur Kenntnis.
