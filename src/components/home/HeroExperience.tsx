@@ -6,18 +6,23 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { FlavorPalette } from "@/lib/catalog/home";
 import { useHomeStore } from "@/lib/home/store";
 import { heroGeometry } from "./hero-geometry";
+import { HERO_DRAG_END_EVENT, HERO_DRAG_EVENT, type HeroDragDetail } from "./hero-drag";
 
 /**
  * Interaktivität des Heros (Arbeitspaket A). Rendert nichts, hängt sich an die
  * Server-Markup-Knoten von Hero.tsx über data-Attribute.
  *
  * Aufgaben:
- * - Maße von Dose und Sequenz als CSS-Variablen auf die Sektion schreiben, damit
- *   das PNG im DOM exakt dort steht, wo CanScene die 3D-Dose rendert.
+ * - Maße von Dose, Nachbardosen, Pfeilen und Sequenz als CSS-Variablen auf die
+ *   Sektion schreiben, damit die PNGs exakt dort stehen, wo CanScene rendert.
  * - ScrollTrigger mit scrub 0,8 über #pv-hero: schreibt --seq und store.seqProgress.
- * - Sortenwechsel per Pfeilen, Punkten, Tastatur und Wischen.
+ * - Sortenwechsel per Pfeilen, Punkten, Tastatur, Wischen und Ziehen mit der Maus.
  * - Farbwelt (--flavor-*) auf dem <html>-Element weich überblenden.
- * - PNG ausblenden, sobald das 3D-Modell der Sorte bereit ist.
+ * - Nur die aktive Sorte sichtbar und fokussierbar halten.
+ *
+ * Zustände stehen grundsätzlich als data-Attribute an DOM-Knoten, nie als Klassen
+ * auf <html> oder <body>: React setzt className beim erneuten Rendern neu, etwa
+ * wenn eine Browser-Erweiterung vor der Hydration ins DOM schreibt.
  */
 
 export interface HeroFlavorView {
@@ -26,7 +31,10 @@ export interface HeroFlavorView {
   palette: FlavorPalette;
 }
 
+/** Ab dieser gezogenen Strecke in Pixeln wechselt die Sorte. */
 const SWIPE_THRESHOLD = 40;
+/** Ab dieser Strecke entscheidet sich, ob quer gezogen oder gescrollt wird. */
+const AXIS_LOCK = 8;
 /** Ab diesem Fortschritt sind die Hero-Texte weg und nicht mehr fokussierbar. */
 const HERO_TEXT_GONE = 0.34;
 
@@ -34,6 +42,12 @@ function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   const tag = target.tagName;
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
+}
+
+/** Klicks auf Bedienelemente dürfen kein Ziehen starten. */
+function isInteractive(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  return Boolean(target.closest("a, button, input, textarea, select, label, [role='button']"));
 }
 
 export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] }) {
@@ -55,14 +69,30 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
     const applyGeometry = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
+      const half = width / 2;
       const geometry = heroGeometry(width, height);
       const style = section.style;
+
       style.setProperty("--pv-vh", `${height}px`);
       style.setProperty("--pv-can-h", `${geometry.canHeightFraction * height}px`);
       style.setProperty("--pv-can-top", `${(0.5 - geometry.canCenterYFraction) * height}px`);
       style.setProperty("--pv-seq-x", `${geometry.seqShiftXFraction * width}px`);
       style.setProperty("--pv-seq-y", `${geometry.seqShiftYFraction * height}px`);
       style.setProperty("--pv-seq-scale", String(geometry.seqScale - 1));
+
+      // Nachbardosen als PNG (Ladezustand und Ersatz ohne WebGL).
+      style.setProperty("--pv-neighbor-x", `${geometry.neighborCenterFraction * half}px`);
+      style.setProperty("--pv-neighbor-scale", geometry.neighborScreenScale.toFixed(4));
+
+      // Pfeile stehen immer neben der aktiven Dose, im Hero weit außen, im
+      // gezoomten Zustand dicht an der Dose, damit sie den Text nicht überdecken.
+      const arrowHalf = geometry.isSide ? 26 : 22;
+      const edge = geometry.isSide ? width * 0.04 : 10;
+      const heroRadius = Math.max(120, half - edge - arrowHalf);
+      const zoomRadius = geometry.activeHalfFractionZoom * half + arrowHalf + 14;
+      style.setProperty("--pv-arrow-r0", `${heroRadius}px`);
+      style.setProperty("--pv-arrow-r1", `${Math.min(heroRadius, zoomRadius)}px`);
+
       lastWidth = width;
       lastHeight = height;
     };
@@ -122,23 +152,33 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
 
     // ------------------------------------------------------- Sortenwechsel
     const flavorNodes = Array.from(section.querySelectorAll<HTMLElement>("[data-pv-flavor]"));
+    const factNodes = Array.from(section.querySelectorAll<HTMLElement>(".pv-facts__item"));
     const dots = Array.from(section.querySelectorAll<HTMLButtonElement>("[data-pv-dot]"));
-
-    /** PNG der Sorte ausblenden, sobald ihr 3D-Modell steht (G11). */
-    const cans = Array.from(section.querySelectorAll<HTMLElement>(".pv-can[data-pv-flavor]"));
-    const applyModelReady = () => {
-      const state = store.getState();
-      for (const can of cans) {
-        const own = Number(can.dataset.pvFlavor);
-        const ready = state.tier === "3d" && state.modelReady[own] === true;
-        can.dataset.modelReady = ready ? "true" : "false";
-      }
-    };
+    const count = flavors.length;
 
     const applyFlavor = (index: number, duration: number) => {
       for (const node of flavorNodes) {
         const own = Number(node.dataset.pvFlavor);
         node.dataset.active = own === index ? "true" : "false";
+        // Die PNGs bilden dasselbe Karussell ab wie die 3D-Szene: eine Dose vorn,
+        // je eine links und rechts daneben.
+        if (node.classList.contains("pv-can")) {
+          const offset = (own - index + count) % count;
+          node.dataset.pos =
+            offset === 0
+              ? "active"
+              : offset === 1
+                ? "next"
+                : offset === count - 1
+                  ? "prev"
+                  : "back";
+        }
+      }
+      // Die unsichtbaren Zutatenblöcke dürfen auch nicht fokussierbar sein.
+      for (const node of factNodes) {
+        const active = node.dataset.active === "true";
+        if (active) node.removeAttribute("inert");
+        else node.setAttribute("inert", "");
       }
       for (const dot of dots) {
         const own = Number(dot.dataset.pvDot);
@@ -147,6 +187,8 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       }
       const palette = flavors[index]?.palette;
       if (palette) {
+        // Die Farbwelt hängt am Wurzelelement, deshalb wechselt der Hintergrund der
+        // ganzen Sektion mit, egal wie weit die Sequenz schon gelaufen ist.
         gsap.to(document.documentElement, {
           duration,
           ease: "power2.out",
@@ -157,7 +199,6 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
           "--flavor-accent": palette.accent,
         });
       }
-      applyModelReady();
     };
 
     applyFlavor(store.getState().flavorIndex, 0);
@@ -165,8 +206,6 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
     const unsubscribe = store.subscribe((state, previous) => {
       if (state.flavorIndex !== previous.flavorIndex) {
         applyFlavor(state.flavorIndex, reduced ? 0 : 0.6);
-      } else if (state.modelReady !== previous.modelReady || state.tier !== previous.tier) {
-        applyModelReady();
       }
     });
     cleanups.push(unsubscribe);
@@ -216,33 +255,95 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
     window.addEventListener("keydown", onKeyDown);
     cleanups.push(() => window.removeEventListener("keydown", onKeyDown));
 
-    // ------------------------------------------------------------- Wischen
+    // ------------------------------------------------- Wischen und Ziehen
+    // Touch und Maus laufen über dieselben Zeigerereignisse. Senkrecht bleibt das
+    // Scrollen der Seite unberührt (touch-action: pan-y auf der Bühne), waagerecht
+    // dreht der Ring mit und rastet beim Loslassen ein.
     let pointerId: number | null = null;
     let startX = 0;
     let startY = 0;
+    let axis: "x" | "y" | null = null;
+    let dragged = false;
+
+    const sendDrag = (name: string, detail: HeroDragDetail) => {
+      window.dispatchEvent(new CustomEvent<HeroDragDetail>(name, { detail }));
+    };
+
+    const endDrag = () => {
+      pointerId = null;
+      axis = null;
+      delete stage.dataset.dragging;
+    };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.pointerType === "mouse") return;
+      // Immer zuerst zurücksetzen, sonst verschluckt der Klickfilter unten den
+      // nächsten echten Klick auf einen Pfeil.
+      dragged = false;
+      if (pointerId !== null) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (isInteractive(event.target)) return;
       pointerId = event.pointerId;
       startX = event.clientX;
       startY = event.clientY;
+      axis = null;
     };
-    const onPointerEnd = (event: PointerEvent) => {
+
+    const onPointerMove = (event: PointerEvent) => {
       if (pointerId !== event.pointerId) return;
-      pointerId = null;
       const deltaX = event.clientX - startX;
       const deltaY = event.clientY - startY;
-      if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+      if (axis === null) {
+        if (Math.abs(deltaX) < AXIS_LOCK && Math.abs(deltaY) < AXIS_LOCK) return;
+        axis = Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
+        if (axis === "x") {
+          dragged = true;
+          stage.dataset.dragging = "true";
+          try {
+            stage.setPointerCapture(event.pointerId);
+          } catch {
+            // Manche Browser verweigern das Einfangen, das Ziehen geht trotzdem.
+          }
+        }
+      }
+      if (axis !== "x") return;
+      // Verhindert, dass die Maus beim Ziehen Text markiert.
+      if (event.cancelable) event.preventDefault();
+      sendDrag(HERO_DRAG_EVENT, { progress: deltaX / window.innerWidth, settled: false });
+    };
+
+    const onPointerEnd = (event: PointerEvent) => {
+      if (pointerId !== event.pointerId) return;
+      const deltaX = event.clientX - startX;
+      const wasDragging = axis === "x";
+      endDrag();
+      if (!wasDragging) return;
+      const switches = Math.abs(deltaX) >= SWIPE_THRESHOLD;
+      sendDrag(HERO_DRAG_END_EVENT, { progress: 0, settled: switches });
+      if (!switches) return;
       if (deltaX < 0) onNext();
       else onPrev();
     };
-    stage.addEventListener("pointerdown", onPointerDown, { passive: true });
-    stage.addEventListener("pointerup", onPointerEnd, { passive: true });
-    stage.addEventListener("pointercancel", onPointerEnd, { passive: true });
+
+    // Nach dem Ziehen mit der Maus darf der abschließende Klick keinen Link auslösen.
+    const onClickCapture = (event: MouseEvent) => {
+      if (!dragged) return;
+      dragged = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    stage.addEventListener("pointerdown", onPointerDown);
+    stage.addEventListener("pointermove", onPointerMove, { passive: false });
+    stage.addEventListener("pointerup", onPointerEnd);
+    stage.addEventListener("pointercancel", onPointerEnd);
+    stage.addEventListener("click", onClickCapture, true);
     cleanups.push(() => {
       stage.removeEventListener("pointerdown", onPointerDown);
+      stage.removeEventListener("pointermove", onPointerMove);
       stage.removeEventListener("pointerup", onPointerEnd);
       stage.removeEventListener("pointercancel", onPointerEnd);
+      stage.removeEventListener("click", onClickCapture, true);
+      delete stage.dataset.dragging;
     });
 
     return () => {

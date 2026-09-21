@@ -41,10 +41,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Progressive Enhancement: Effekte nur mit JS, Inhalte immer im HTML.
             Als data-Attribut statt Klasse, weil React bei einer Hydration-Wiederholung
             (zum Beispiel durch Browser-Erweiterungen, die vor dem Start ins DOM schreiben)
-            className von <html> neu setzt und Klassen aus Skripten verloren gehen. */}
+            className von <html> neu setzt und Klassen aus Skripten verloren gehen. Ein
+            MutationObserver setzt das Attribut wieder, falls React es beim Neuaufbau entfernt. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.documentElement.setAttribute('data-js','')",
+            __html:
+              "(function(){var h=document.documentElement;h.setAttribute('data-js','');" +
+              "if(window.MutationObserver){new MutationObserver(function(){if(!h.hasAttribute('data-js'))h.setAttribute('data-js','')})" +
+              ".observe(h,{attributes:true,attributeFilter:['data-js']})}})()",
           }}
         />
       </head>

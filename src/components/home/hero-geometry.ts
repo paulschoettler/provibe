@@ -8,6 +8,12 @@
  * benutzt sie direkt in Welteinheiten. Kein React, kein three, kein DOM hier.
  *
  * Kamera: Perspektive, fov 35, Blick entlang -z, Ursprung in der Bildmitte.
+ *
+ * Der Ring ist eine Ellipse: `ringRadiusX` zur Seite, `ringRadiusZ` in die Tiefe.
+ * Die seitliche Halbachse wird so gelöst, dass der Mittelpunkt einer Nachbardose
+ * genau auf `neighborCenterFraction` der halben Bildbreite landet. Damit sitzen
+ * die Nachbarn auf jeder Bildschirmbreite gleich, statt wie bei einem Kreis aus
+ * dem Bild zu wandern oder im Nichts zu verschwinden.
  */
 
 /** Öffnungswinkel der Kamera in Grad. Muss zur <Canvas camera> in CanScene passen. */
@@ -16,8 +22,19 @@ export const CAMERA_FOV = 35;
 export const CAMERA_BASE_Z = 6;
 /** Halber Tangens des Öffnungswinkels: sichtbare Höhe = 2 * Abstand * TAN_HALF_FOV. */
 const TAN_HALF_FOV = Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180);
-/** Ab dieser Breite gilt das Desktop-Layout (Tailwind md). */
+/** Ab dieser Breite laden wir die großen Modelle (Tailwind md). */
 export const MOBILE_MAX_WIDTH = 768;
+/**
+ * Ab dieser Breite und diesem Seitenverhältnis steht der Zutatenblock im
+ * gezoomten Zustand rechts neben der Dose. Darunter liegt er unter der Dose.
+ * Muss zur Medienabfrage in globals.css passen (min-width 900px, min-aspect-ratio 5/4).
+ */
+export const SIDE_MIN_WIDTH = 900;
+export const SIDE_MIN_ASPECT = 1.25;
+/** Breite des Zutatenblocks im Seitenlayout, identisch zu globals.css. */
+const FACTS_WIDTH_VW = 0.42;
+const FACTS_MAX_PX = 480;
+const FACTS_RIGHT_VW = 0.05;
 /**
  * Radius der Dose geteilt durch ihre Höhe (aus der Bounding Box der GLB: 1,98 zu 3,96).
  * Die sichtbare Silhouette entsteht an der vorderen Kante, also einen Radius näher
@@ -25,17 +42,36 @@ export const MOBILE_MAX_WIDTH = 768;
  * größer als das PNG an derselben Stelle und die Überblendung springt.
  */
 const CAN_RADIUS_RATIO = 0.25;
+/** Winkel der Nachbardose auf dem Ring (drei Sorten, also 120 Grad). */
+const NEIGHBOR_ANGLE = (2 * Math.PI) / 3;
+/**
+ * Nachbardosen stehen hinten auf dem Ring und sind zusätzlich etwas kleiner.
+ * Steht der Zutatenblock unter der Dose (schmale Bildschirme), sind sie deutlicher
+ * kleiner, sonst bliebe neben der aktiven Dose kein Platz für sie.
+ */
+const NEIGHBOR_SCALE_SIDE = 0.86;
+const NEIGHBOR_SCALE_STACKED = 0.74;
+/** Deckkraft der Nachbardosen im gezoomten Zustand (Feedback 7: dezent sichtbar). */
+export const NEIGHBOR_OPACITY_ZOOM = 0.4;
+/** Kippung der Nachbardosen um die z-Achse, Oberkante nach außen. */
+export const CAN_TILT_Z_DEG = 11.5;
+/** Zusätzliche y-Drehung der Nachbardosen, damit das Etikett lesbar bleibt. */
+export const CAN_YAW_DEG = 45;
 
 export interface HeroGeometry {
-  /** Schmales Layout: kleinere Dose, Zutaten unter der Dose, 1k-Modelle. */
+  /** Schmales Layout: kleinere Modelle laden. */
   isMobile: boolean;
+  /** Zutaten stehen im gezoomten Zustand seitlich neben der Dose. */
+  isSide: boolean;
   /** Seitenverhältnis der Canvas (Breite durch Höhe). */
   aspect: number;
-  /** Radius des Karussell-Rings in Welteinheiten. */
-  ringRadius: number;
+  /** Seitliche Halbachse des Karussell-Rings in Welteinheiten. */
+  ringRadiusX: number;
+  /** Tiefe des Karussell-Rings in Welteinheiten. */
+  ringRadiusZ: number;
   /** Höhe einer Dose in Welteinheiten (Bounding Box, nicht Silhouette). */
   canHeight: number;
-  /** Höhe der aktiven Dose als Anteil der Viewporthöhe (0,62 mobil, 0,70 Desktop). */
+  /** Höhe der aktiven Dose als Anteil der Viewporthöhe. */
   canHeightFraction: number;
   /** Mittelpunkt der Dose oberhalb der Bildmitte, in Welteinheiten. */
   canCenterY: number;
@@ -49,9 +85,21 @@ export interface HeroGeometry {
   seqShiftXFraction: number;
   /** Versatz der Dose am Ende des Zooms, Anteil der Viewporthöhe (negativ = nach oben). */
   seqShiftYFraction: number;
-  /** Versatz in Welteinheiten am Ende des Zooms. */
+  /** Versatz des Rings in Welteinheiten am Ende des Zooms. */
   seqShiftX: number;
   seqShiftY: number;
+  /** Mittelpunkt der Nachbardose als Anteil der halben Bildbreite (Hero-Zustand). */
+  neighborCenterFraction: number;
+  /** Größe der Nachbardose auf dem Schirm, relativ zur aktiven Dose. */
+  neighborScreenScale: number;
+  /** Maßstab der Nachbardose in der Szene, relativ zur aktiven Dose. */
+  neighborScale: number;
+  /** Faktor auf die seitliche Ringposition im gezoomten Zustand. */
+  neighborSpreadZoom: number;
+  /** Halbe Breite der aktiven Dose als Anteil der halben Bildbreite (Hero-Zustand). */
+  activeHalfFraction: number;
+  /** Halbe Breite der aktiven Dose als Anteil der halben Bildbreite (gezoomt). */
+  activeHalfFractionZoom: number;
 }
 
 /** Sichtbare Höhe in Welteinheiten an einem Kameraabstand. */
@@ -63,32 +111,25 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-/**
- * Ringradius so wählen, dass die Nachbardosen seitlich ins Bild ragen: ihr
- * Mittelpunkt soll bei `targetFraction` der halben Bildbreite liegen. Die
- * Nachbardose steht bei 120 Grad, also x = sin(120°) * r und z = cos(120°) * r.
- */
-function ringRadiusFor(targetFraction: number, aspect: number): number {
-  const sin120 = Math.sin((120 * Math.PI) / 180); // 0,866
-  const k = targetFraction * TAN_HALF_FOV * aspect;
-  const denominator = sin120 - 0.5 * k;
-  if (denominator <= 0.05) return 3;
-  return clamp((CAMERA_BASE_Z * k) / denominator, 0.45, 3);
-}
-
 /** Alle Maße aus der aktuellen Canvas-Größe in CSS-Pixeln. */
 export function heroGeometry(width: number, height: number): HeroGeometry {
   const safeWidth = Math.max(1, width);
   const safeHeight = Math.max(1, height);
   const aspect = safeWidth / safeHeight;
   const isMobile = safeWidth < MOBILE_MAX_WIDTH;
+  const isSide = safeWidth >= SIDE_MIN_WIDTH && aspect >= SIDE_MIN_ASPECT;
 
-  // Mobil stehen die Nachbardosen weiter außen (dezenter), auf Desktop näher an der Mitte.
-  const ringRadius = ringRadiusFor(isMobile ? 0.95 : 0.4, aspect);
-  const activeDistance = CAMERA_BASE_Z - ringRadius;
+  /** Halbe sichtbare Breite an einem Kameraabstand, in Welteinheiten. */
+  const halfAt = (distance: number) => Math.max(0.0001, distance * TAN_HALF_FOV * aspect);
 
-  const canHeightFraction = isMobile ? 0.62 : 0.7;
-  const canCenterYFraction = isMobile ? 0.04 : 0.03;
+  // Flacher Ring: die Nachbardosen sollen nur wenig kleiner wirken als die aktive.
+  const ringRadiusZ = isSide ? 0.75 : 0.55;
+  const activeDistance = CAMERA_BASE_Z - ringRadiusZ;
+  // Steht der Zutatenblock unter der Dose, begrenzt die Bildbreite die Dosenhöhe:
+  // je schmaler der Bildschirm, desto kleiner die Dose, sonst haben die
+  // Nachbardosen daneben keinen Platz mehr.
+  const canHeightFraction = isSide ? 0.7 : clamp(0.3 + 0.35 * aspect, 0.4, 0.58);
+  const canCenterYFraction = isSide ? 0.03 : 0.04;
 
   // canHeight = f * sichtbare Höhe an der Vorderkante der Dose, also an
   // (activeDistance - Radius). Der Radius hängt selbst von canHeight ab, deshalb
@@ -97,29 +138,77 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
     (2 * canHeightFraction * TAN_HALF_FOV * activeDistance) /
     (1 + 2 * canHeightFraction * TAN_HALF_FOV * CAN_RADIUS_RATIO);
   const canRadius = CAN_RADIUS_RATIO * canHeight;
-  /** Sichtbare Höhe an der Vorderkante der Dose: Maßstab für alle Bildschirmanteile. */
-  const visibleHeight = visibleHeightAt(activeDistance - canRadius);
-  const canCenterY = canCenterYFraction * visibleHeight;
+  /** Abstand der vorderen Kante der aktiven Dose: Maßstab für alle Bildschirmanteile. */
+  const activeFront = activeDistance - canRadius;
+  const canCenterY = canCenterYFraction * visibleHeightAt(activeFront);
+
+  // Nachbardose bei 120 Grad: z = cos(120°) * ringRadiusZ, also ein halber
+  // Ringradius hinter der Ringmitte.
+  const neighborDepth = CAMERA_BASE_Z + 0.5 * ringRadiusZ;
+  const neighborScale = isSide ? NEIGHBOR_SCALE_SIDE : NEIGHBOR_SCALE_STACKED;
+  const activeHalfFraction = canRadius / halfAt(activeFront);
+  // Die Kippung nach außen macht die Nachbardose deutlich breiter als ihren
+  // Radius. Ohne diesen Anteil schneidet der Bildrand sie ab.
+  const tilt = CAN_TILT_Z_DEG * (Math.PI / 180);
+  const neighborHalfWorld =
+    neighborScale * (canRadius * Math.cos(tilt) + 0.5 * canHeight * Math.sin(tilt));
+  const neighborHalfFraction = neighborHalfWorld / halfAt(neighborDepth - canRadius);
+  const neighborScreenScale = (neighborScale * activeFront) / (neighborDepth - canRadius);
+
+  // Wunschwert des Auftraggebers, aber nie so weit innen, dass die Nachbardose
+  // hinter der aktiven verschwindet, und nie so weit außen, dass sie am Bildrand
+  // abgeschnitten wird. Auf schmalen Telefonen gewinnt der Bildrand.
+  const targetCenter = isSide ? 0.55 : 0.42;
+  const minCenter = activeHalfFraction + 0.2 * neighborHalfFraction;
+  const maxCenter = Math.max(0.25, 1 - neighborHalfFraction - 0.03);
+  const neighborCenterFraction = clamp(Math.max(targetCenter, minCenter), 0.25, maxCenter);
+
+  const ringRadiusX = (neighborCenterFraction * halfAt(neighborDepth)) / Math.sin(NEIGHBOR_ANGLE);
 
   // Größenänderung der aktiven Dose am Ende der Sequenz. Bedingung aus dem Plan:
-  // die ganze Dose bleibt sichtbar. Auf Desktop heißt das Zoom nach vorn mit
-  // Versatz nach links (Zutaten rechts daneben). Auf einem Telefon passt ein
-  // Zoom nicht neben den Zutatenblock, dort tritt die Dose leicht zurück und
-  // wandert nach oben (Zutaten darunter).
-  const seqScale = isMobile ? 0.84 : 1.15;
-  const zoomZ = ringRadius + canRadius + (activeDistance - canRadius) / seqScale;
+  // die ganze Dose bleibt sichtbar. Im Seitenlayout heißt das Zoom nach vorn mit
+  // Versatz nach links (Zutaten rechts daneben). Steht der Zutatenblock unter der
+  // Dose, tritt sie leicht zurück und wandert nach oben.
+  const seqScale = isSide ? 1.15 : 0.84;
+  const zoomZ = ringRadiusZ + canRadius + activeFront / seqScale;
+  const activeAxisZoom = zoomZ - ringRadiusZ;
+  const neighborAxisZoom = zoomZ + 0.5 * ringRadiusZ;
+  const activeHalfFractionZoom = canRadius / halfAt(activeAxisZoom - canRadius);
+  const neighborHalfZoom = neighborHalfWorld / halfAt(neighborAxisZoom - canRadius);
+  /** Wo die Nachbardose ohne zusätzliche Spreizung im gezoomten Bild läge. */
+  const neighborBaseZoom = (neighborCenterFraction * neighborDepth) / neighborAxisZoom;
 
-  const seqShiftXFraction = isMobile ? 0 : -0.19;
-  const seqShiftYFraction = isMobile ? -0.165 : -0.02;
+  let seqShiftX = 0;
+  let seqShiftXFraction = 0;
+  let neighborSpreadZoom = 1;
 
-  const visibleHeightZoomed = visibleHeightAt(zoomZ - ringRadius - canRadius);
-  const seqShiftX = seqShiftXFraction * visibleHeightZoomed * aspect;
-  const seqShiftY = -seqShiftYFraction * visibleHeightZoomed;
+  if (isSide) {
+    // Linke Kante des Zutatenblocks als Anteil der halben Bildbreite.
+    const textLeft =
+      1 - 2 * FACTS_RIGHT_VW - 2 * Math.min(FACTS_WIDTH_VW, FACTS_MAX_PX / safeWidth);
+    // Ringversatz P und Spreizung s so wählen, dass die rechte Nachbardose mit
+    // Abstand vor dem Text endet und die linke im Bild bleibt.
+    const right = textLeft - 0.05 - neighborHalfZoom;
+    const left = -0.97 + neighborHalfZoom;
+    // Die symmetrische Lösung hält beide Bedingungen genau ein: kein Text unter
+    // der Nachbardose, kein Anschnitt am linken Rand. Auf schmalen Fenstern wird
+    // die Spreizung klein, die Nachbardosen rücken also hinter die aktive Dose.
+    const spread = Math.max(0.05, (right - left) / 2);
+    const shift = (right + left) / 2;
+    neighborSpreadZoom = spread / Math.max(0.0001, neighborBaseZoom);
+    seqShiftX = shift * halfAt(neighborAxisZoom);
+    seqShiftXFraction = seqShiftX / halfAt(activeAxisZoom) / 2;
+  }
+
+  const seqShiftYFraction = isSide ? -0.02 : -0.165;
+  const seqShiftY = -seqShiftYFraction * visibleHeightAt(activeAxisZoom);
 
   return {
     isMobile,
+    isSide,
     aspect,
-    ringRadius,
+    ringRadiusX,
+    ringRadiusZ,
     canHeight,
     canHeightFraction,
     canCenterY,
@@ -130,5 +219,11 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
     seqShiftYFraction,
     seqShiftX,
     seqShiftY,
+    neighborCenterFraction,
+    neighborScreenScale,
+    neighborScale,
+    neighborSpreadZoom,
+    activeHalfFraction,
+    activeHalfFractionZoom,
   };
 }

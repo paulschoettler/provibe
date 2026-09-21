@@ -133,12 +133,18 @@ Gebaut wurde in drei parallelen Arbeitspaketen mit vorab festgelegten Verträgen
 Abweichungen vom Plan, jeweils mit Grund:
 
 - Hero und Scroll-Sequenz sind eine Sektion (`#pv-hero`, 400vh, klebende Bühne `#pv-sequence`), weil Dose und Pfeile sonst beim Scrollen wegwandern würden.
-- Der Zoom arbeitet mit einem Zielfaktor statt fester Kamerawerte (Desktop 1,15fach mit Versatz nach links, mobil 0,84fach mit Versatz nach oben), weil auf einem Telefon "ganze Dose sichtbar" und "Zutaten darunter" sonst nicht zusammenpassen. Stellschrauben in `hero-geometry.ts`.
-- Nachbardosen blenden beim Zoom aus, sonst stünde auf Desktop eine Dose im Zutatentext.
+- Der Zoom arbeitet mit einem Zielfaktor statt fester Kamerawerte (Desktop mit Versatz nach links, mobil mit Versatz nach oben), weil auf einem Telefon "ganze Dose sichtbar" und "Zutaten darunter" sonst nicht zusammenpassen. Stellschrauben in `hero-geometry.ts`.
+- Das Karussell ist eine Ellipse statt eines Kreises: Der seitliche Radius wird aus der gewünschten Bildschirmposition der Nachbardosen gelöst (55 Prozent der halben Bildbreite im Seitenlayout, 42 Prozent gestapelt, auf 390 px Breite geometrisch nur 53 Prozent), damit beide Nachbarn bei jeder Bildschirmgröße vollständig sichtbar sind. Kippung (11,5 Grad um z), Etikettdrehung, Größe und Deckkraft jeder Dose folgen kontinuierlich ihrem Ringwinkel, dadurch kippt die einfahrende Dose weich in die Mitte.
+- Im gezoomten Zustand bleiben die Nachbardosen mit 40 Prozent Deckkraft sichtbar und rücken neben den Zutatenblock, damit klar bleibt, dass man wechseln kann. Die Pfeile wandern mit der Dose.
+- Ziehen funktioniert mit Maus und Finger (Achsensperre ab 8 px, Schwelle 40 px, Ring folgt live und rastet ein), vertikales Scrollen bleibt per `touch-action: pan-y` erhalten.
+- Das PNG ist nur Ladeplatzhalter und Fallback: Sobald die Szene die aktive Sorte zwei Bilder lang gerendert hat (`#pv-hero[data-canvas-ready]`), blendet der ganze PNG-Block aus. PNG und 3D sind nie gleichzeitig sichtbar.
+- Das Seitenlayout (Text rechts neben der Dose) gilt ab 900 px Breite und Seitenverhältnis 5:4, hochkant stehende Tablets bekommen das gestapelte Layout.
 - `#pvbanner` liegt auf Butter statt Creme, damit die Wellen 2 und 3 sichtbar sind.
 - Wellen ohne Parallax (wie bei royalbev), Pfeile ohne JavaScript und bei reduzierter Bewegung ausgeblendet.
 - Im 3D-Modus ist `#pvlogo` durchsichtig, damit die Canvas mit den einfliegenden Dosen dahinter sichtbar ist; die PNG-Dosen sind der Fallback.
 - Der Warenkorbstand kommt nach dem Mounten per Server Action, damit das Root-Layout und die Startseite statisch bleiben (`revalidate = 3600`).
+
+Robustheit gegen Browser-Erweiterungen: Schreibt eine Erweiterung vor der Hydration ins DOM, rendert React die Seite client-seitig neu und setzt dabei die Attribute von `<html>` aus seinem eigenen Bild. Zustands-Flags liegen deshalb als data-Attribute (`data-js`, `data-tier`, `data-flat`, `data-lenis`, `data-scrolled`), nie als Klassen; das Inline-Skript in `layout.tsx` hält `data-js` per MutationObserver fest, `HomeMotion` setzt es im Effekt erneut. Ein Playwright-Test mit simulierter Erweiterung ist Teil der Abnahme.
 
 Geprüft am Produktions-Build (`pnpm build`, `pnpm start`):
 
@@ -148,4 +154,4 @@ Geprüft am Produktions-Build (`pnpm build`, `pnpm start`):
 - Warenkorb: Sortenwechsel per Pfeil, Klick auf den Button legt den 9er-Pack der aktiven Sorte ab, Drawer zeigt Preis, Pfand, Grundpreis, Versandschwelle, MwSt.; nach Reload steht der Zähler auf 1. Testwarenkorb danach gelöscht.
 - 404-Meldungen in der Konsole stammen von Prefetches auf Seiten, die es noch nicht gibt (`/pages/*`, `/search`, `/account`, `/collections/*`, `/products/*`, `/checkout`). Sie verschwinden mit Phase 5b.
 
-Offen für die Abnahme durch den Auftraggeber: Dosengröße im Hero mobil (62 % der Höhe, eng unter der Dose), Zutatenblock auf kleinen Telefonen scrollbar, Position der Footer-Dosen, Texte der Stimmungs-Sektion ("Powered by Protein", "15 g Protein.") sind Vorschläge.
+Offen für die Abnahme durch den Auftraggeber: Am Ende der Sequenz zeigt die aktive Dose ihre Rückseite mit Zutaten und Strichcode (180-Grad-Drehung laut Plan; ein kleinerer Winkel wie 140 Grad zeigt mehr Etikett), Position der Footer-Dosen, Texte der Stimmungs-Sektion ("Powered by Protein", "15 g Protein.") sind Vorschläge.

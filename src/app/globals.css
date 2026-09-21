@@ -946,7 +946,11 @@ html:not([data-js]) .pvlogo {
    Die Canvas liegt fix über dem Seitenhintergrund, aber unter allem DOM-Inhalt.
    Alle Maße kommen aus src/components/home/hero-geometry.ts: HeroExperience
    schreibt sie als Pixelwerte auf #pv-hero, die Werte hier sind der Stand
-   ohne JavaScript. */
+   ohne JavaScript.
+
+   Zustände stehen als data-Attribute (html[data-js], html[data-flat],
+   #pv-hero[data-canvas-ready], .pv-stage[data-dragging]), nie als Klassen auf
+   <html> oder <body>: React setzt className beim erneuten Rendern neu. */
 
 .pv-canvas {
   position: fixed;
@@ -963,14 +967,22 @@ html[data-tier="static"] .pv-canvas {
   height: 400vh;
   color: var(--color-aubergine);
 
+  --seq: 0;
   --pv-vh: 100svh;
-  --pv-can-h: calc(var(--pv-vh) * 0.62);
+  --pv-can-h: calc(var(--pv-vh) * 0.46);
   --pv-can-top: calc(var(--pv-vh) * 0.46);
   --pv-seq-x: 0px;
   --pv-seq-y: calc(var(--pv-vh) * -0.165);
   --pv-seq-scale: -0.16;
+  --pv-neighbor-x: 26.5vw;
+  --pv-neighbor-scale: 0.64;
+  --pv-arrow-r0: calc(50vw - 32px);
+  --pv-arrow-r1: calc(50vw - 32px);
   /* Zoomanteil der Sequenz: 0 bis 0,4 des Gesamtfortschritts */
   --seqz: clamp(0, calc(var(--seq) / 0.4), 1);
+  /* Aktueller waagerechter und senkrechter Versatz der Dose */
+  --pv-x: calc(var(--seqz) * var(--pv-seq-x));
+  --pv-y: calc(var(--seqz) * var(--pv-seq-y));
 }
 
 .pv-skip {
@@ -986,7 +998,9 @@ html[data-tier="static"] .pv-canvas {
   text-decoration: none;
 }
 
-/* Sortenfläche: klebt hinter der Canvas, Farben aus --flavor-* */
+/* Sortenfläche: klebt hinter der Canvas, Farben aus --flavor-*.
+   Sie steht über die gesamten 400vh der Sektion, deshalb wechselt der
+   Hintergrund auch im gezoomten Zustand mit der Sorte. */
 .pv-hero__bg {
   position: sticky;
   top: 0;
@@ -1012,14 +1026,39 @@ html[data-tier="static"] .pv-canvas {
   top: 0;
   z-index: 2;
   height: 100svh;
+  /* Senkrecht scrollt die Seite weiter, waagerecht wechselt die Sorte. */
   touch-action: pan-y;
+  cursor: grab;
+}
+.pv-stage[data-dragging="true"] {
+  cursor: grabbing;
+  user-select: none;
+}
+/* Über Text und Bedienelementen bleibt der normale Zeiger. */
+.pv-facts,
+.pv-stage__top,
+.pv-stage__bottom {
+  cursor: auto;
+}
+.pv-stage a,
+.pv-stage button {
+  cursor: pointer;
 }
 
-/* --- Dosen-PNG (Fallback und Überblendung zur 3D-Dose) ---------------------- */
+/* --- Dosen-PNG (Ladeplatzhalter und Ersatz ohne WebGL) ---------------------- */
 .pv-cans {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+/* Sobald die 3D-Szene die aktive Sorte wirklich gerendert hat, verschwinden alle
+   PNGs. Es steht nie ein PNG neben oder hinter der 3D-Dose. */
+#pv-hero[data-canvas-ready="true"] .pv-cans {
+  opacity: 0;
+  visibility: hidden;
 }
 .pv-can {
   position: absolute;
@@ -1029,19 +1068,33 @@ html[data-tier="static"] .pv-canvas {
   width: auto;
   max-width: none;
   opacity: 0;
+  visibility: hidden;
   transform-origin: 50% 50%;
-  transform: translate(-50%, -50%)
-    translate(calc(var(--seqz) * var(--pv-seq-x)), calc(var(--seqz) * var(--pv-seq-y)))
+  transform: translate(-50%, -50%) translate(var(--pv-x), var(--pv-y))
     scale(calc(1 + var(--seqz) * var(--pv-seq-scale)));
   filter: var(--shadow-can);
-  transition: opacity 0.4s ease;
   will-change: transform, opacity;
 }
 .pv-can[data-active="true"] {
   opacity: 1;
+  visibility: visible;
 }
-.pv-can[data-active="true"][data-model-ready="true"] {
-  opacity: 0;
+/* Nachbardosen: dieselbe Anordnung wie auf dem Ring der 3D-Szene, nach außen
+   gekippt und etwas kleiner. */
+.pv-can[data-pos="prev"],
+.pv-can[data-pos="next"] {
+  opacity: 0.9;
+  visibility: visible;
+  transform: translate(-50%, -50%)
+    translate(calc(var(--pv-x) + var(--pv-side) * var(--pv-neighbor-x)), var(--pv-y))
+    scale(calc((1 + var(--seqz) * var(--pv-seq-scale)) * var(--pv-neighbor-scale)))
+    rotate(calc(var(--pv-side) * 10deg));
+}
+.pv-can[data-pos="prev"] {
+  --pv-side: -1;
+}
+.pv-can[data-pos="next"] {
+  --pv-side: 1;
 }
 
 /* --- Kopf: Logo und H1 ------------------------------------------------------ */
@@ -1075,10 +1128,14 @@ html[data-tier="static"] .pv-canvas {
 }
 
 /* --- Pfeile ----------------------------------------------------------------- */
+/* Die Pfeile stehen immer neben der aktiven Dose und wandern mit ihr, damit sie
+   im gezoomten Zustand nicht über dem Zutatenblock liegen. */
 .pv-arrow {
   position: absolute;
-  top: var(--pv-can-top);
-  transform: translateY(-50%);
+  top: calc(var(--pv-can-top) + var(--pv-y));
+  left: 50%;
+  --pv-arrow-r: calc(var(--pv-arrow-r0) + var(--seqz) * (var(--pv-arrow-r1) - var(--pv-arrow-r0)));
+  transform: translate(-50%, -50%);
   z-index: 3;
   width: 44px;
   height: 44px;
@@ -1091,19 +1148,20 @@ html[data-tier="static"] .pv-canvas {
   box-shadow: 0 10px 24px rgba(74, 47, 57, 0.18);
   transition:
     background-color 0.2s ease,
-    transform 0.2s ease;
+    opacity 0.2s ease;
 }
 .pv-arrow:hover {
   background: #fff;
 }
 .pv-arrow:active {
-  transform: translateY(-50%) scale(0.94);
+  background: #fff;
+  opacity: 0.85;
 }
 .pv-arrow--prev {
-  left: 10px;
+  margin-left: calc(var(--pv-x) - var(--pv-arrow-r));
 }
 .pv-arrow--next {
-  right: 10px;
+  margin-left: calc(var(--pv-x) + var(--pv-arrow-r));
 }
 
 /* --- Sortenname, Punkte, Scrollhinweis -------------------------------------- */
@@ -1133,11 +1191,16 @@ html[data-tier="static"] .pv-canvas {
   grid-area: 1 / 1;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    visibility 0s linear 0.4s;
 }
 .pv-names__item[data-active="true"] {
   opacity: 1;
   visibility: visible;
+  transition:
+    opacity 0.4s ease,
+    visibility 0s;
 }
 .pv-names__title {
   margin: 0;
@@ -1214,10 +1277,10 @@ html[data-tier="static"] .pv-canvas {
   position: absolute;
   left: 0;
   right: 0;
-  top: 56%;
-  bottom: calc(92px + env(safe-area-inset-bottom));
+  top: 52%;
+  bottom: calc(84px + env(safe-area-inset-bottom));
   display: grid;
-  padding: 0 20px;
+  padding: 0 18px;
   overflow-y: auto;
   overscroll-behavior: contain;
   pointer-events: none;
@@ -1226,15 +1289,22 @@ html[data-tier="static"] .pv-canvas {
 .pv-stage[data-facts="true"] .pv-facts {
   pointer-events: auto;
 }
+/* Nur die aktive Sorte ist sichtbar. Unsichtbare Blöcke sind zusätzlich inert,
+   also nicht fokussierbar (gesetzt in HeroExperience). */
 .pv-facts__item {
   grid-area: 1 / 1;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    visibility 0s linear 0.4s;
 }
 .pv-facts__item[data-active="true"] {
   opacity: 1;
   visibility: visible;
+  transition:
+    opacity 0.4s ease,
+    visibility 0s;
 }
 
 /* Gestaffeltes Aufsteigen der Zeilen, Muster BYQ scroll-text-reveal */
@@ -1264,14 +1334,14 @@ html[data-tier="static"] .pv-canvas {
 
 .pv-facts__title {
   margin: 0;
-  font-size: clamp(20px, 5.4vw, 34px);
+  font-size: clamp(19px, 5vw, 34px);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.08;
 }
 .pv-facts__label {
-  margin: 10px 0 2px;
-  font-size: 11px;
+  margin: 8px 0 2px;
+  font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1280,41 +1350,43 @@ html[data-tier="static"] .pv-canvas {
 .pv-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 8px 0 0;
+  gap: 5px;
+  margin: 7px 0 0;
   padding: 0;
   list-style: none;
 }
+/* Die Akzentfarbe der Sorte wandert mit: Badges und Eyebrow wechseln mit. */
 .pv-badge {
   border-radius: var(--radius-pill);
-  border: 1px solid rgba(74, 47, 57, 0.16);
-  background: rgba(255, 255, 255, 0.72);
-  padding: 4px 11px;
-  font-size: 11.5px;
+  border: 1px solid var(--flavor-accent);
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--flavor-accent);
+  padding: 3px 10px;
+  font-size: 11px;
   font-weight: 600;
 }
 .pv-ingredients {
-  font-size: 12.5px;
-  line-height: 1.45;
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 .pv-ingredients p {
-  margin: 0 0 6px;
+  margin: 0 0 5px;
 }
 .pv-allergens {
-  margin: 8px 0 0;
-  font-size: 12.5px;
-  line-height: 1.45;
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 .pv-nutrition {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 13px;
+  gap: 1px 11px;
   margin: 0;
-  font-size: 12px;
+  font-size: 11px;
 }
 .pv-nutrition__row {
   display: inline-flex;
-  gap: 5px;
+  gap: 4px;
 }
 .pv-nutrition dt,
 .pv-nutrition dd {
@@ -1363,15 +1435,8 @@ html[data-tier="static"] .pv-canvas {
   cursor: progress;
 }
 
-/* --- Desktop ---------------------------------------------------------------- */
+/* --- Ab Tablet: größere Schrift und Marken ---------------------------------- */
 @media (min-width: 769px) {
-  .pv-hero {
-    --pv-can-h: calc(var(--pv-vh) * 0.7);
-    --pv-can-top: calc(var(--pv-vh) * 0.47);
-    --pv-seq-x: -19vw;
-    --pv-seq-y: calc(var(--pv-vh) * -0.02);
-    --pv-seq-scale: 0.15;
-  }
   .pv-hero__logo img {
     height: 34px;
   }
@@ -1379,14 +1444,12 @@ html[data-tier="static"] .pv-canvas {
     width: 52px;
     height: 52px;
   }
-  .pv-arrow--prev {
-    left: 4vw;
-  }
-  .pv-arrow--next {
-    right: 4vw;
-  }
   .pv-stage__bottom {
     bottom: 40px;
+  }
+  .pv-facts__label {
+    font-size: 11px;
+    margin: 10px 0 2px;
   }
   .pv-ingredients,
   .pv-allergens {
@@ -1395,17 +1458,34 @@ html[data-tier="static"] .pv-canvas {
   }
   .pv-nutrition {
     font-size: 13px;
+    gap: 2px 13px;
   }
   .pv-badge {
     padding: 5px 13px;
     font-size: 12.5px;
+  }
+}
+
+/* --- Seitenlayout: Dose links, Zutaten rechts -------------------------------
+   Schwellen identisch zu SIDE_MIN_WIDTH und SIDE_MIN_ASPECT in hero-geometry.ts.
+   Breite und Abstand des Blocks gehen dort in die Berechnung des Dosenversatzes
+   ein, damit sich Dose und Text nie überlappen. */
+@media (min-width: 900px) and (min-aspect-ratio: 5 / 4) {
+  .pv-hero {
+    --pv-can-h: calc(var(--pv-vh) * 0.7);
+    --pv-can-top: calc(var(--pv-vh) * 0.47);
+    --pv-seq-x: -24vw;
+    --pv-seq-y: calc(var(--pv-vh) * -0.02);
+    --pv-seq-scale: 0.15;
+    --pv-neighbor-x: 27.5vw;
+    --pv-neighbor-scale: 0.695;
   }
   .pv-facts {
     left: auto;
     right: 5vw;
     top: 50%;
     bottom: auto;
-    width: min(44vw, 520px);
+    width: min(42vw, 480px);
     max-height: 78svh;
     transform: translateY(-50%);
     padding: 0;
@@ -1451,6 +1531,7 @@ html[data-tier="static"] .pv-canvas {
   align-items: center;
   gap: 18px;
   padding: 20px 16px 40px;
+  cursor: auto;
 }
 :is(html:not([data-js]), html[data-flat]) .pv-stage__top {
   order: 1;
@@ -1490,6 +1571,7 @@ html[data-tier="static"] .pv-canvas {
 :is(html:not([data-js]), html[data-flat]) .pv-can[data-active="true"] {
   display: block;
   opacity: 1;
+  visibility: visible;
 }
 :is(html:not([data-js]), html[data-flat]) .pv-facts {
   display: block;
@@ -1521,6 +1603,13 @@ html[data-tier="static"] .pv-canvas {
 }
 :is(html:not([data-js]), html[data-flat]) .pv-scrollhint {
   display: none;
+}
+:is(html:not([data-js]), html[data-flat]) .pv-facts__label,
+:is(html:not([data-js]), html[data-flat]) .pv-ingredients,
+:is(html:not([data-js]), html[data-flat]) .pv-allergens,
+:is(html:not([data-js]), html[data-flat]) .pv-nutrition {
+  font-size: 13px;
+  line-height: 1.55;
 }
 html:not([data-js]) .pv-dots {
   display: none;

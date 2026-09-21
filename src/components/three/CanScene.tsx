@@ -11,17 +11,29 @@ import { useHomeStore } from "@/lib/home/store";
 import {
   CAMERA_BASE_Z,
   CAMERA_FOV,
+  CAN_TILT_Z_DEG,
+  CAN_YAW_DEG,
+  NEIGHBOR_OPACITY_ZOOM,
   heroGeometry,
   visibleHeightAt,
   type HeroGeometry,
 } from "@/components/home/hero-geometry";
+import {
+  DRAG_GAIN,
+  DRAG_MAX_STEP,
+  HERO_DRAG_END_EVENT,
+  HERO_DRAG_EVENT,
+  type HeroDragDetail,
+} from "@/components/home/hero-drag";
 
 /**
  * Eine einzige fixe WebGL-Canvas für die ganze Startseite (Arbeitspaket A).
  *
  * Sie liegt zwischen Sortenfläche (z-index 0) und DOM-Inhalt (z-index 2) und
  * nimmt keine Zeiger-Ereignisse an. Inhalt:
- * - Karussell: drei Dosen auf einem Ring, Wechsel dreht die Gruppe um 120 Grad.
+ * - Karussell: drei Dosen auf einem elliptischen Ring. Jeder Platz bekommt seine
+ *   Position, Größe, Neigung und Deckkraft aus seinem aktuellen Ringwinkel, nicht
+ *   aus seinem Index. Dadurch ist jede Bewegung automatisch weich und endlos.
  * - Sequenz: 0 bis 0,4 Kamerazoom, 0,4 bis 0,7 aktive Dose dreht 180 Grad, dann halten.
  * - Footer: zwei Dosen fliegen zum Logo-Zoom von außen ins Bild.
  *
@@ -30,12 +42,20 @@ import {
  */
 
 const DEG = Math.PI / 180;
+/** Dauer und Kurve der Ringdrehung. Gilt auch für das Einrasten nach dem Ziehen. */
+const RING_DURATION = 0.8;
+const RING_EASE = "power3.inOut";
 /**
  * Grunddrehung der Dose um die Y-Achse, damit das Etikett zur Kamera zeigt.
  * Alle drei Modelle teilen Mesh und UV-Layout, ein Wert reicht. Stellschraube,
  * falls der Schriftzug beim ersten Blick nicht mittig sitzt.
  */
 const CAN_BASE_ROTATION_Y = (120 * Math.PI) / 180;
+
+/** Lineare Mischung, damit wir nicht für jede Zeile THREE.MathUtils bemühen. */
+function mix(from: number, to: number, t: number): number {
+  return from + (to - from) * t;
+}
 
 /** Deckkraft aller Materialien einer Dosengruppe setzen. */
 function setGroupOpacity(group: THREE.Object3D, opacity: number): void {
@@ -44,9 +64,16 @@ function setGroupOpacity(group: THREE.Object3D, opacity: number): void {
     if (!mesh.isMesh) return;
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const material of materials) {
+      const next = opacity < 0.999;
+      if (material.transparent !== next) {
+        material.transparent = next;
+        material.needsUpdate = true;
+      }
       material.opacity = opacity;
-      material.transparent = opacity < 0.999;
-      material.depthWrite = opacity >= 0.999;
+      // depthWrite bleibt an. Zusammen mit side = FrontSide (siehe normalizeCan)
+      // verdeckt die Vorderseite der durchsichtigen Nachbardose ihre eigene
+      // Rückseite, sonst stünde die Schrift des Etiketts spiegelverkehrt darin.
+      material.depthWrite = true;
     }
   });
 }
@@ -74,6 +101,11 @@ function normalizeCan(source: THREE.Object3D): THREE.Group {
     const original = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     const materials = original.map((material) => {
       const standard = material.clone() as THREE.MeshStandardMaterial;
+      // Rückseiten wegschneiden, sonst scheint bei durchsichtigen Nachbardosen
+      // die Innenseite des Etiketts durch. needsUpdate, weil side und transparent
+      // in das Shader-Programm eingehen.
+      standard.side = THREE.FrontSide;
+      standard.needsUpdate = true;
       if (typeof standard.roughness === "number") {
         // Die Quelle liefert roughnessFactor 1.7, außerhalb der glTF-Spanne.
         standard.roughness = Math.min(1, standard.roughness);
@@ -164,8 +196,11 @@ function Scene({ flavors, mobileModels }: SceneProps) {
 
   const ringRef = useRef<THREE.Group>(null);
   const slotRefs = useRef<Array<THREE.Group | null>>([]);
+  const slotOpacity = useRef<number[]>([]);
   const footerRefs = useRef<Array<THREE.Group | null>>([]);
   const ringAngle = useRef({ value: 0 });
+  /** Zusatzwinkel, solange der Finger oder die Maus den Ring zieht. */
+  const dragAngle = useRef({ value: 0 });
   const lastIndex = useRef(useHomeStore.getState().flavorIndex);
   const heroVisible = useRef(true);
   const reduced = useRef(false);
@@ -229,14 +264,55 @@ function Scene({ flavors, mobileModels }: SceneProps) {
       }
       gsap.to(angle, {
         value: target,
-        duration: 0.8,
-        ease: "power3.inOut",
+        duration: RING_DURATION,
+        ease: RING_EASE,
         onUpdate: invalidate,
       });
     });
     return () => {
       gsap.killTweensOf(angle);
       unsubscribe();
+    };
+  }, [flavors.length, invalidate]);
+
+  // Ziehen mit Finger oder Maus: Der Ring folgt, beim Loslassen rastet er ein.
+  // Weil Grunddrehung und Zusatzwinkel dieselbe Dauer und Kurve benutzen, ist die
+  // Summe beider Tweens wieder eine saubere power3.inOut-Bewegung.
+  useEffect(() => {
+    const drag = dragAngle.current;
+    const step = (Math.PI * 2) / flavors.length;
+
+    const onDrag = (event: Event) => {
+      const detail = (event as CustomEvent<HeroDragDetail>).detail;
+      if (!detail) return;
+      gsap.killTweensOf(drag);
+      const limit = step * DRAG_MAX_STEP;
+      drag.value = Math.max(-limit, Math.min(limit, detail.progress * DRAG_GAIN * step));
+      invalidate();
+    };
+
+    const onDragEnd = (event: Event) => {
+      const detail = (event as CustomEvent<HeroDragDetail>).detail;
+      gsap.killTweensOf(drag);
+      if (reduced.current) {
+        drag.value = 0;
+        invalidate();
+        return;
+      }
+      gsap.to(drag, {
+        value: 0,
+        duration: detail?.settled ? RING_DURATION : 0.45,
+        ease: detail?.settled ? RING_EASE : "power3.out",
+        onUpdate: invalidate,
+      });
+    };
+
+    window.addEventListener(HERO_DRAG_EVENT, onDrag);
+    window.addEventListener(HERO_DRAG_END_EVENT, onDragEnd);
+    return () => {
+      gsap.killTweensOf(drag);
+      window.removeEventListener(HERO_DRAG_EVENT, onDrag);
+      window.removeEventListener(HERO_DRAG_END_EVENT, onDragEnd);
     };
   }, [flavors.length, invalidate]);
 
@@ -259,8 +335,36 @@ function Scene({ flavors, mobileModels }: SceneProps) {
   // Desktop: Dosen neben dem Logo (Logo ist bis 680 px breit), nicht dahinter
   const footerX = geometry.isMobile ? 1.1 : Math.max(1.6, halfVisibleWidth * 0.78);
   const footerStartX = halfVisibleWidth + 1.4;
-  const footerScale = geometry.canHeight * (geometry.isMobile ? 0.42 : 0.6);
+  const footerScale = geometry.canHeight * (geometry.isMobile ? 0.42 : 0.54);
   const footerY = geometry.isMobile ? -geometry.canHeight * 0.45 : -geometry.canHeight * 0.12;
+
+  /**
+   * Sobald die aktive Sorte zwei Bilder lang wirklich gerendert wurde, verschwindet
+   * das PNG (Feedback 1). Die Marke steht als data-Attribut auf der Sektion, damit
+   * sie ein erneutes Rendern von React übersteht, und wird jedes Bild nachgesetzt,
+   * falls der Knoten doch einmal ausgetauscht wird.
+   */
+  const readyFrames = useRef(0);
+  const markCanvasReady = useCallback((slot: THREE.Group | null) => {
+    if (!slot || slot.children.length === 0) {
+      readyFrames.current = 0;
+      return;
+    }
+    if (readyFrames.current < 2) {
+      readyFrames.current += 1;
+      return;
+    }
+    const hero = document.getElementById("pv-hero");
+    if (hero && hero.dataset.canvasReady !== "true") hero.dataset.canvasReady = "true";
+  }, []);
+
+  // Fällt die Szene weg (Kontextverlust, reduzierte Bewegung), ist das PNG wieder die Dose.
+  useEffect(() => {
+    return () => {
+      const hero = document.getElementById("pv-hero");
+      if (hero) delete hero.dataset.canvasReady;
+    };
+  }, []);
 
   useFrame((state) => {
     const store = useHomeStore.getState();
@@ -277,23 +381,54 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     if (ring) {
       const hidden = seq >= 1 && !heroVisible.current;
       ring.visible = !hidden;
-      ring.rotation.y = ringAngle.current.value;
+      // Die Plätze stehen auf einer Ellipse und werden einzeln gesetzt, deshalb
+      // dreht sich die Gruppe selbst nicht.
+      ring.rotation.y = 0;
       ring.position.x = geometry.seqShiftX * zoom;
       ring.position.y = geometry.canCenterY + geometry.seqShiftY * zoom;
     }
 
+    // Im gezoomten Zustand rücken die Nachbardosen so weit zur Seite, dass sie
+    // neben dem Zutatenblock Platz haben (Feedback 7).
+    const spread = mix(1, geometry.neighborSpreadZoom, zoom);
+    const base = ringAngle.current.value + dragAngle.current.value;
+
     for (let index = 0; index < slotRefs.current.length; index += 1) {
       const slot = slotRefs.current[index];
       if (!slot) continue;
-      const isActive = index === store.flavorIndex;
-      const idle = still || !isActive ? 0 : Math.sin(time * 0.45) * 8 * DEG;
-      const float = still || !isActive ? 0 : Math.sin(time * 0.8) * 0.018;
-      slot.rotation.y = index * step + CAN_BASE_ROTATION_Y + idle + (isActive ? spin * Math.PI : 0);
+      // Alles hängt am aktuellen Ringwinkel, nicht am Index. Damit kippt, wächst
+      // und leuchtet jede Dose beim Wechsel von allein weich auf.
+      const angle = base + index * step;
+      const sin = Math.sin(angle);
+      const cos = Math.cos(angle);
+      /** 1 vorne in der Mitte, 0 ab 120 Grad und weiter hinten. */
+      const front = clamp01((cos + 0.5) / 1.5);
+
+      slot.position.x = sin * geometry.ringRadiusX * spread;
+      slot.position.z = cos * geometry.ringRadiusZ;
+
+      const float = still ? 0 : Math.sin(time * 0.8) * 0.018 * front;
       slot.position.y = float * geometry.canHeight;
-      slot.scale.setScalar(geometry.canHeight);
-      // Beim Zoom treten die Nachbardosen zurück, damit der Zutatenblock frei liegt.
-      setGroupOpacity(slot, isActive ? 1 : 1 - zoom);
+
+      const idle = still ? 0 : Math.sin(time * 0.45) * 8 * DEG * front;
+      // Nachbardosen kippen nach außen: links gegen, rechts mit dem Uhrzeigersinn.
+      slot.rotation.z = -sin * CAN_TILT_Z_DEG * DEG;
+      // Gedämpfte Mitdrehung, damit das Etikett der Nachbardosen lesbar bleibt.
+      slot.rotation.y =
+        CAN_BASE_ROTATION_Y + sin * CAN_YAW_DEG * DEG + idle + spin * Math.PI * front;
+      slot.scale.setScalar(geometry.canHeight * mix(geometry.neighborScale, 1, front));
+
+      // Beim Zoom treten die Nachbardosen zurück, bleiben aber sichtbar.
+      const opacity = 1 - zoom * (1 - NEIGHBOR_OPACITY_ZOOM) * (1 - front);
+      // Ein Modell, das gerade erst eingehängt wurde, braucht seine Deckkraft neu.
+      if (slot.children.length === 0) slotOpacity.current[index] = -1;
+      if (Math.abs((slotOpacity.current[index] ?? -1) - opacity) > 0.004) {
+        slotOpacity.current[index] = opacity;
+        setGroupOpacity(slot, opacity);
+      }
     }
+
+    markCanvasReady(slotRefs.current[store.flavorIndex]);
 
     // Footer-Dosen: linear an footerProgress, die Glättung macht der Scrub des Aufrufers.
     const footer = store.footerProgress;
@@ -331,11 +466,6 @@ function Scene({ flavors, mobileModels }: SceneProps) {
             ref={(node) => {
               slotRefs.current[index] = node;
             }}
-            position={[
-              Math.sin(index * step) * geometry.ringRadius,
-              0,
-              Math.cos(index * step) * geometry.ringRadius,
-            ]}
           >
             {mounted[index] ? (
               <Suspense fallback={null}>

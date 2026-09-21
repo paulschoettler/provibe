@@ -51,6 +51,21 @@ function isWeakDevice(): boolean {
 
 export default function HomeMotion() {
   useEffect(() => {
+    // Das Inline-Skript in layout.tsx setzt data-js vor der Hydration. Rendert
+    // React die Seite danach noch einmal komplett neu, weil eine Browser-
+    // Erweiterung vorher ins DOM geschrieben hat, baut React das Wurzelelement
+    // aus seinem eigenen Bild wieder auf und das Attribut fällt weg. Ohne
+    // data-js fiele die Seite in das flache Layout ohne JavaScript zurück,
+    // obwohl die 3D-Szene läuft. Deshalb setzen wir es hier erneut und halten
+    // es fest, solange die Startseite steht.
+    const root = document.documentElement;
+    const keepJs = () => {
+      if (!root.hasAttribute("data-js")) root.setAttribute("data-js", "");
+    };
+    keepJs();
+    const jsWatcher = new MutationObserver(keepJs);
+    jsWatcher.observe(root, { attributes: true, attributeFilter: ["data-js", "class"] });
+
     gsap.registerPlugin(ScrollTrigger);
 
     const reduced = prefersReducedMotion();
@@ -82,6 +97,7 @@ export default function HomeMotion() {
     const refresh = window.setTimeout(() => ScrollTrigger.refresh(), 0);
 
     return () => {
+      jsWatcher.disconnect();
       window.clearTimeout(refresh);
       if (tick) gsap.ticker.remove(tick);
       if (lenis) {

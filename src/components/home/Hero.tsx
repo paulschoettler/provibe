@@ -122,9 +122,10 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
       </div>
 
       <div id="pv-sequence" className="pv-stage">
-        {/* Freigestellte Dosen als Server-HTML. Sie bleiben sichtbar, bis das
-            passende 3D-Modell geladen ist, und sind der dauerhafte Fallback
-            ohne WebGL (G11: kein Loader). */}
+        {/* Freigestellte Dosen als Server-HTML: eine vorn, je eine links und rechts.
+            Sie bleiben sichtbar, bis die 3D-Szene die aktive Sorte gerendert hat,
+            und sind der dauerhafte Fallback ohne WebGL (G11: kein Loader).
+            data-pos hält dieselbe Anordnung wie der Ring der 3D-Szene. */}
         <div className="pv-cans" aria-hidden="true">
           {flavors.map((flavor, index) => (
             // eslint-disable-next-line @next/next/no-img-element
@@ -133,6 +134,7 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
               className="pv-can"
               data-pv-flavor={index}
               data-active={index === 0 ? "true" : "false"}
+              data-pos={index === 0 ? "active" : index === 1 ? "next" : "prev"}
               src={flavor.imageUrl}
               alt=""
               width={405}
