@@ -37,10 +37,18 @@ export interface CartView {
 }
 
 export type CartActionResult =
-  | { ok: true; cart: CartView }
-  | { ok: false; error: string; cart: CartView };
+  { ok: true; cart: CartView } | { ok: false; error: string; cart: CartView };
 
-export const EMPTY_CART: CartView = { id: null, lines: [], itemCount: 0, totals: null, updatedAt: null };
+export const EMPTY_CART: CartView = {
+  id: null,
+  lines: [],
+  itemCount: 0,
+  totals: null,
+  updatedAt: null,
+};
 
 /** Name des httpOnly-Cookies mit dem Warenkorb-Token (carts.token) */
 export const CART_COOKIE = "pv_cart";
+
+/** Höchstmenge je Position. Der größte Karton sind 48 Dosen, mehr braucht der B2C-Shop nicht. */
+export const MAX_LINE_QUANTITY = 48;
