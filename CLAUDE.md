@@ -1,0 +1,55 @@
+# PROVIBE Shop (Ablösung Shopify)
+
+Das verbindliche Projektbriefing liegt unter `docs/briefing.md`. Lies es zu Beginn jeder Session vollständig. Abschnitt 13 enthält bereits getroffene Entscheidungen, die nicht erneut abgefragt werden.
+
+Weitere Projektdokumente:
+
+- `docs/analyse.md`: Inventar des bestehenden Shopify-Shops (URLs, Funktionen, Assets, Gap-Liste)
+- `docs/plan.md`: Phasenplan mit Status
+- `docs/decisions.md`: Architekturentscheidungen (kurze ADRs)
+- `docs/setup.md`: Einmalige Einrichtung von Werkzeugen und Zugängen
+- `docs/fragen.md`: Offene Fragen mit Empfehlungen und nachgetragenen Antworten
+- `docs/quelltexte/`: Originaltexte aller Shopify-Seiten (Rechtstexte, Produkttexte), `assets/source/`: Originalmedien und Shopify-Snapshot
+- `docs/redirects.md`, `docs/legal-checklist.md`, `docs/rechtstexte-aenderungen.md`, `docs/golive.md`, `docs/handbuch.md` entstehen in späteren Phasen
+
+## Arbeitsweise
+
+- Rolle: Lead Engineer. Der Shopify-Store https://www.provibe-drinks.de/ wird als eigene Anwendung nachgebaut. Keine Funktion, keine Unterseite und kein alter Pfad darf verloren gehen.
+- Phase für Phase nach `docs/plan.md`. Nach jeder Phase ein kurzer Statusbericht: fertig, offen, was vom Auftraggeber gebraucht wird.
+- Offene Fragen gesammelt stellen, jede mit einer konkreten Empfehlung. Bei Recht, Geld und Kundendaten nie raten.
+- So lange wie möglich ohne Zugänge arbeiten: alle externen Dienste (Stripe, Resend, Lexware, DHL, Supabase) hinter Interfaces mit Mock-Implementierungen. `.env.example` vollständig pflegen. Zugänge erst anfordern, wenn sie wirklich gebraucht werden, dann mit exakter Angabe von Key und Berechtigungen.
+- Jede Architekturentscheidung als kurzer ADR in `docs/decisions.md`.
+- Stack ist gesetzt: Next.js (App Router, TypeScript, Tailwind) mit statischer Generierung und On-Demand-Revalidation, Storefront und Backoffice (`/admin`) in einem Repo, Netlify, Supabase (EU, Frankfurt), Stripe (Payment Element), Resend, Lexware Office, DHL, BYQ Supply für das Design.
+- Harte Rendering-Regel: Jede kundenseitige Seite liefert vollständiges HTML vom Server oder aus dem Build. Kein Inhalt nur per Client-JavaScript. Mit `curl` prüfen und dokumentieren.
+- Sprache im Chat und in den Dokumenten: Deutsch, Ansprache per Du, keine Gedankenstriche im Fließtext.
+
+## Aktuelle Sperren
+
+- **Kein kundenseitiges Frontend (Storefront-UI/UX) bauen, bevor der Auftraggeber Design-Beispiele geliefert hat.** Er hat das am 21.09.2026 ausdrücklich angekündigt. Datenmodell, Backoffice und Backend dürfen vorher entstehen.
+- Kein Produktivcode, solange die mit **jetzt** markierten Fragen in `docs/fragen.md` unbeantwortet sind.
+
+## Schutzregeln für die Live-Instanz
+
+Es gibt genau ein Supabase-Projekt und eine Netlify-Site, beides live. Kein Staging.
+
+- Vor dem Go-live darf auf der Instanz frei gearbeitet werden. Ab dem Import echter Kundendaten gilt sie als Produktion.
+- Ab dann: Jede Migration zuerst lokal testen (Supabase CLI, Docker). Migrationen sind vorwärtskompatibel und haben einen dokumentierten Rückweg. Vor jeder Migration ein Backup per `pg_dump` an einen privaten Ort.
+- Destruktive Befehle auf der Live-Instanz (`DROP`, `TRUNCATE`, `DELETE` ohne enges `WHERE`, Migrations-Reset, Löschen von Buckets, Pausieren oder Löschen des Projekts) niemals ohne ausdrückliche Freigabe des Auftraggebers im Chat.
+- Entwicklung und automatisierte Tests laufen ausschließlich lokal gegen Supabase per CLI und gegen Stripe im Testmodus, nie gegen die Live-Datenbank.
+- Netlify Deploy Previews abschalten oder ohne Live-Secrets betreiben.
+- Bis zum Go-live liegt die Site hinter Passwortschutz oder `noindex`. Der Schutz fällt erst mit dem DNS-Umzug.
+- Stripe bleibt im Testmodus, bis der Auftraggeber den Wechsel nach Checkliste selbst freigibt. Lexware-Rechnungen und DHL-Labels bis dahin nur als Entwurf, Sandbox oder Mock. Testbestellungen markieren und vor dem Go-live nach Rücksprache entfernen.
+- Newsletter- und Automations-Versand bis zum Go-live hart auf eine Allowlist von Testadressen begrenzt.
+
+## Umgang mit Secrets
+
+- Secrets landen nie im Repo, nie im Client-Bundle, nie in Logs, nie in Commit-Messages oder Dokumenten.
+- Nur Variablen mit Präfix `NEXT_PUBLIC_` dürfen in den Client. Service-Role-Key, Stripe Secret Key, Resend-, Lexware- und DHL-Zugänge existieren nur in Netlify Functions beziehungsweise serverseitigem Code.
+- `.env*` steht in `.gitignore`, `.env.example` enthält nur Platzhalter und eine Beschreibung je Variable.
+- Bei Bedarf einen Restricted Key mit minimalen Rechten anfordern und die Rechte dokumentieren.
+- Geldbeträge als Integer in Cent, Zeitstempel in UTC, Eingaben serverseitig mit Zod validieren, RLS auf jeder Tabelle.
+
+## Git
+
+- Arbeit auf dem jeweils zugewiesenen Branch, klare Commit-Messages, Push mit `git push -u origin <branch>`.
+- Keine Pull Requests ohne ausdrückliche Bitte.

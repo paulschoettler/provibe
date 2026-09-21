@@ -1,0 +1,1197 @@
+{
+ "/": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/",
+  "size": 140490,
+  "file": "html/home.html",
+  "title": "provibe - Eistee mit Protein\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/",
+  "robots": null,
+  "og:title": "provibe - Eistee mit Protein",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Protein, das injede Tasche passt."
+  ],
+  "jsonld_types": [
+   "Organization",
+   "WebSite"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n",
+   "\n    {\n      \"@context\": \"http://schema.org\",\n      \"@type\": \"WebSite\",\n      \"name\": \"Provibe\",\n      \"potentialAction\": {\n        \"@type\": \"SearchAction\",\n        \"target\": \"https:\\/\\/www.provibe-drinks.de\\/search?q={search_term_string}\",\n        \"query-input\": \"required name=search_term_string\"\n      },\n      \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n    }\n  "
+  ]
+ },
+ "/pages/shop": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/shop",
+  "size": 130317,
+  "file": "html/pages_shop.html",
+  "title": "shop\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/shop",
+  "robots": null,
+  "og:title": "shop",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/shop",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "get the vibe"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/shop\"\n  }\n"
+  ]
+ },
+ "/pages/uber-uns": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/uber-uns",
+  "size": 112096,
+  "file": "html/pages_uber_uns.html",
+  "title": "Über uns\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/uber-uns",
+  "robots": null,
+  "og:title": "Über uns",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/uber-uns",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/uber-uns\"\n  }\n"
+  ]
+ },
+ "/pages/partner": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/partner",
+  "size": 118025,
+  "file": "html/pages_partner.html",
+  "title": "Partner\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/partner",
+  "robots": null,
+  "og:title": "Partner",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/partner",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Provibe für dein Geschäft oder Gym"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/partner\"\n  }\n"
+  ]
+ },
+ "/pages/contact": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/contact",
+  "size": 114434,
+  "file": "html/pages_contact.html",
+  "title": "Kontakt\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/contact",
+  "robots": null,
+  "og:title": "Kontakt",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/contact",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Wir sind für dich da"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/contact\"\n  }\n"
+  ]
+ },
+ "/pages/impressum": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/impressum",
+  "size": 111790,
+  "file": "html/pages_impressum.html",
+  "title": "Impressum\n – Provibe",
+  "description": "Impressum Gesetzliche Anbieterkennung: CG Projects UG (haftungsbeschränkt) Kurt-Viermetz-Straße 1a 86150 Augsburg Deutschland vertr. d. d. Geschäftsführer Celine Grimm Telefon: +491629231702 E-Mail: hello@provibe-drinks.de Email Marketing USt-IdNr.: DE457662597 eingetragen im Handelsregister des Amtsgerichtes Augsburg",
+  "canonical": "https://www.provibe-drinks.de/pages/impressum",
+  "robots": null,
+  "og:title": "Impressum",
+  "og:description": "Impressum Gesetzliche Anbieterkennung: CG Projects UG (haftungsbeschränkt) Kurt-Viermetz-Straße 1a 86150 Augsburg Deutschland vertr. d. d. Geschäftsführer Celine Grimm Telefon: +491629231702 E-Mail: hello@provibe-drinks.de Email Marketing USt-IdNr.: DE457662597 eingetragen im Handelsregister des Amtsgerichtes Augsburg",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/impressum",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Impressum"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/impressum\"\n  }\n"
+  ]
+ },
+ "/pages/allgemeine-geschaftsbedingungen": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/allgemeine-geschaftsbedingungen",
+  "size": 127137,
+  "file": "html/pages_allgemeine_geschaftsbedingungen.html",
+  "title": "Allgemeine Geschäftsbedingungen\n – Provibe",
+  "description": "Allgemeine Geschäftsbedingungen und Kundeninformationen I. Allgemeine Geschäftsbedingungen § 1 Grundlegende Bestimmungen (1) Die nachstehenden Geschäftsbedingungen gelten für Verträge, die Sie mit uns als Anbieter (CG Projects UG (haftungsbeschränkt)) über die Internetseite www.provibe-drinks.de/ schließen. Soweit nich",
+  "canonical": "https://www.provibe-drinks.de/pages/allgemeine-geschaftsbedingungen",
+  "robots": null,
+  "og:title": "Allgemeine Geschäftsbedingungen",
+  "og:description": "Allgemeine Geschäftsbedingungen und Kundeninformationen I. Allgemeine Geschäftsbedingungen § 1 Grundlegende Bestimmungen (1) Die nachstehenden Geschäftsbedingungen gelten für Verträge, die Sie mit uns als Anbieter (CG Projects UG (haftungsbeschränkt)) über die Internetseite www.provibe-drinks.de/ schließen. Soweit nich",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/allgemeine-geschaftsbedingungen",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Allgemeine Geschäftsbedingungen"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/allgemeine-geschaftsbedingungen\"\n  }\n"
+  ]
+ },
+ "/pages/ruckgabe-und-wiederrufsbelehrung": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/ruckgabe-und-wiederrufsbelehrung",
+  "size": 117708,
+  "file": "html/pages_ruckgabe_und_wiederrufsbelehrung.html",
+  "title": "Rückgabe- und Widerrufsbelehrung\n – Provibe",
+  "description": "Widerrufsrecht für den Verkauf von Waren Widerrufsrecht für Verbraucher  (Verbraucher ist jede natürliche Person, die ein Rechtsgeschäft zu Zwecken abschließt, die überwiegend weder ihrer gewerblichen noch ihrer selbstständigen beruflichen Tätigkeit zugerechnet werden können.) Widerrufsbelehrung Widerrufsrecht Sie habe",
+  "canonical": "https://www.provibe-drinks.de/pages/ruckgabe-und-wiederrufsbelehrung",
+  "robots": null,
+  "og:title": "Rückgabe- und Widerrufsbelehrung",
+  "og:description": "Widerrufsrecht für den Verkauf von Waren Widerrufsrecht für Verbraucher  (Verbraucher ist jede natürliche Person, die ein Rechtsgeschäft zu Zwecken abschließt, die überwiegend weder ihrer gewerblichen noch ihrer selbstständigen beruflichen Tätigkeit zugerechnet werden können.) Widerrufsbelehrung Widerrufsrecht Sie habe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/ruckgabe-und-wiederrufsbelehrung",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Rückgabe- und Widerrufsbelehrung"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/ruckgabe-und-wiederrufsbelehrung\"\n  }\n"
+  ]
+ },
+ "/pages/qrcode": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/qrcode",
+  "size": 130128,
+  "file": "html/pages_qrcode.html",
+  "title": "qrcode 1\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/qrcode",
+  "robots": null,
+  "og:title": "qrcode 1",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/qrcode",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "get the vibe"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/qrcode\"\n  }\n"
+  ]
+ },
+ "/pages/messe": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/messe",
+  "size": 140829,
+  "file": "html/pages_messe.html",
+  "title": "Messe\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/messe",
+  "robots": null,
+  "og:title": "Messe",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/messe",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Eistee mit Protein.Funktion, die sich wie Sommer anfühlt."
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/messe\"\n  }\n"
+  ]
+ },
+ "/pages/qr-code-page-investoren": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/qr-code-page-investoren",
+  "size": 140955,
+  "file": "html/pages_qr_code_page_investoren.html",
+  "title": "Qr code page Investoren\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/qr-code-page-investoren",
+  "robots": null,
+  "og:title": "Qr code page Investoren",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/qr-code-page-investoren",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Eistee mit Protein.Funktion, die sich wie Sommer anfühlt."
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/qr-code-page-investoren\"\n  }\n"
+  ]
+ },
+ "/pages/provibe-paket": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/provibe-paket",
+  "size": 116093,
+  "file": "html/pages_provibe_paket.html",
+  "title": "provibe Paket\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/provibe-paket",
+  "robots": null,
+  "og:title": "provibe Paket",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/provibe-paket",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/provibe-paket\"\n  }\n"
+  ]
+ },
+ "/pages/provibe-founder-paket": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/provibe-founder-paket",
+  "size": 116149,
+  "file": "html/pages_provibe_founder_paket.html",
+  "title": "provibe Founder Paket\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/provibe-founder-paket",
+  "robots": null,
+  "og:title": "provibe Founder Paket",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/provibe-founder-paket",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/provibe-founder-paket\"\n  }\n"
+  ]
+ },
+ "/pages/datenschutzerklarung": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/datenschutzerklarung",
+  "size": 117145,
+  "file": "html/pages_datenschutzerklarung.html",
+  "title": "Datenschutzerklärung\n – Provibe",
+  "description": "Datenschutzerklärung Soweit nachstehend keine anderen Angaben gemacht werden, ist die Bereitstellung Ihrer personenbezogenen Daten weder gesetzlich oder vertraglich vorgeschrieben, noch für einen Vertragsabschluss erforderlich. Sie sind zur Bereitstellung der Daten nicht verpflichtet. Eine Nichtbereitstellung hat keine",
+  "canonical": "https://www.provibe-drinks.de/pages/datenschutzerklarung",
+  "robots": null,
+  "og:title": "Datenschutzerklärung",
+  "og:description": "Datenschutzerklärung Soweit nachstehend keine anderen Angaben gemacht werden, ist die Bereitstellung Ihrer personenbezogenen Daten weder gesetzlich oder vertraglich vorgeschrieben, noch für einen Vertragsabschluss erforderlich. Sie sind zur Bereitstellung der Daten nicht verpflichtet. Eine Nichtbereitstellung hat keine",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/datenschutzerklarung",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/datenschutzerklarung\"\n  }\n"
+  ]
+ },
+ "/pages/versand": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/versand",
+  "size": 111943,
+  "file": "html/pages_versand.html",
+  "title": "Versand\n – Provibe",
+  "description": "Zahlung und VersandEs gelten folgende Bedingungen:Die Lieferung erfolgt nur im Inland (Deutschland). Versandkosten (inklusive gesetzliche Mehrwertsteuer)Wir berechnen die Versandkosten pauschal mit 4,90 € pro Bestellung.Ab einem Bestellwert von 50,00 € liefern wir versandkostenfrei.LieferfristenSoweit im jeweiligen Ang",
+  "canonical": "https://www.provibe-drinks.de/pages/versand",
+  "robots": null,
+  "og:title": "Versand",
+  "og:description": "Zahlung und VersandEs gelten folgende Bedingungen:Die Lieferung erfolgt nur im Inland (Deutschland). Versandkosten (inklusive gesetzliche Mehrwertsteuer)Wir berechnen die Versandkosten pauschal mit 4,90 € pro Bestellung.Ab einem Bestellwert von 50,00 € liefern wir versandkostenfrei.LieferfristenSoweit im jeweiligen Ang",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/versand",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Versand"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/versand\"\n  }\n"
+  ]
+ },
+ "/pages/widerruf-formular": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/widerruf-formular",
+  "size": 112653,
+  "file": "html/pages_widerruf_formular.html",
+  "title": "Widerruf\n – Provibe",
+  "description": "Bitte nutzen Sie das folgende Formular, um Ihren Widerruf einzureichen.",
+  "canonical": "https://www.provibe-drinks.de/pages/widerruf-formular",
+  "robots": null,
+  "og:title": "Widerruf",
+  "og:description": "Bitte nutzen Sie das folgende Formular, um Ihren Widerruf einzureichen.",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/widerruf-formular",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/widerruf-formular\"\n  }\n"
+  ]
+ },
+ "/pages/widerrufsbutton": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/pages/widerrufsbutton",
+  "size": 112395,
+  "file": "html/pages_widerrufsbutton.html",
+  "title": "widerrufsbutton\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/pages/widerrufsbutton",
+  "robots": null,
+  "og:title": "widerrufsbutton",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/pages/widerrufsbutton",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\\/pages\\/widerrufsbutton\"\n  }\n"
+  ]
+ },
+ "/collections/all": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/collections/all",
+  "size": 136188,
+  "file": "html/collections_all.html",
+  "title": "Produkte\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/collections/all",
+  "robots": null,
+  "og:title": "Produkte",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/collections/all",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "get the vibe"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/collections/aktion": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/collections/aktion",
+  "size": 125057,
+  "file": "html/collections_aktion.html",
+  "title": "Founder Bundles\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/collections/aktion",
+  "robots": null,
+  "og:title": "Founder Bundles",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/collections/aktion",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "get the vibe"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/collections/eistee": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/collections/eistee",
+  "size": 127183,
+  "file": "html/collections_eistee.html",
+  "title": "Eistee\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/collections/eistee",
+  "robots": null,
+  "og:title": "Eistee",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/collections/eistee",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "get the vibe"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/collections/alle-produkte": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/collections/alle-produkte",
+  "size": 133151,
+  "file": "html/collections_alle_produkte.html",
+  "title": "Produkte\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/collections/alle-produkte",
+  "robots": null,
+  "og:title": "Produkte",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/collections/alle-produkte",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "get the vibe"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/collections": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/collections",
+  "size": 119345,
+  "file": "html/collections.html",
+  "title": "Kollektionen\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/collections",
+  "robots": null,
+  "og:title": "Kollektionen",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/collections",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Collections"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/wildberry": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/wildberry",
+  "size": 143485,
+  "file": "html/products_wildberry.html",
+  "title": "Wildberry Eistee\n – Provibe",
+  "description": "Wildberry vereint die fruchtige Vielfalt ausgewählter Beeren zu einem vollmundigen Geschmackserlebnis, das Erinnerungen an unbeschwerte Kindheitstage weckt. Die harmonische Kombination aus Johannisbeeren, Heidelbeeren und Erdbeeren sorgt für eine ausgewogene Balance zwischen fruchtiger Intensität und angenehmer Leichti",
+  "canonical": "https://www.provibe-drinks.de/products/wildberry",
+  "robots": null,
+  "og:title": "Wildberry Eistee",
+  "og:description": "Wildberry vereint die fruchtige Vielfalt ausgewählter Beeren zu einem vollmundigen Geschmackserlebnis, das Erinnerungen an unbeschwerte Kindheitstage weckt. Die harmonische Kombination aus Johannisbeeren, Heidelbeeren und Erdbeeren sorgt für eine ausgewogene Balance zwischen fruchtiger Intensität und angenehmer Leichti",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Untitled_Project_-_illustrationImage-6.png?v=1783937934",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/wildberry",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Wildberry Eistee"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/peach": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/peach",
+  "size": 143791,
+  "file": "html/products_peach.html",
+  "title": "Peach Eistee\n – Provibe",
+  "description": "Pfirsich-Eistee – der Klassiker von provibe Unser Pfirsich-Eistee vereint den saftig-süßen Geschmack sonnengereifter Pfirsiche mit der feinen Note von Schwarztee. Das Ergebnis: eine ausgewogene Erfrischung mit vollem Geschmack – fruchtig, aber nicht aufdringlich, angenehm süß, aber nie zu viel. Genau die richtige Balan",
+  "canonical": "https://www.provibe-drinks.de/products/peach",
+  "robots": null,
+  "og:title": "Peach Eistee",
+  "og:description": "Pfirsich-Eistee – der Klassiker von provibe Unser Pfirsich-Eistee vereint den saftig-süßen Geschmack sonnengereifter Pfirsiche mit der feinen Note von Schwarztee. Das Ergebnis: eine ausgewogene Erfrischung mit vollem Geschmack – fruchtig, aber nicht aufdringlich, angenehm süß, aber nie zu viel. Genau die richtige Balan",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/IMG_0770_2_6ae60530-5008-4cf3-ac6d-f07e2739bd9a.jpg?v=1783938269",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/peach",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Peach Eistee"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/raspberry-lime": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/raspberry-lime",
+  "size": 144826,
+  "file": "html/products_raspberry_lime.html",
+  "title": "Raspberry-Lime Eistee\n – Provibe",
+  "description": "Raspberry Lime vereint die fruchtige Süße sonnengereifter Himbeeren mit der spritzigen Frische von Limetten zu einem harmonischen Geschmackserlebnis. Die perfekt ausbalancierte Kombination aus süß und säuerlich sorgt für einen erfrischenden Genuss, der weder zu schwer noch zu intensiv wirkt. Mit seinem belebenden Frisc",
+  "canonical": "https://www.provibe-drinks.de/products/raspberry-lime",
+  "robots": null,
+  "og:title": "Raspberry-Lime Eistee",
+  "og:description": "Raspberry Lime vereint die fruchtige Süße sonnengereifter Himbeeren mit der spritzigen Frische von Limetten zu einem harmonischen Geschmackserlebnis. Die perfekt ausbalancierte Kombination aus süß und säuerlich sorgt für einen erfrischenden Genuss, der weder zu schwer noch zu intensiv wirkt. Mit seinem belebenden Frisc",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Untitled_Project_-_illustrationImage-8.png?v=1783939181",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/raspberry-lime",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Raspberry-Lime Eistee"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/provibe-shirt": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/provibe-shirt",
+  "size": 136859,
+  "file": "html/products_provibe_shirt.html",
+  "title": "provibe shirt\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/products/provibe-shirt",
+  "robots": null,
+  "og:title": "provibe shirt",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot2026-06-1215.11.55.png?v=1781388028",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/provibe-shirt",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "provibe shirt"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/provibe-clear-cup": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/provibe-clear-cup",
+  "size": 134723,
+  "file": "html/products_provibe_clear_cup.html",
+  "title": "provibe clear cup\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/products/provibe-clear-cup",
+  "robots": null,
+  "og:title": "provibe clear cup",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Gemini_Generated_Image_oygj7doygj7doygj.png?v=1781388160",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/provibe-clear-cup",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "provibe clear cup"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/provibe-eistee-mixed": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/provibe-eistee-mixed",
+  "size": 143795,
+  "file": "html/products_provibe_eistee_mixed.html",
+  "title": "provibe Eistee mixed\n – Provibe",
+  "description": "Du kannst dich nicht für eine Sorte entscheiden? Dann ist das Mixed Bundle genau das Richtige für dich. Es vereint alle provibe Sorten in einem Paket und bietet die perfekte Möglichkeit, die gesamte Geschmacksvielfalt kennenzulernen. Jede Sorte ist zu gleichen Teilen enthalten, sodass du ausgewogen durchprobieren und f",
+  "canonical": "https://www.provibe-drinks.de/products/provibe-eistee-mixed",
+  "robots": null,
+  "og:title": "provibe Eistee mixed",
+  "og:description": "Du kannst dich nicht für eine Sorte entscheiden? Dann ist das Mixed Bundle genau das Richtige für dich. Es vereint alle provibe Sorten in einem Paket und bietet die perfekte Möglichkeit, die gesamte Geschmacksvielfalt kennenzulernen. Jede Sorte ist zu gleichen Teilen enthalten, sodass du ausgewogen durchprobieren und f",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Untitled_Project_-_illustrationImage-20.png?v=1783947798",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/provibe-eistee-mixed",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "provibe Eistee mixed"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/founder-bundle-i": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/founder-bundle-i",
+  "size": 138368,
+  "file": "html/products_founder_bundle_i.html",
+  "title": "Founder Bundle l\n – Provibe",
+  "description": "Das perfekte provibe Starter-Set Enthalten sind jeweils 2 Dosen unserer drei provibe Sorten – Pfirsich, Wildberry und Raspberry Lime – sowie unser exklusiver provibe Trinkbecher. So kannst du dich durch alle Geschmacksrichtungen probieren und deinen provibe ganz nach deinem Geschmack genießen. Mit ein paar Eiswürfeln i",
+  "canonical": "https://www.provibe-drinks.de/products/founder-bundle-i",
+  "robots": null,
+  "og:title": "Founder Bundle l",
+  "og:description": "Das perfekte provibe Starter-Set Enthalten sind jeweils 2 Dosen unserer drei provibe Sorten – Pfirsich, Wildberry und Raspberry Lime – sowie unser exklusiver provibe Trinkbecher. So kannst du dich durch alle Geschmacksrichtungen probieren und deinen provibe ganz nach deinem Geschmack genießen. Mit ein paar Eiswürfeln i",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/UntitledProject-illustrationImage_22.jpg?v=1781477577",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/founder-bundle-i",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Founder Bundle l"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/founder-bundle-ii": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/founder-bundle-ii",
+  "size": 153110,
+  "file": "html/products_founder_bundle_ii.html",
+  "title": "Founder Bundle ll\n – Provibe",
+  "description": "Das provibe Bundle für echte Geschmacksträger Dieses Bundle vereint alles, wofür provibe steht: außergewöhnlichen Geschmack und einen lässigen Look. Freue dich auf 6 erfrischende Eistees – je 2 Dosen unserer Sorten Pfirsich, Wildberry und Raspberry-Lime – und dazu unser exklusives „Looks Like You Have Great Taste“ T-Sh",
+  "canonical": "https://www.provibe-drinks.de/products/founder-bundle-ii",
+  "robots": null,
+  "og:title": "Founder Bundle ll",
+  "og:description": "Das provibe Bundle für echte Geschmacksträger Dieses Bundle vereint alles, wofür provibe steht: außergewöhnlichen Geschmack und einen lässigen Look. Freue dich auf 6 erfrischende Eistees – je 2 Dosen unserer Sorten Pfirsich, Wildberry und Raspberry-Lime – und dazu unser exklusives „Looks Like You Have Great Taste“ T-Sh",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/UntitledProject-illustrationImage_23.jpg?v=1781477759",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/founder-bundle-ii",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Founder Bundle ll",
+   "Founder Bundle ll"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/founder-bundle-iii-1": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/products/founder-bundle-iii-1",
+  "size": 152606,
+  "file": "html/products_founder_bundle_iii_1.html",
+  "title": "Founder Bundle lll\n – Provibe",
+  "description": "Das ultimative provibe Bundle! Für alle, die provibe nicht nur trinken, sondern auch leben möchten: Dieses Bundle kombiniert unsere beliebtesten Eistee-Sorten mit exklusivem Merchandise und bringt die volle provibe Experience direkt zu dir nach Hause. Enthalten sind jeweils 2 Dosen unserer drei Sorten Pfirsich, Wildber",
+  "canonical": "https://www.provibe-drinks.de/products/founder-bundle-iii-1",
+  "robots": null,
+  "og:title": "Founder Bundle lll",
+  "og:description": "Das ultimative provibe Bundle! Für alle, die provibe nicht nur trinken, sondern auch leben möchten: Dieses Bundle kombiniert unsere beliebtesten Eistee-Sorten mit exklusivem Merchandise und bringt die volle provibe Experience direkt zu dir nach Hause. Enthalten sind jeweils 2 Dosen unserer drei Sorten Pfirsich, Wildber",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Untitled_Project_-_illustrationImage_25.jpg?v=1781478455",
+  "og:type": "product",
+  "og:url": "https://www.provibe-drinks.de/products/founder-bundle-iii-1",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Founder Bundle lll",
+   "Founder Bundle lll"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/cart": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/cart",
+  "size": 112472,
+  "file": "html/cart.html",
+  "title": "Dein Warenkorb\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/cart",
+  "robots": null,
+  "og:title": "Dein Warenkorb",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/cart",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Dein Warenkorb (0)"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/search": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/search",
+  "size": 110427,
+  "file": "html/search.html",
+  "title": "Suchen\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/search",
+  "robots": null,
+  "og:title": "Suchen",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/search",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/search?q=peach": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/search?q=peach",
+  "size": 115581,
+  "file": "html/search_q_peach.html",
+  "title": "Suche: 4 Ergebnisse gefunden für \"peach\"\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/search?q=peach",
+  "robots": null,
+  "og:title": "Suche: 4 Ergebnisse gefunden für \"peach\"",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/search?q=peach",
+  "twitter:card": "summary_large_image",
+  "h1": [],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/account/login": {
+  "status": "406",
+  "final_url": "https://shopify.com/92984115527/account?locale=de&buyer_flags=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmcnRiMWstcmgubXlzaG9waWZ5LmNvbSIsImZsYWdzIjpbXSwiZXhwIjoxNzkwNTk3MDQ0LCJuYmYiOjE3ODk5OTIyNDR9.LiM7fJBzNoBAntMdQntOGBwZcMQ7mvrKUJOst0AHFCk",
+  "size": 14,
+  "file": "html/account_login.html",
+  "title": null,
+  "description": null,
+  "canonical": null,
+  "robots": null,
+  "og:title": null,
+  "og:description": null,
+  "og:image": null,
+  "og:type": null,
+  "og:url": null,
+  "twitter:card": null,
+  "h1": [],
+  "jsonld_types": [],
+  "jsonld_raw": []
+ },
+ "/account/register": {
+  "status": "406",
+  "final_url": "https://shopify.com/92984115527/account?locale=de&buyer_flags=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmcnRiMWstcmgubXlzaG9waWZ5LmNvbSIsImZsYWdzIjpbXSwiZXhwIjoxNzkwNTk3MDQ1LCJuYmYiOjE3ODk5OTIyNDV9.IxmHUiRUPxGG_pzcYSAijtWRmouOoV4NsE6aO9zcPgU",
+  "size": 14,
+  "file": "html/account_register.html",
+  "title": null,
+  "description": null,
+  "canonical": null,
+  "robots": null,
+  "og:title": null,
+  "og:description": null,
+  "og:image": null,
+  "og:type": null,
+  "og:url": null,
+  "twitter:card": null,
+  "h1": [],
+  "jsonld_types": [],
+  "jsonld_raw": []
+ },
+ "/account": {
+  "status": "406",
+  "final_url": "https://shopify.com/92984115527/account?locale=de&buyer_flags=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmcnRiMWstcmgubXlzaG9waWZ5LmNvbSIsImZsYWdzIjpbXSwiZXhwIjoxNzkwNTk3MDQ2LCJuYmYiOjE3ODk5OTIyNDZ9.CgCTrzP3-brVT-dQ3K3UByiPLEbkvbhdWfUH5gTHE_E",
+  "size": 14,
+  "file": "html/account.html",
+  "title": null,
+  "description": null,
+  "canonical": null,
+  "robots": null,
+  "og:title": null,
+  "og:description": null,
+  "og:image": null,
+  "og:type": null,
+  "og:url": null,
+  "twitter:card": null,
+  "h1": [],
+  "jsonld_types": [],
+  "jsonld_raw": []
+ },
+ "/policies/privacy-policy": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/policies/privacy-policy",
+  "size": 128329,
+  "file": "html/policies_privacy_policy.html",
+  "title": "Datenschutzerklärung\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/policies/privacy-policy",
+  "robots": null,
+  "og:title": "Datenschutzerklärung",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/policies/privacy-policy",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Datenschutzerklärung"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/policies/terms-of-service": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/policies/terms-of-service",
+  "size": 107896,
+  "file": "html/policies_terms_of_service.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/policies/refund-policy": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/policies/refund-policy",
+  "size": 107896,
+  "file": "html/policies_refund_policy.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/policies/shipping-policy": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/policies/shipping-policy",
+  "size": 107896,
+  "file": "html/policies_shipping_policy.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/policies/legal-notice": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/policies/legal-notice",
+  "size": 107896,
+  "file": "html/policies_legal_notice.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/policies/contact-information": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/policies/contact-information",
+  "size": 107896,
+  "file": "html/policies_contact_information.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/blogs/news": {
+  "status": "200",
+  "final_url": "https://www.provibe-drinks.de/blogs/news",
+  "size": 110008,
+  "file": "html/blogs_news.html",
+  "title": "News\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/blogs/news",
+  "robots": null,
+  "og:title": "News",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/blogs/news",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "News"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/404-test-provibe-xyz": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/404-test-provibe-xyz",
+  "size": 107896,
+  "file": "html/404_test_provibe_xyz.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/products/founder-bundle-iii": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/products/founder-bundle-iii",
+  "size": 107896,
+  "file": "html/products_founder_bundle_iii.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/pages/faq": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/pages/faq",
+  "size": 107896,
+  "file": "html/pages_faq.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/pages/agb": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/pages/agb",
+  "size": 107896,
+  "file": "html/pages_agb.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ },
+ "/pages/widerruf": {
+  "status": "404",
+  "final_url": "https://www.provibe-drinks.de/pages/widerruf",
+  "size": 107896,
+  "file": "html/pages_widerruf.html",
+  "title": "404 Nicht gefunden\n – Provibe",
+  "description": null,
+  "canonical": "https://www.provibe-drinks.de/404",
+  "robots": null,
+  "og:title": "404 Nicht gefunden",
+  "og:description": "Provibe",
+  "og:image": "http://www.provibe-drinks.de/cdn/shop/files/Screenshot_2026-05-26_17.03.18_-_bearbeitet.png?v=1781532530",
+  "og:type": "website",
+  "og:url": "https://www.provibe-drinks.de/404",
+  "twitter:card": "summary_large_image",
+  "h1": [
+   "Seite nicht gefunden"
+  ],
+  "jsonld_types": [
+   "Organization"
+  ],
+  "jsonld_raw": [
+   "\n  {\n    \"@context\": \"http://schema.org\",\n    \"@type\": \"Organization\",\n    \"name\": \"Provibe\",\n    \n      \"logo\": \"https:\\/\\/www.provibe-drinks.de\\/cdn\\/shop\\/files\\/provibe-logo-wine.png?v=1780483109\\u0026width=500\",\n    \n    \"sameAs\": [\n      \"\",\n      \"\",\n      \"\",\n      \"https:\\/\\/www.instagram.com\\/provibe.de?igsh=MWhqZnBpMDdwc3p1Zg%3D%3D\\u0026utm_source=qr\",\n      \"https:\\/\\/www.tiktok.com\\/@provibe.de\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    \"url\": \"https:\\/\\/www.provibe-drinks.de\"\n  }\n"
+  ]
+ }
+}

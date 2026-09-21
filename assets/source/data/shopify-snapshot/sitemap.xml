@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- This is the parent sitemap linking to additional sitemaps for products, collections and pages as shown below. The sitemap can not be edited manually, but is kept up to date in real time. -->
+  <sitemap>
+    <loc>https://www.provibe-drinks.de/sitemap_agentic_discovery.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.provibe-drinks.de/sitemap_products_1.xml?from=10854668861767&amp;to=10867247120711</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.provibe-drinks.de/sitemap_pages_1.xml?from=153977815367&amp;to=164251238727</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.provibe-drinks.de/sitemap_collections_1.xml?from=677072929095&amp;to=677073092935</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.provibe-drinks.de/sitemap_blogs_1.xml</loc>
+  </sitemap>
+</sitemapindex>

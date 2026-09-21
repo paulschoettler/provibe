@@ -1,0 +1,33 @@
+# Umgebungsvariablen und Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Abhängigkeiten und Build
+node_modules/
+.next/
+out/
+dist/
+.netlify/
+.turbo/
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+
+# Lokale Datenbank und Backups
+.pgdata/
+backups/
+*.dump
+*.sql.gz
+
+# Abgeleitete Assets (werden im Build erzeugt)
+assets/derived/
+public/images/generated/
+
+# System
+.DS_Store
+Thumbs.db
+*.log

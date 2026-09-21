@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.provibe-drinks.de/</loc>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/wildberry</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/Untitled_Project_-_illustrationImage-6.png?v=1783937934</image:loc>
+      <image:title>Wildberry Eistee</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/peach</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/IMG_0770_2_6ae60530-5008-4cf3-ac6d-f07e2739bd9a.jpg?v=1783938269</image:loc>
+      <image:title>Peach Eistee</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/raspberry-lime</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/Untitled_Project_-_illustrationImage-8.png?v=1783939181</image:loc>
+      <image:title>Raspberry-Lime Eistee</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/provibe-shirt</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/Screenshot2026-06-1215.11.55.png?v=1781388028</image:loc>
+      <image:title>provibe shirt</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/provibe-clear-cup</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/Gemini_Generated_Image_oygj7doygj7doygj.png?v=1781388160</image:loc>
+      <image:title>provibe clear cup</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/provibe-eistee-mixed</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/Untitled_Project_-_illustrationImage-20.png?v=1783947798</image:loc>
+      <image:title>provibe Eistee mixed</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/founder-bundle-i</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/UntitledProject-illustrationImage_22.jpg?v=1781477577</image:loc>
+      <image:title>Founder Bundle l</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/founder-bundle-ii</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/UntitledProject-illustrationImage_23.jpg?v=1781477759</image:loc>
+      <image:title>Founder Bundle ll</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.provibe-drinks.de/products/founder-bundle-iii-1</loc>
+    <lastmod>2026-09-21T14:03:05+02:00</lastmod>
+    <changefreq>daily</changefreq>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0929/8411/5527/files/Untitled_Project_-_illustrationImage_25.jpg?v=1781478455</image:loc>
+      <image:title>Founder Bundle lll</image:title>
+      <image:caption></image:caption>
+    </image:image>
+  </url>
+</urlset>
