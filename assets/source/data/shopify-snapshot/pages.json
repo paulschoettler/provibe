@@ -839,7 +839,7 @@
  },
  "/account/login": {
   "status": "406",
-  "final_url": "https://shopify.com/92984115527/account?locale=de&buyer_flags=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmcnRiMWstcmgubXlzaG9waWZ5LmNvbSIsImZsYWdzIjpbXSwiZXhwIjoxNzkwNTk3MDQ0LCJuYmYiOjE3ODk5OTIyNDR9.LiM7fJBzNoBAntMdQntOGBwZcMQ7mvrKUJOst0AHFCk",
+  "final_url": "https://shopify.com/92984115527/account?locale=de",
   "size": 14,
   "file": "html/account_login.html",
   "title": null,
@@ -858,7 +858,7 @@
  },
  "/account/register": {
   "status": "406",
-  "final_url": "https://shopify.com/92984115527/account?locale=de&buyer_flags=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmcnRiMWstcmgubXlzaG9waWZ5LmNvbSIsImZsYWdzIjpbXSwiZXhwIjoxNzkwNTk3MDQ1LCJuYmYiOjE3ODk5OTIyNDV9.IxmHUiRUPxGG_pzcYSAijtWRmouOoV4NsE6aO9zcPgU",
+  "final_url": "https://shopify.com/92984115527/account?locale=de",
   "size": 14,
   "file": "html/account_register.html",
   "title": null,
@@ -877,7 +877,7 @@
  },
  "/account": {
   "status": "406",
-  "final_url": "https://shopify.com/92984115527/account?locale=de&buyer_flags=eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmcnRiMWstcmgubXlzaG9waWZ5LmNvbSIsImZsYWdzIjpbXSwiZXhwIjoxNzkwNTk3MDQ2LCJuYmYiOjE3ODk5OTIyNDZ9.CgCTrzP3-brVT-dQ3K3UByiPLEbkvbhdWfUH5gTHE_E",
+  "final_url": "https://shopify.com/92984115527/account?locale=de",
   "size": 14,
   "file": "html/account.html",
   "title": null,
