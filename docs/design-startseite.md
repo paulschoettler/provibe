@@ -117,3 +117,35 @@ BYQ: Komponente `kelvin-video-2` (SVG-Logo-Maske mit Scroll-Reveal) als Gegenche
 ## 6. Offene Fragen
 
 Siehe `docs/fragen.md`, Abschnitt G.
+
+## 7. Umsetzung (Stand 21.09.2026)
+
+Die Startseite ist gebaut und auf dem Branch `claude/epic-edison-nb0vts` deployt (Netlify-Vorschau hinter Basic Auth). Aufbau in `src/app/page.tsx`, Architektur in ADR-009 und ADR-010.
+
+Gebaut wurde in drei parallelen Arbeitspaketen mit vorab festgelegten Verträgen (`src/lib/home/store.ts`, `src/lib/cart/types.ts`, `src/components/cart/cart-context.tsx`):
+
+| Paket | Dateien                                                                                                                                                                                                | Inhalt                                                                                                                                                                                                                                                  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A     | `src/components/three/CanScene.tsx`, `CanSceneMount.tsx`, `src/components/home/Hero.tsx`, `HeroExperience.tsx`, `HomeMotion.tsx`, `StickyAddToCart.tsx`, `hero-geometry.ts`                            | Eine fixe Canvas mit Karussell (endlos, Wechselrichtung), Zoom und 180-Grad-Drehung per ScrollTrigger, Footer-Dosen, Fähigkeitsprüfung (`html[data-tier]`), Lenis nur Desktop, PNG-zu-3D-Überblendung, Pfeile, Punkte, Tastatur, Wischen                |
+| B     | `src/components/layout/*`, `src/components/home/FlavorCards.tsx`, `PurseBanner.tsx`, `FounderBundles.tsx`, `MoodSection.tsx`, `LogoZoom.tsx`, `src/lib/newsletter/*`, `src/app/newsletter/bestaetigen` | Header (sticky nach der Sequenz, Announcement-Bar, mobiler Drawer), Footer, `WaveDivider` mit fünf Übergängen, Sektionen 1:1 aus dem alten Shop plus Pfand- und Grundpreiszeile, Logo-Zoom mit derselben Kurve wie im Ist, Newsletter mit Double Opt-in |
+| C     | `src/lib/cart/*`, `src/components/cart/*`, `src/app/cart`                                                                                                                                              | Warenkorb über httpOnly-Cookie und Server Actions, Drawer, Seite `/cart` ohne JavaScript, 12 Tests für die Abbildungslogik                                                                                                                              |
+
+Abweichungen vom Plan, jeweils mit Grund:
+
+- Hero und Scroll-Sequenz sind eine Sektion (`#pv-hero`, 400vh, klebende Bühne `#pv-sequence`), weil Dose und Pfeile sonst beim Scrollen wegwandern würden.
+- Der Zoom arbeitet mit einem Zielfaktor statt fester Kamerawerte (Desktop 1,15fach mit Versatz nach links, mobil 0,84fach mit Versatz nach oben), weil auf einem Telefon "ganze Dose sichtbar" und "Zutaten darunter" sonst nicht zusammenpassen. Stellschrauben in `hero-geometry.ts`.
+- Nachbardosen blenden beim Zoom aus, sonst stünde auf Desktop eine Dose im Zutatentext.
+- `#pvbanner` liegt auf Butter statt Creme, damit die Wellen 2 und 3 sichtbar sind.
+- Wellen ohne Parallax (wie bei royalbev), Pfeile ohne JavaScript und bei reduzierter Bewegung ausgeblendet.
+- Im 3D-Modus ist `#pvlogo` durchsichtig, damit die Canvas mit den einfliegenden Dosen dahinter sichtbar ist; die PNG-Dosen sind der Fallback.
+- Der Warenkorbstand kommt nach dem Mounten per Server Action, damit das Root-Layout und die Startseite statisch bleiben (`revalidate = 3600`).
+
+Geprüft am Produktions-Build (`pnpm build`, `pnpm start`):
+
+- `curl` ohne JavaScript: alle Sorten, Zutaten, Nährwerte, Preise mit Pfand und Grundpreis, Menüs, Newsletter, Zahlarten stehen im HTML (Skript `ssr-check`, 27 Stichproben). Ohne JavaScript ist die Seite 9.240 px hoch und zeigt alle drei Zutatenblöcke untereinander.
+- Playwright 390 × 844 und 1440 × 900: zwölf Scrollpositionen je Gerät, keine Skriptfehler. Reduzierte Bewegung: `tier=static`, Sequenz flach, Zutaten sofort sichtbar.
+- Keine externen Anfragen beim Laden (Fonts, Modelle, Umgebungslicht liegen lokal).
+- Warenkorb: Sortenwechsel per Pfeil, Klick auf den Button legt den 9er-Pack der aktiven Sorte ab, Drawer zeigt Preis, Pfand, Grundpreis, Versandschwelle, MwSt.; nach Reload steht der Zähler auf 1. Testwarenkorb danach gelöscht.
+- 404-Meldungen in der Konsole stammen von Prefetches auf Seiten, die es noch nicht gibt (`/pages/*`, `/search`, `/account`, `/collections/*`, `/products/*`, `/checkout`). Sie verschwinden mit Phase 5b.
+
+Offen für die Abnahme durch den Auftraggeber: Dosengröße im Hero mobil (62 % der Höhe, eng unter der Dose), Zutatenblock auf kleinen Telefonen scrollbar, Position der Footer-Dosen, Texte der Stimmungs-Sektion ("Powered by Protein", "15 g Protein.") sind Vorschläge.

@@ -43,3 +43,11 @@ Offen und was ich von dir brauche:
 - Gewichte (C3), EANs (C4), Etikett-Texte (B9), LUCID (B13), Custom-Pixel-Code (D1), Shopify-Testexport (C9)
 
 Nächster Schritt: Phase 4, Backoffice-Grundgerüst (nicht kundenseitig).
+
+## Phase 5a: Statusbericht Startseite (21.09.2026)
+
+Fertig: Startseite nach Design-Prompt (Hero mit 3D-Karussell, Scroll-Sequenz mit Zutaten, dauerhafter Warenkorb-Button, Header nach der Sequenz, Sektionen Unsere Sorten, Protein for your purse, Founder Bundles, Stimmungsbild, Logo-Zoom mit Dosen, Footer, fünf Wellen), minimaler Warenkorb (Drawer und `/cart`), Newsletter-Anmeldung mit Double Opt-in. Details und Prüfprotokoll in `docs/design-startseite.md`, Abschnitt 7. Deploy auf https://provibe-shop.netlify.app (Basic Auth).
+
+Offen: alle weiteren Seiten aus dem URL-Inventar (Phase 5b: Kollektionen, Produktseiten, Inhaltsseiten, Rechtstexte, Suche, Konto), Checkout (Phase 6), Redirects der alten Pfade.
+
+Vom Auftraggeber gebraucht: Abnahme der Startseite auf dem Handy und am Desktop, Antworten H1 bis H2 in `docs/fragen.md` (Pfand in den Bundles, Steuersatz), weiterhin die Lieferungen aus Phase 1 (Gewichte, EANs, Etikett-Texte, LUCID, Shopify-Export).
