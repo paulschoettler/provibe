@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { CartProvider } from "@/components/cart/CartProvider";
+import { CartDrawer } from "@/components/cart/CartDrawer";
+import { EMPTY_CART } from "@/lib/cart/types";
 import "./globals.css";
 
 /** Jost, selbst gehostet (SIL Open Font License 1.1, siehe src/fonts/OFL.txt). Keine Google-Fonts-CDN-Einbindung. */
@@ -42,7 +45,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {/* Warenkorb: Stand kommt nach dem Mounten per Server Action, damit das Layout statisch bleibt (ADR-010) */}
+        <CartProvider initialCart={EMPTY_CART}>
+          {children}
+          <CartDrawer />
+        </CartProvider>
+      </body>
     </html>
   );
 }
