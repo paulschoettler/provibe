@@ -21,7 +21,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  typedRoutes: true,
   images: {
     // Netlify Image CDN übernimmt die Optimierung (AVIF/WebP, responsive Größen)
     formats: ["image/avif", "image/webp"],

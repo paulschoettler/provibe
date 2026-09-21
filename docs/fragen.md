@@ -156,3 +156,5 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **G11. Ladeanimation.** Ciao zeigt ein Loader-Video, bis die 3D-Szene bereit ist. Empfehlung: kein Loader, stattdessen sofort das Dosen-PNG zeigen und in die 3D-Dose überblenden, sobald das Modell (300 KB) geladen ist. Das ist schneller und robuster für Instagram-Traffic.
 
 **G12. Lizenz und Hosting der 3D-Modelle.** Die Etikett-Texturen enthalten die vollständigen Dosendesigns. Dürfen die optimierten Modelle öffentlich ausgeliefert werden (jeder kann sie herunterladen)? Empfehlung: ja, das ist bei 3D-Shops üblich, aber ich frage vorher.
+
+**Antworten vom 21.09.2026 (G):** G1 bis G3 und G5 bis G12 wie empfohlen. G4: kein Preis im Hero. Bau der Startseite freigegeben.

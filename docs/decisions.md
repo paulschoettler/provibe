@@ -2,6 +2,20 @@
 
 Kurzform: Kontext, Entscheidung, Konsequenz. Neue Einträge oben anfügen.
 
+## ADR-010: Warenkorb über httpOnly-Cookie und Service-Role
+
+- Datum: 2026-09-21
+- Kontext: Gäste kaufen ohne Konto. `carts` und `cart_items` haben RLS ohne anon-Policies (ADR-007), der Client soll nie Preise oder fremde Warenkörbe sehen.
+- Entscheidung: Der Warenkorb ist an ein zufälliges Token (`carts.token`) gebunden, das ausschließlich in einem httpOnly-Cookie `pv_cart` liegt. Alle Änderungen laufen über Server Actions (`src/lib/cart/actions.ts`) mit dem Service-Role-Client; der Client sendet nur Varianten-IDs und Mengen, Summen rechnet `src/lib/pricing` auf dem Server. Der Drawer ist eine Client-Erweiterung, `/cart` funktioniert vollständig ohne JavaScript über Formulare.
+- Konsequenz: Kein Warenkorbzustand im localStorage, kein Preis vom Client. Beim Login wird der Gast-Warenkorb später per `customer_id` übernommen (Status `merged`).
+
+## ADR-009: Startseite mit einer fixen 3D-Canvas als Progressive Enhancement
+
+- Datum: 2026-09-21
+- Kontext: Design-Prompt des Auftraggebers (Hero mit 3D-Dose, Scroll-Sequenz, Sortenwechsel jederzeit, Dosen im Footer). Harte Rendering-Regel: alles Inhaltliche im Server-HTML.
+- Entscheidung: Genau eine `<Canvas>` (React Three Fiber) liegt fix hinter der Seite und rendert alle Dosen (Hero-Karussell, Sequenz, Footer). Sie wird per `next/dynamic` ohne SSR nach dem ersten Paint geladen und nur, wenn WebGL vorhanden ist, `prefers-reduced-motion` nicht gesetzt ist und das Gerät nicht als schwach gilt (`html[data-tier]`). Alle Texte, Zutaten, Buttons und die freigestellten Dosen-PNGs stehen im Server-HTML; das PNG blendet zur 3D-Dose über, sobald das Modell geladen ist. Der Zustand (aktive Sorte, Scroll-Fortschritte, Tier) liegt in einem kleinen zustand-Store (`src/lib/home/store.ts`), der die einzige Kopplung zwischen DOM-Sektionen und Szene ist. Scroll-Animationen laufen über GSAP ScrollTrigger mit `scrub`, Lenis nur auf Desktop. Modelle liegen als optimierte GLB (2K Desktop, 1K Mobil, Meshopt, WebP) unter `public/3d/`.
+- Konsequenz: `curl` zeigt die volle Seite ohne JS. Die Startseite ist die einzige Seite mit WebGL; Produktseiten nutzen später dieselbe Szene oder nur PNGs. Der Bau lief in drei parallelen Arbeitspaketen (Szene/Hero, Layout/Sektionen, Warenkorb) mit vorab festgelegten Verträgen (Store, `CartView`, `useCart`).
+
 ## ADR-008: Seed-Daten als Migrationen
 
 - Datum: 2026-09-21

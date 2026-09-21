@@ -27,7 +27,7 @@ Weitere Projektdokumente:
 
 ## Aktuelle Sperren
 
-- Storefront-Design: Der Auftraggeber hat am 21.09.2026 einen Design-Prompt für die Startseite geliefert (Referenzen ciaoenergy.com, royalbev.com, ballaurent.com, drei GLB-Dosenmodelle). Analyse und Plan in `docs/design-startseite.md`. **Bau erst nach Beantwortung der Fragen G1 bis G12 in `docs/fragen.md`.**
+- Storefront-Design: Der Auftraggeber hat am 21.09.2026 einen Design-Prompt für die Startseite geliefert (Referenzen ciaoenergy.com, royalbev.com, ballaurent.com, drei GLB-Dosenmodelle). Analyse und Plan in `docs/design-startseite.md`. Fragen G1 bis G12 sind beantwortet (kein Preis im Hero), der Bau läuft. Regeln: Mobile first, alles Inhaltliche im Server-HTML, 3D nur als Progressive Enhancement mit PNG-Fallback.
 - Keys liegen ausschließlich in `.env.local` (gitignoriert). Nie in Docs, Commits oder Logs übernehmen.
 - Kein Produktivcode, solange die mit **jetzt** markierten Fragen in `docs/fragen.md` unbeantwortet sind.
 
