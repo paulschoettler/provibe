@@ -36,12 +36,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${jost.variable} no-js`} suppressHydrationWarning>
+    <html lang="de" className={jost.variable} suppressHydrationWarning>
       <head>
-        {/* Progressive Enhancement: Effekte nur mit JS, Inhalte immer im HTML */}
+        {/* Progressive Enhancement: Effekte nur mit JS, Inhalte immer im HTML.
+            Als data-Attribut statt Klasse, weil React bei einer Hydration-Wiederholung
+            (zum Beispiel durch Browser-Erweiterungen, die vor dem Start ins DOM schreiben)
+            className von <html> neu setzt und Klassen aus Skripten verloren gehen. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.documentElement.classList.replace('no-js','js')",
+            __html: "document.documentElement.setAttribute('data-js','')",
           }}
         />
       </head>

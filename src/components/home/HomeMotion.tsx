@@ -70,7 +70,7 @@ export default function HomeMotion() {
       lenis = new Lenis({ duration: 1.05, smoothWheel: true, syncTouch: false });
       // Lenis setzt die Klassen html.lenis und html.lenis-smooth selbst, dazu die
       // Stile aus globals.css. Zusätzlich markieren wir die Seite für eigenes CSS.
-      document.documentElement.classList.add("pv-lenis");
+      document.documentElement.setAttribute("data-lenis", "");
       lenis.on("scroll", ScrollTrigger.update);
       const instance = lenis;
       tick = (time: number) => instance.raf(time * 1000);
@@ -86,7 +86,7 @@ export default function HomeMotion() {
       if (tick) gsap.ticker.remove(tick);
       if (lenis) {
         lenis.destroy();
-        document.documentElement.classList.remove("pv-lenis");
+        document.documentElement.removeAttribute("data-lenis");
         gsap.ticker.lagSmoothing(500, 33);
       }
     };

@@ -95,8 +95,8 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
 
     if (reduced) {
       // Ohne Bewegung bleibt die Sequenz statisch, die Zutaten stehen sofort da.
-      document.documentElement.classList.add("pv-flat");
-      cleanups.push(() => document.documentElement.classList.remove("pv-flat"));
+      document.documentElement.setAttribute("data-flat", "");
+      cleanups.push(() => document.documentElement.removeAttribute("data-flat"));
       setSeq(1);
     } else {
       gsap.registerPlugin(ScrollTrigger);

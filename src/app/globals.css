@@ -95,19 +95,19 @@ body {
 }
 
 /* Scroll-Reveal: nur mit JS und ohne reduced-motion aktiv */
-html.js .reveal {
+html[data-js] .reveal {
   opacity: 0;
   transform: translateY(24px);
   transition:
     opacity 0.7s ease,
     transform 0.7s ease;
 }
-html.js .reveal.is-visible {
+html[data-js] .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  html.js .reveal {
+  html[data-js] .reveal {
     opacity: 1;
     transform: none;
     transition: none;
@@ -439,11 +439,11 @@ html[data-scrolled] .pv-headerbar {
     box-shadow 0.25s;
 }
 .pvshop-card:hover,
-html.js .pvshop-card.reveal.is-visible:hover {
+html[data-js] .pvshop-card.reveal.is-visible:hover {
   transform: translateY(-6px);
   box-shadow: 0 24px 50px rgba(74, 47, 57, 0.14);
 }
-html.js .pvshop-card.reveal.is-visible {
+html[data-js] .pvshop-card.reveal.is-visible {
   transition:
     transform 0.25s,
     box-shadow 0.25s,
@@ -722,7 +722,7 @@ html[data-tier="3d"] .pvlogo-can {
 html[data-tier="3d"] .pvlogo {
   background: transparent;
 }
-html.no-js .pvlogo {
+html:not([data-js]) .pvlogo {
   --footer-p: 1;
 }
 @media (min-width: 861px) {
@@ -1428,10 +1428,10 @@ html[data-tier="static"] .pv-canvas {
 }
 
 /* --- Ohne JavaScript und ohne Bewegung: alles untereinander, nichts versteckt */
-:is(html.no-js, html.pv-flat) #pv-hero {
+:is(html:not([data-js]), html[data-flat]) #pv-hero {
   height: auto;
 }
-:is(html.no-js, html.pv-flat) .pv-hero__bg {
+:is(html:not([data-js]), html[data-flat]) .pv-hero__bg {
   position: absolute;
   top: 0;
   left: 0;
@@ -1439,11 +1439,11 @@ html[data-tier="static"] .pv-canvas {
   bottom: 0;
   height: auto;
 }
-:is(html.no-js, html.pv-flat) .pv-hero__bg-fill {
+:is(html:not([data-js]), html[data-flat]) .pv-hero__bg-fill {
   inset: 0;
   height: 100%;
 }
-:is(html.no-js, html.pv-flat) .pv-stage {
+:is(html:not([data-js]), html[data-flat]) .pv-stage {
   position: relative;
   height: auto;
   display: flex;
@@ -1452,19 +1452,20 @@ html[data-tier="static"] .pv-canvas {
   gap: 18px;
   padding: 20px 16px 40px;
 }
-:is(html.no-js, html.pv-flat) .pv-stage__top {
+:is(html:not([data-js]), html[data-flat]) .pv-stage__top {
   order: 1;
 }
-:is(html.no-js, html.pv-flat) .pv-cans {
+:is(html:not([data-js]), html[data-flat]) .pv-cans {
   order: 2;
 }
-:is(html.no-js, html.pv-flat) .pv-stage__bottom {
+:is(html:not([data-js]), html[data-flat]) .pv-stage__bottom {
   order: 3;
 }
-:is(html.no-js, html.pv-flat) .pv-facts {
+:is(html:not([data-js]), html[data-flat]) .pv-facts {
   order: 4;
 }
-:is(html.no-js, html.pv-flat) :is(.pv-stage__top, .pv-stage__bottom, .pv-cans, .pv-facts) {
+:is(html:not([data-js]), html[data-flat])
+  :is(.pv-stage__top, .pv-stage__bottom, .pv-cans, .pv-facts) {
   position: static;
   inset: auto;
   width: 100%;
@@ -1476,61 +1477,61 @@ html[data-tier="static"] .pv-canvas {
   visibility: visible;
   pointer-events: auto;
 }
-:is(html.no-js, html.pv-flat) .pv-cans {
+:is(html:not([data-js]), html[data-flat]) .pv-cans {
   display: flex;
   justify-content: center;
 }
-:is(html.no-js, html.pv-flat) .pv-can {
+:is(html:not([data-js]), html[data-flat]) .pv-can {
   position: static;
   transform: none;
   height: min(52svh, 420px);
   display: none;
 }
-:is(html.no-js, html.pv-flat) .pv-can[data-active="true"] {
+:is(html:not([data-js]), html[data-flat]) .pv-can[data-active="true"] {
   display: block;
   opacity: 1;
 }
-:is(html.no-js, html.pv-flat) .pv-facts {
+:is(html:not([data-js]), html[data-flat]) .pv-facts {
   display: block;
 }
-:is(html.no-js, html.pv-flat) .pv-facts__item {
+:is(html:not([data-js]), html[data-flat]) .pv-facts__item {
   display: none;
   opacity: 1;
   visibility: visible;
 }
-:is(html.no-js, html.pv-flat) .pv-facts__item[data-active="true"] {
+:is(html:not([data-js]), html[data-flat]) .pv-facts__item[data-active="true"] {
   display: block;
 }
-:is(html.no-js, html.pv-flat) .pv-rise {
+:is(html:not([data-js]), html[data-flat]) .pv-rise {
   opacity: 1;
   transform: none;
 }
 /* Im flachen Aufbau steht --seq auf 1, die Ausblendungen der Sequenz gelten dort nicht. */
-:is(html.no-js, html.pv-flat) .pv-h1 {
+:is(html:not([data-js]), html[data-flat]) .pv-h1 {
   opacity: 1;
 }
-:is(html.no-js, html.pv-flat) .pv-stage[data-seq-past="true"] .pv-stage__bottom {
+:is(html:not([data-js]), html[data-flat]) .pv-stage[data-seq-past="true"] .pv-stage__bottom {
   visibility: visible;
   opacity: 1;
 }
 /* Ohne Scroll-Sequenz übernehmen die Fortschrittspunkte den Sortenwechsel,
    die überlagernden Pfeile hätten im Fluss keinen sinnvollen Platz. */
-:is(html.no-js, html.pv-flat) .pv-arrow {
+:is(html:not([data-js]), html[data-flat]) .pv-arrow {
   display: none;
 }
-:is(html.no-js, html.pv-flat) .pv-scrollhint {
+:is(html:not([data-js]), html[data-flat]) .pv-scrollhint {
   display: none;
 }
-html.no-js .pv-dots {
+html:not([data-js]) .pv-dots {
   display: none;
 }
 /* Ohne JavaScript gibt es keinen Sortenwechsel, deshalb stehen alle drei
    Zutatenblöcke untereinander. Jeder trägt den Sortennamen als Überschrift. */
-html.no-js .pv-facts__item {
+html:not([data-js]) .pv-facts__item {
   display: block;
   margin-bottom: 28px;
 }
-html.no-js .pv-atc {
+html:not([data-js]) .pv-atc {
   position: static;
   margin: 8px auto 0;
   width: min(100%, 420px);
