@@ -4,23 +4,23 @@ Stand: 21.09.2026, geprüft in der Claude-Code-Cloud-Umgebung (Linux, Node 22, p
 
 ## Was bereits funktioniert
 
-| Werkzeug | Status | Details |
-|---|---|---|
-| BYQ Supply MCP | verfügbar | `search_byq_styles` liefert 50 Marketplace-Designsysteme, Komponenten, Wireframes und Gems sind abrufbar |
-| Supabase MCP | verfügbar und autorisiert | Organisation "Abimanufaktur GmbH" (`coollircnlwtzulzhrbj`), 8 bestehende Projekte in `eu-central-1` (Frankfurt), noch kein PROVIBE-Projekt |
-| Supabase CLI | verfügbar über `npx supabase@latest` (2.117.0) | für Migrationen, Typgenerierung, `db push`, `db dump` |
-| Netlify CLI | verfügbar über `npx netlify-cli@latest` (27.8.0) | **nicht eingeloggt**, braucht `NETLIFY_AUTH_TOKEN` |
-| GitHub MCP | verfügbar | Repo `paulschoettler/provibe` |
-| PostgreSQL 16 lokal | installiert (`/usr/lib/postgresql/16/bin`, `psql`, `pg_dump`) | Ersatz für den Docker-basierten Supabase-Local-Stack (siehe unten) |
-| Playwright + Chromium | vorinstalliert | End-to-End-Tests, Lighthouse |
+| Werkzeug              | Status                                                        | Details                                                                                                                                    |
+| --------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| BYQ Supply MCP        | verfügbar                                                     | `search_byq_styles` liefert 50 Marketplace-Designsysteme, Komponenten, Wireframes und Gems sind abrufbar                                   |
+| Supabase MCP          | verfügbar und autorisiert                                     | Organisation "Abimanufaktur GmbH" (`coollircnlwtzulzhrbj`), 8 bestehende Projekte in `eu-central-1` (Frankfurt), noch kein PROVIBE-Projekt |
+| Supabase CLI          | verfügbar über `npx supabase@latest` (2.117.0)                | für Migrationen, Typgenerierung, `db push`, `db dump`                                                                                      |
+| Netlify CLI           | verfügbar über `npx netlify-cli@latest` (27.8.0)              | **nicht eingeloggt**, braucht `NETLIFY_AUTH_TOKEN`                                                                                         |
+| GitHub MCP            | verfügbar                                                     | Repo `paulschoettler/provibe`                                                                                                              |
+| PostgreSQL 16 lokal   | installiert (`/usr/lib/postgresql/16/bin`, `psql`, `pg_dump`) | Ersatz für den Docker-basierten Supabase-Local-Stack (siehe unten)                                                                         |
+| Playwright + Chromium | vorinstalliert                                                | End-to-End-Tests, Lighthouse                                                                                                               |
 
 ## Was fehlt oder eingeschränkt ist
 
-| Werkzeug | Status | Konsequenz |
-|---|---|---|
+| Werkzeug      | Status                                                | Konsequenz                                                                                                                                                                                                                                                                                                              |
+| ------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Docker-Daemon | **nicht verfügbar** (Client installiert, kein Socket) | `supabase start` (lokaler Supabase-Stack) läuft in dieser Umgebung nicht. Lokale Tests laufen stattdessen gegen einen lokalen PostgreSQL-16-Server, den ich per `initdb`/`pg_ctl` starte. Supabase-spezifische Schemas (`auth`, `storage`) werden dafür als Stubs mitgeführt. Details in `docs/decisions.md` (ADR-003). |
-| Stripe CLI | nicht installiert | Ich lade das Binary aus den GitHub-Releases, sobald Phase 5 startet. Webhook-Tests laufen alternativ über die Stripe-API (`POST /v1/webhook_endpoints`) und signierte Test-Events. |
-| Netlify Login | Token fehlt | siehe unten |
+| Stripe CLI    | nicht installiert                                     | Ich lade das Binary aus den GitHub-Releases, sobald Phase 5 startet. Webhook-Tests laufen alternativ über die Stripe-API (`POST /v1/webhook_endpoints`) und signierte Test-Events.                                                                                                                                      |
+| Netlify Login | Token fehlt                                           | siehe unten                                                                                                                                                                                                                                                                                                             |
 
 ## Was du einmalig einrichten musst
 
@@ -33,25 +33,43 @@ Stand: 21.09.2026, geprüft in der Claude-Code-Cloud-Umgebung (Linux, Node 22, p
 
 Der Token landet damit nur in der Umgebung, nie im Repo. Ich prüfe mit `netlify status`.
 
-### 2. Supabase-Projekt (jetzt, vor Phase 3)
+### 2. Supabase-Projekt (erledigt) und Keys
 
-Der Supabase-MCP ist bereits autorisiert. Zwei Wege:
+Das Projekt `ajscwnbgaijknmdrtihn` ist angelegt, Schema und Seed sind drauf. Für die nächsten Schritte brauche ich drei Werte als Umgebungsvariablen in der Claude-Code-Umgebung (nicht im Repo):
 
-- **Empfohlen:** Du legst das Projekt an (Dashboard, **New project**, Organisation Abimanufaktur GmbH, Name `provibe`, Region **Frankfurt (eu-central-1)**, Datenbank-Passwort generieren lassen und in deinem Passwort-Manager speichern, Plan siehe Frage A2 in `docs/fragen.md`). Danach nennst du mir nur die Project-Ref. So bleibt das DB-Passwort bei dir.
-- Alternativ lege ich das Projekt per MCP an. Dann erzeuge ich das Passwort, hinterlege es ausschließlich als Netlify-Umgebungsvariable und du setzt es bei Bedarf im Dashboard zurück.
+1. `SUPABASE_SERVICE_ROLE_KEY`: Dashboard, **Project Settings**, **API Keys**, Tab **Legacy** oder **Secret keys**, Service-Role- beziehungsweise Secret-Key kopieren. Damit lade ich Bilder in Storage, lege die Owner-Accounts an und teste RLS gegen das Live-Schema.
+2. `SUPABASE_ACCESS_TOKEN`: Dashboard, Avatar, **Account**, **Access Tokens**, **Generate new token**, Name `claude-code-provibe`.
+3. `SUPABASE_DB_URL`: Dashboard, **Connect** (oben), **Session pooler** oder **Direct connection**, URI kopieren und das Datenbank-Passwort einsetzen. Nur für `pg_dump`-Backups.
 
-Für CLI-Aktionen (`supabase db push`, Typgenerierung, `pg_dump`-Backups) brauche ich zusätzlich einen **Supabase Access Token** als Umgebungsvariable `SUPABASE_ACCESS_TOKEN` (Dashboard, Account, **Access Tokens**, **Generate new token**, Name `claude-code-provibe`). Für Backups per `pg_dump` brauche ich später den Datenbank-Connection-String, den ich als `SUPABASE_DB_URL` in der Umgebung erwarte.
+Dieselben Werte 1 und die Publishable/anon-Keys gehören später in Netlify (Kontext production) als `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
-### 3. Später, jeweils erst wenn die Phase beginnt
+### 3. Netlify ohne Token: was du einmal klicken musst
 
-| Phase | Zugang | Was ich genau brauche |
-|---|---|---|
-| 5 (Checkout) | Stripe Restricted Key (Testmodus) | Rechte liste ich in der Anfrage auf: Payment Intents (write), Customers (write), Webhook Endpoints (write), Refunds (write), Apple Pay Domains (write), Payment Methods (read) |
-| 5 (Mails) | Resend API Key | Full access für Domain-Anlage, danach Sending-Key für den Betrieb |
-| 5 (Rechnungen) | Lexware Office API Key | aus Lexware Office, Einstellungen, Erweiterungen, Public API |
-| 5/6 (Versand) | DHL Geschäftskundenportal: API-Zugang, Abrechnungsnummer (EKP + Verfahren + Teilnahme) | erst Sandbox, dann Produktion |
-| 8 (Tracking) | Meta Pixel ID + CAPI Token, GA4 Measurement ID + API Secret, Google Ads Conversion ID/Labels, TikTok Pixel ID + Events API Token | trägst du im Backoffice ein |
-| 10 (Go-live) | Zugriff auf DNS beim Registrar | ich liefere die exakten Einträge |
+Die Site ist mit dem Repo verbunden. Solange kein `NETLIFY_AUTH_TOKEN` vorliegt, bitte einmalig in Netlify, **Site configuration**, **Environment variables**, **Add a variable**, jeweils mit Scope "All" und, wo angegeben, nur für den Kontext **Production**:
+
+| Variable                                      | Wert                                       | Kontext                                                          |
+| --------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| `APP_INTEGRATIONS`                            | `mock`                                     | alle (bis Stripe-Testmodus steht, dann `live` nur in Production) |
+| `NEXT_PUBLIC_SITE_URL`                        | `https://<deine-site>.netlify.app`         | alle                                                             |
+| `NEXT_PUBLIC_SUPABASE_URL`                    | `https://ajscwnbgaijknmdrtihn.supabase.co` | alle                                                             |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`        | Publishable Key aus Supabase (API Keys)    | alle                                                             |
+| `SUPABASE_SERVICE_ROLE_KEY`                   | Service-Role-Key                           | **nur Production**                                               |
+| `SITE_PROTECT_USER` / `SITE_PROTECT_PASSWORD` | frei wählbar                               | alle (Basic-Auth-Schutz bis zum Go-live)                         |
+| `APP_TOKEN_SECRET`                            | 32+ zufällige Zeichen                      | **nur Production**                                               |
+| `JOBS_RUNNER_SECRET`                          | 32+ zufällige Zeichen                      | **nur Production**                                               |
+
+Außerdem: **Site configuration**, **Build & deploy**, **Deploy Previews**: entweder deaktivieren oder so lassen (sie laufen dank `netlify.toml` mit Mock-Integrationen und ohne Production-Secrets). Bitte schick mir die Netlify-Site-URL, dann trage ich sie in `.env.example` und `docs` ein.
+
+### 4. Später, jeweils erst wenn die Phase beginnt
+
+| Phase          | Zugang                                                                                                                           | Was ich genau brauche                                                                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 5 (Checkout)   | Stripe Restricted Key (Testmodus)                                                                                                | Rechte liste ich in der Anfrage auf: Payment Intents (write), Customers (write), Webhook Endpoints (write), Refunds (write), Apple Pay Domains (write), Payment Methods (read) |
+| 5 (Mails)      | Resend API Key                                                                                                                   | Full access für Domain-Anlage, danach Sending-Key für den Betrieb                                                                                                              |
+| 5 (Rechnungen) | Lexware Office API Key                                                                                                           | aus Lexware Office, Einstellungen, Erweiterungen, Public API                                                                                                                   |
+| 5/6 (Versand)  | DHL Geschäftskundenportal: API-Zugang, Abrechnungsnummer (EKP + Verfahren + Teilnahme)                                           | erst Sandbox, dann Produktion                                                                                                                                                  |
+| 8 (Tracking)   | Meta Pixel ID + CAPI Token, GA4 Measurement ID + API Secret, Google Ads Conversion ID/Labels, TikTok Pixel ID + Events API Token | trägst du im Backoffice ein                                                                                                                                                    |
+| 10 (Go-live)   | Zugriff auf DNS beim Registrar                                                                                                   | ich liefere die exakten Einträge                                                                                                                                               |
 
 ## Was ich in dieser Umgebung selbst erledige
 

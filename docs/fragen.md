@@ -1,5 +1,26 @@
 # Offene Fragen nach Phase 1
 
+## Antworten vom 21.09.2026
+
+Der Auftraggeber hat alle Empfehlungen bestätigt, mit diesen Abweichungen und Ergänzungen:
+
+- **A1:** Netlify ist per Oberfläche mit dem Repo verbunden. Ein `NETLIFY_AUTH_TOKEN` liegt noch nicht in der Umgebung. Konsequenz: Build-Konfiguration, Redirects, Header und Functions laufen über `netlify.toml` im Repo. Umgebungsvariablen, Passwortschutz und Build-Logs brauchen entweder den Token oder Klicks in der Netlify-Oberfläche (Anleitung in `docs/setup.md`).
+- **A2/A3:** Bestehendes Supabase-Projekt `ajscwnbgaijknmdrtihn` (Frankfurt, Postgres 17, angelegt am 21.09.2026, leer). Der Konnektor hat Zugriff. `SUPABASE_ACCESS_TOKEN` ist noch nicht gesetzt, Migrationen laufen bis dahin über den MCP.
+- **A4:** Lokaler PostgreSQL 16 für Tests bestätigt (ADR-003).
+- **A5:** Zurückgestellt bis zum Go-live. Bis dahin nur Netlify-Domain. Domain liegt bei Strato und bleibt vorerst auf Shopify.
+- **A6:** Postfächer bei Google Workspace. Resend ist bereits eingerichtet. Reply-To auf hello@provibe-drinks.de.
+- **A7:** Owner: hello@provibe-drinks.de. Super-Admin: mail@paulschoettler.de.
+- **A8/A9:** Stripe, Lexware Office und DHL existieren noch nicht, werden angelegt, sobald sie gebraucht werden.
+- **B1/B2:** Pfand 0,25 € je Dose ab Go-live aktiv, Nettofüllmenge 330 ml bestätigt.
+- **B10:** Das Produkt ist laktosefrei. Umsetzung: "laktosefrei" wird als Eigenschaft auf der PDP geführt. Der Allergenhinweis "Milch" bleibt, weil Molkenprotein ein Milchprotein und damit ein kennzeichnungspflichtiges Allergen nach LMIV Anhang II ist. Nur der Zusatz "einschließlich Laktose" entfällt. Beides steht zur Prüfung in der Rechts-Checkliste (ADR-006).
+- **D3:** Alle Newsletter-Kontakte haben laut Auftraggeber zugestimmt, keine Re-Permission. Importiert werden Kontakte mit Shopify-Status "subscribed" als versandfähig, der Shopify-Zeitstempel gilt als Nachweis.
+- **E1:** Design-Beispiele kommen im Chat. Storefront-UI bleibt bis dahin gesperrt.
+- **F7:** Allowlist für Test-Versand: alle Adressen unter `@provibe-drinks.de` sowie `mail@paulschoettler.de`.
+
+Noch offen: A1 (Token oder Klick-Anleitung), C3 (echte Gewichte), C4 (EANs), D1 (Custom-Pixel-Code), B9 (Etikett-Texte), B13 (LUCID-Nummer), C9 (Test-Export aus Shopify).
+
+---
+
 Jede Frage hat eine Empfehlung. Wenn du nur "ok" sagst, setze ich die Empfehlung um. Antworten trage ich hier nach, Architekturfolgen landen in `docs/decisions.md`. Fragen mit dem Vermerk **jetzt** blockieren Phase 2 oder 3, alle anderen brauche ich erst später.
 
 ## A. Infrastruktur und Zugänge

@@ -1,0 +1,144 @@
+# Netlify-Konfiguration für den PROVIBE-Shop.
+# Alles Infrastrukturelle steht hier im Repo (ADR-005). Secrets kommen ausschließlich
+# aus Netlify-Umgebungsvariablen, nie aus dieser Datei.
+
+[build]
+  command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_FLAGS = "--frozen-lockfile"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Deploy Previews und Branch-Deploys bekommen keine Live-Secrets. Sie laufen komplett
+# gegen die Mock-Provider (APP_INTEGRATIONS=mock). Live-Keys sind in Netlify nur für den
+# Kontext "production" gesetzt (Scope pro Kontext beim Anlegen der Variablen wählen).
+[context.deploy-preview.environment]
+  APP_INTEGRATIONS = "mock"
+  APP_STAGE = "preview"
+
+[context.branch-deploy.environment]
+  APP_INTEGRATIONS = "mock"
+  APP_STAGE = "preview"
+
+[context.production.environment]
+  APP_STAGE = "production"
+
+# Bis zum Go-live: kein Crawler indexiert die Netlify-Domain. Der Header fällt
+# im Zuge des DNS-Umzugs (docs/golive.md).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self)"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+    Cache-Control = "no-store"
+
+# Redirects aus dem alten Shopify-Shop (docs/redirects.md). 301 = dauerhaft.
+[[redirects]]
+  from = "/pages/qrcode"
+  to = "/pages/shop"
+  status = 301
+
+[[redirects]]
+  from = "/pages/qr-code-page-investoren"
+  to = "/pages/messe"
+  status = 301
+
+[[redirects]]
+  from = "/pages/widerrufsbutton"
+  to = "/pages/widerruf-formular"
+  status = 301
+
+[[redirects]]
+  from = "/pages/datenschutzerklarung"
+  to = "/policies/privacy-policy"
+  status = 301
+
+[[redirects]]
+  from = "/pages/provibe-paket"
+  to = "/collections/aktion"
+  status = 301
+
+[[redirects]]
+  from = "/pages/provibe-founder-paket"
+  to = "/collections/aktion"
+  status = 301
+
+[[redirects]]
+  from = "/policies/terms-of-service"
+  to = "/pages/allgemeine-geschaftsbedingungen"
+  status = 301
+
+[[redirects]]
+  from = "/policies/refund-policy"
+  to = "/pages/ruckgabe-und-wiederrufsbelehrung"
+  status = 301
+
+[[redirects]]
+  from = "/policies/shipping-policy"
+  to = "/pages/versand"
+  status = 301
+
+[[redirects]]
+  from = "/policies/legal-notice"
+  to = "/pages/impressum"
+  status = 301
+
+[[redirects]]
+  from = "/policies/contact-information"
+  to = "/pages/contact"
+  status = 301
+
+[[redirects]]
+  from = "/products/founder-bundle-iii"
+  to = "/products/founder-bundle-iii-1"
+  status = 301
+
+[[redirects]]
+  from = "/collections/alle-produkte/products/:handle"
+  to = "/products/:handle"
+  status = 301
+
+[[redirects]]
+  from = "/collections/:collection/products/:handle"
+  to = "/products/:handle"
+  status = 301
+
+[[redirects]]
+  from = "/account/login"
+  to = "/konto/login"
+  status = 301
+
+[[redirects]]
+  from = "/account/register"
+  to = "/konto/login"
+  status = 301
+
+[[redirects]]
+  from = "/account"
+  to = "/konto"
+  status = 301
+
+[[redirects]]
+  from = "/customer_authentication/redirect"
+  to = "/konto/login"
+  status = 301
+
+[[redirects]]
+  from = "/agents.md"
+  to = "/llms.txt"
+  status = 301

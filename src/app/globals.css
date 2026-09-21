@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Design-Tokens werden in Phase 5 nach den Beispielen des Auftraggebers festgelegt. */
+:root {
+  color-scheme: light;
+}

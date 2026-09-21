@@ -1,0 +1,9 @@
+node_modules
+.next
+.netlify
+assets/source
+docs/quelltexte
+pnpm-lock.yaml
+src/lib/supabase/database.types.ts
+docs/briefing.md
+docs/quelltexte

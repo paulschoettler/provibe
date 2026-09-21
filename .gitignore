@@ -31,3 +31,19 @@ public/images/generated/
 .DS_Store
 Thumbs.db
 *.log
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# dependencies
+/.pnp
+.pnp.*
+# testing
+# next.js
+# production
+/build
+# misc
+# debug
+# env files (can opt-in for committing if needed)
+# vercel
+.vercel
+# typescript
+*.tsbuildinfo
+next-env.d.ts

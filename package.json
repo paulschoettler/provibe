@@ -1,0 +1,58 @@
+{
+  "name": "provibe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:local": "bash scripts/db/local-pg.sh",
+    "db:local:stop": "bash scripts/db/local-pg.sh stop",
+    "db:migrate:local": "bash scripts/db/local-pg.sh migrate",
+    "db:seed:generate": "tsx scripts/seed/generate-seed-sql.ts",
+    "check": "pnpm lint && pnpm typecheck && pnpm test"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.7",
+    "@supabase/supabase-js": "^2",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "resend": "^6",
+    "server-only": "^0.0.1",
+    "stripe": "^20",
+    "svix": "^2.5.0",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "^5",
+    "@playwright/test": "^1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4",
+    "dotenv": "^17",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "pg": "^8",
+    "prettier": "^3",
+    "prettier-plugin-tailwindcss": "^0.7",
+    "tailwindcss": "^4",
+    "tsx": "^4",
+    "typescript": "^5",
+    "vitest": "^4"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  }
+}
