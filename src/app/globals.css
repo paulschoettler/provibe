@@ -713,9 +713,14 @@ html.js .pvshop-card.reveal.is-visible {
   transform: translateX(calc(120% - 120% * var(--footer-p)))
     translateY(calc(150px - 150px * var(--footer-p))) rotate(calc(18deg - 12deg * var(--footer-p)));
 }
-/* Die PNG-Dosen sind der Fallback: sobald die 3D-Szene läuft, übernimmt sie */
+/* Die PNG-Dosen sind der Fallback: sobald die 3D-Szene läuft, übernimmt sie.
+   Dann muss die Sektion durchsichtig sein, damit die fixe Canvas dahinter sichtbar wird
+   (der Seitenhintergrund ist ohnehin Creme). */
 html[data-tier="3d"] .pvlogo-can {
   opacity: 0;
+}
+html[data-tier="3d"] .pvlogo {
+  background: transparent;
 }
 html.no-js .pvlogo {
   --footer-p: 1;
@@ -962,8 +967,8 @@ html[data-tier="static"] .pv-canvas {
   --pv-can-h: calc(var(--pv-vh) * 0.62);
   --pv-can-top: calc(var(--pv-vh) * 0.46);
   --pv-seq-x: 0px;
-  --pv-seq-y: calc(var(--pv-vh) * -0.155);
-  --pv-seq-scale: 0.12;
+  --pv-seq-y: calc(var(--pv-vh) * -0.165);
+  --pv-seq-scale: -0.16;
   /* Zoomanteil der Sequenz: 0 bis 0,4 des Gesamtfortschritts */
   --seqz: clamp(0, calc(var(--seq) / 0.4), 1);
 }
@@ -1058,12 +1063,15 @@ html[data-tier="static"] .pv-canvas {
 .pv-hero__logo img {
   height: 28px;
   width: auto;
+  filter: drop-shadow(0 2px 7px rgba(251, 248, 238, 0.6));
 }
 .pv-h1 {
   margin: 0;
   font-size: clamp(13px, 3.4vw, 17px);
   font-weight: 500;
   letter-spacing: 0.03em;
+  /* Blendet mit den übrigen Hero-Texten aus, das Logo bleibt stehen. */
+  opacity: clamp(0, calc(1 - var(--seq) / 0.3), 1);
 }
 
 /* --- Pfeile ----------------------------------------------------------------- */
@@ -1103,7 +1111,7 @@ html[data-tier="static"] .pv-canvas {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(78px + env(safe-area-inset-bottom));
+  bottom: calc(92px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1119,7 +1127,7 @@ html[data-tier="static"] .pv-canvas {
 
 .pv-names {
   display: grid;
-  min-height: clamp(50px, 13vw, 92px);
+  min-height: clamp(46px, 12vw, 92px);
 }
 .pv-names__item {
   grid-area: 1 / 1;
@@ -1206,8 +1214,8 @@ html[data-tier="static"] .pv-canvas {
   position: absolute;
   left: 0;
   right: 0;
-  top: 66%;
-  bottom: calc(78px + env(safe-area-inset-bottom));
+  top: 56%;
+  bottom: calc(92px + env(safe-area-inset-bottom));
   display: grid;
   padding: 0 20px;
   overflow-y: auto;
@@ -1262,7 +1270,7 @@ html[data-tier="static"] .pv-canvas {
   line-height: 1.08;
 }
 .pv-facts__label {
-  margin: 12px 0 3px;
+  margin: 10px 0 2px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -1273,7 +1281,7 @@ html[data-tier="static"] .pv-canvas {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -1281,28 +1289,28 @@ html[data-tier="static"] .pv-canvas {
   border-radius: var(--radius-pill);
   border: 1px solid rgba(74, 47, 57, 0.16);
   background: rgba(255, 255, 255, 0.72);
-  padding: 5px 12px;
-  font-size: 12px;
+  padding: 4px 11px;
+  font-size: 11.5px;
   font-weight: 600;
 }
 .pv-ingredients {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12.5px;
+  line-height: 1.45;
 }
 .pv-ingredients p {
   margin: 0 0 6px;
 }
 .pv-allergens {
-  margin: 10px 0 0;
-  font-size: 13px;
-  line-height: 1.5;
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
 }
 .pv-nutrition {
   display: flex;
   flex-wrap: wrap;
-  gap: 3px 14px;
+  gap: 2px 13px;
   margin: 0;
-  font-size: 12.5px;
+  font-size: 12px;
 }
 .pv-nutrition__row {
   display: inline-flex;
@@ -1362,7 +1370,7 @@ html[data-tier="static"] .pv-canvas {
     --pv-can-top: calc(var(--pv-vh) * 0.47);
     --pv-seq-x: -19vw;
     --pv-seq-y: calc(var(--pv-vh) * -0.02);
-    --pv-seq-scale: 0.28;
+    --pv-seq-scale: 0.15;
   }
   .pv-hero__logo img {
     height: 34px;
@@ -1379,6 +1387,18 @@ html[data-tier="static"] .pv-canvas {
   }
   .pv-stage__bottom {
     bottom: 40px;
+  }
+  .pv-ingredients,
+  .pv-allergens {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .pv-nutrition {
+    font-size: 13px;
+  }
+  .pv-badge {
+    padding: 5px 13px;
+    font-size: 12.5px;
   }
   .pv-facts {
     left: auto;
@@ -1485,6 +1505,14 @@ html[data-tier="static"] .pv-canvas {
   opacity: 1;
   transform: none;
 }
+/* Im flachen Aufbau steht --seq auf 1, die Ausblendungen der Sequenz gelten dort nicht. */
+:is(html.no-js, html.pv-flat) .pv-h1 {
+  opacity: 1;
+}
+:is(html.no-js, html.pv-flat) .pv-stage[data-seq-past="true"] .pv-stage__bottom {
+  visibility: visible;
+  opacity: 1;
+}
 /* Ohne Scroll-Sequenz übernehmen die Fortschrittspunkte den Sortenwechsel,
    die überlagernden Pfeile hätten im Fluss keinen sinnvollen Platz. */
 :is(html.no-js, html.pv-flat) .pv-arrow {
@@ -1495,6 +1523,12 @@ html[data-tier="static"] .pv-canvas {
 }
 html.no-js .pv-dots {
   display: none;
+}
+/* Ohne JavaScript gibt es keinen Sortenwechsel, deshalb stehen alle drei
+   Zutatenblöcke untereinander. Jeder trägt den Sortennamen als Überschrift. */
+html.no-js .pv-facts__item {
+  display: block;
+  margin-bottom: 28px;
 }
 html.no-js .pv-atc {
   position: static;
