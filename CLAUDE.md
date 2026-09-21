@@ -27,7 +27,8 @@ Weitere Projektdokumente:
 
 ## Aktuelle Sperren
 
-- **Kein kundenseitiges Frontend (Storefront-UI/UX) bauen, bevor der Auftraggeber Design-Beispiele geliefert hat.** Er hat das am 21.09.2026 ausdrücklich angekündigt. Datenmodell, Backoffice und Backend dürfen vorher entstehen.
+- Storefront-Design: Der Auftraggeber hat am 21.09.2026 einen Design-Prompt für die Startseite geliefert (Referenzen ciaoenergy.com, royalbev.com, ballaurent.com, drei GLB-Dosenmodelle). Analyse und Plan in `docs/design-startseite.md`. **Bau erst nach Beantwortung der Fragen G1 bis G12 in `docs/fragen.md`.**
+- Keys liegen ausschließlich in `.env.local` (gitignoriert). Nie in Docs, Commits oder Logs übernehmen.
 - Kein Produktivcode, solange die mit **jetzt** markierten Fragen in `docs/fragen.md` unbeantwortet sind.
 
 ## Schutzregeln für die Live-Instanz

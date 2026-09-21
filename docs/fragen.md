@@ -17,7 +17,9 @@ Der Auftraggeber hat alle Empfehlungen bestätigt, mit diesen Abweichungen und E
 - **E1:** Design-Beispiele kommen im Chat. Storefront-UI bleibt bis dahin gesperrt.
 - **F7:** Allowlist für Test-Versand: alle Adressen unter `@provibe-drinks.de` sowie `mail@paulschoettler.de`.
 
-Noch offen: A1 (Token oder Klick-Anleitung), C3 (echte Gewichte), C4 (EANs), D1 (Custom-Pixel-Code), B9 (Etikett-Texte), B13 (LUCID-Nummer), C9 (Test-Export aus Shopify).
+Noch offen: C3 (echte Gewichte), C4 (EANs), B9 (Etikett-Texte), B13 (LUCID-Nummer), C9 (Test-Export aus Shopify).
+
+**Nachtrag 21.09.2026, zweite Runde:** Keys für Supabase (Service Role, Access Token) und Netlify liegen lokal in `.env.local` (gitignoriert). Netlify-Site `provibe-shop` ist konfiguriert (Umgebungsvariablen, PR-Deploys aus, Basic Auth aktiv). Die 42 Originalmedien liegen in `product-media/seed/...` und `source-assets/`, die GLBs in `source-assets/3d/`. Owner-Accounts für hello@provibe-drinks.de und mail@paulschoettler.de existieren in Supabase Auth mit Rolle `owner`. Beim Browser-Test der aktuellen Seite wurde ein **Meta Pixel (ID 1372318701489027)** sowie Shopifys eigener Cookie-Banner gefunden, das beantwortet D1/D4 teilweise: der Custom Pixel lädt sehr wahrscheinlich das Meta-Pixel.
 
 ---
 
@@ -126,3 +128,31 @@ Jede Frage hat eine Empfehlung. Wenn du nur "ok" sagst, setze ich die Empfehlung
 **F6. Sofortkauf.** Heute Shop Pay "oder sofort bezahlen". Empfehlung: Stripe Express Checkout Element (Apple Pay, Google Pay, PayPal, Link) auf PDP und Warenkorb, Rest über den normalen Checkout.
 
 **F7. Rechnungsversand im Testbetrieb.** Empfehlung: Lexware im Testbetrieb nur als Entwurf, PDF-Versand nur an Allowlist-Adressen. Welche Testadressen kommen auf die Allowlist?
+
+## G. Startseiten-Design (Prompt vom 21.09.2026)
+
+Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich diese Antworten, jede mit Empfehlung:
+
+**G1 (jetzt). Farbwelt der Hero-Hintergründe.** Ciao arbeitet mit dunklen Flächen. Unser Look ist hell (Creme, Butter). Empfehlung: helle Sortenflächen (Wildberry: Pink `#E98AB0` zu Plum `#7E2856` als weicher Verlauf, Raspberry Lime: Magenta `#D9306E` zu Pink-Light `#F7DCEB`, Peach: Peach `#F7CA99` zu Butter `#F3EDA4`), Text in Aubergine, damit die Seite wie PROVIBE aussieht und nicht wie eine Energy-Marke. Einverstanden, oder willst du im Hero bewusst dunkle Flächen wie in der Referenz?
+
+**G2 (jetzt). Startsorte.** Welche Dose zeigt der Hero beim Laden? Empfehlung: Wildberry (erste Karte im Ist, dunkelste Etikettfarbe, stärkster Kontrast), Reihenfolge Wildberry, Raspberry Lime, Peach wie in deinem HTML.
+
+**G3. H1 und Hero-Text.** Der Hero hat keinen Headline-Text mehr außer dem Sortennamen. Für SEO braucht die Seite eine H1 mit "Eistee mit Protein". Empfehlung: kleine Zeile über der Dose "Eistee mit 15 g Protein" als H1 (dezent, Jost 500), Sortenname als große Anzeige darunter. Alternative: H1 visually-hidden, nur für Screenreader und Google.
+
+**G4. Preis im Hero.** Zeigt der Hero den Dosenpreis (2,65 € + 0,25 € Pfand, Grundpreis 8,03 €/l) oder den 9er-Packpreis (26,10 €)? Empfehlung: Dosenpreis mit Pfand und Grundpreis in kleiner Zeile, weil der Button pro Sorte kauft und die PAngV den Grundpreis neben jedem Preis verlangt.
+
+**G5. Position des Warenkorb-Buttons.** Unten links funktioniert mobil, liegt aber nur im rechten Daumen-Randbereich und konkurriert optisch mit dem linken Pfeil. Empfehlung: unten mittig, volle Breite minus 16 px Rand, über der Safe-Area, auf Desktop unten links wie von dir vorgesehen. Beides an identischer Stelle in Hero und Scroll-Sequenz.
+
+**G6. Was legt der Button in den Warenkorb?** Die Sorten werden heute nur als 9er bis 48er verkauft, eine Einzeldose gibt es nicht. Empfehlung: der Button legt den 9er-Pack der aktiven Sorte in den Warenkorb und heißt "9er-Pack in den Warenkorb", der Drawer zeigt dann die anderen Packgrößen. Alternative: Einzeldosen als Produkt freischalten (dann brauchen wir Verpackung und Versandpreis dafür).
+
+**G7. Zutaten-Schritt.** Welche Angaben sollen im Zutaten-Schritt stehen? Empfehlung: Zutatenliste (mit Allergen "Milch" hervorgehoben), drei Badges (15 g Protein, Ohne Zucker, Laktosefrei), Nährwerte je 100 ml als eine Zeile, Link "Alle Details" zur Produktseite. Keine Health-Claims über die bestehenden hinaus.
+
+**G8. Wellen-Stellen.** Ich schlage fünf Stellen vor (`docs/design-startseite.md`, Abschnitt "Sektion 6"). Passt die Auswahl, oder willst du weniger?
+
+**G9. Dosen im Footer.** Welche zwei Sorten? Empfehlung: Wildberry links, Peach rechts (größter Farbkontrast zueinander und zum Logo in Wine).
+
+**G10. Smooth Scrolling.** Lenis auf Desktop wie in beiden Referenzen, auf Mobil natives Scrollen. Einverstanden? Lenis verändert das Scrollgefühl spürbar, manche Nutzer mögen das nicht.
+
+**G11. Ladeanimation.** Ciao zeigt ein Loader-Video, bis die 3D-Szene bereit ist. Empfehlung: kein Loader, stattdessen sofort das Dosen-PNG zeigen und in die 3D-Dose überblenden, sobald das Modell (300 KB) geladen ist. Das ist schneller und robuster für Instagram-Traffic.
+
+**G12. Lizenz und Hosting der 3D-Modelle.** Die Etikett-Texturen enthalten die vollständigen Dosendesigns. Dürfen die optimierten Modelle öffentlich ausgeliefert werden (jeder kann sie herunterladen)? Empfehlung: ja, das ist bei 3D-Shops üblich, aber ich frage vorher.
