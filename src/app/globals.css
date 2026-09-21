@@ -57,10 +57,12 @@ body {
   @apply text-magenta text-[13px] font-semibold tracking-[0.24em] uppercase;
 }
 .headline {
-  @apply font-semibold tracking-[-0.02em] leading-[1.05];
+  @apply leading-[1.05] font-semibold tracking-[-0.02em];
 }
-.btn-pill {
-  @apply inline-flex items-center justify-center gap-2 rounded-pill px-6 py-3.5 text-[15px] font-semibold transition-[transform,background-color,box-shadow] duration-200 select-none;
+/* Als @utility, damit .btn-primary und .btn-secondary es per @apply verwenden können
+   (Tailwind 4 erlaubt @apply nur für Utilities, nicht für gewöhnliche Klassen). */
+@utility btn-pill {
+  @apply rounded-pill inline-flex items-center justify-center gap-2 px-6 py-3.5 text-[15px] font-semibold transition-[transform,background-color,box-shadow] duration-200 select-none;
   min-height: 48px;
 }
 .btn-pill:active {
@@ -73,13 +75,13 @@ body {
   @apply bg-[#c22860];
 }
 .btn-secondary {
-  @apply btn-pill bg-white/80 text-aubergine border border-aubergine/15;
+  @apply btn-pill text-aubergine border-aubergine/15 border bg-white/80;
 }
 .link-underline {
-  @apply text-aubergine text-[15px] font-medium border-b-[1.5px] border-current pb-0.5 no-underline;
+  @apply text-aubergine border-b-[1.5px] border-current pb-0.5 text-[15px] font-medium no-underline;
 }
 .link-caps {
-  @apply text-magenta text-[13px] tracking-[0.18em] uppercase font-semibold border-b-[1.5px] border-magenta pb-1 no-underline;
+  @apply text-magenta border-magenta border-b-[1.5px] pb-1 text-[13px] font-semibold tracking-[0.18em] uppercase no-underline;
 }
 
 /* Fokus sichtbar (WCAG 2.4.7) */
@@ -133,4 +135,1369 @@ html.lenis body {
 }
 .lenis.lenis-stopped {
   overflow: hidden;
+}
+
+/* Layout, Sektionen, Wellen (Arbeitspaket B) */
+
+/* --- Wellen-Übergänge (Muster royalbev.com) --------------------------------- */
+.pv-wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: block;
+  width: 100%;
+  height: 10vw;
+  min-height: 48px;
+  pointer-events: none;
+  z-index: 1;
+}
+.pv-wave--top {
+  bottom: 100%;
+}
+.pv-wave--bottom {
+  top: 100%;
+  transform: scaleY(-1);
+}
+.pv-wave--flip {
+  transform: scaleX(-1);
+}
+.pv-wave--bottom.pv-wave--flip {
+  transform: scale(-1, -1);
+}
+@media (min-width: 861px) {
+  .pv-wave {
+    height: 7vw;
+  }
+}
+
+/* --- Header ------------------------------------------------------------------ */
+/* Der Body darf kein eigener Scrollcontainer sein, sonst klebt der sticky Header nicht.
+   overflow-x: clip schneidet wie hidden ab, erzeugt aber keinen Scrollport. */
+body {
+  overflow-x: clip;
+}
+/* Der ganze Kopf klebt oben. Der negative Versatz entspricht der Höhe der
+   Announcement-Bar: sie scrollt weg, die Leiste mit Logo und Navigation bleibt. */
+.pv-header {
+  --pv-announce-h: 34px;
+  position: sticky;
+  top: calc(-1 * var(--pv-announce-h));
+  z-index: 60;
+}
+.pv-announce {
+  background: var(--color-wine);
+  color: var(--color-cream);
+  font-size: 13px;
+}
+.pv-announce-track {
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  padding: 7px 16px;
+  text-align: center;
+}
+.pv-announce-item {
+  grid-area: 1 / 1;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.pv-announce-item[data-active] {
+  opacity: 1;
+}
+.pv-headerbar {
+  position: relative;
+  z-index: 50;
+  background: rgba(251, 248, 238, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(74, 47, 57, 0.1);
+  transition: box-shadow 0.25s ease;
+}
+html[data-scrolled] .pv-headerbar {
+  box-shadow: 0 10px 30px rgba(74, 47, 57, 0.1);
+}
+.pv-headerbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 8px 6vw;
+}
+.pv-logo-link {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+.pv-logo-img {
+  height: 28px;
+  width: auto;
+}
+.pv-nav {
+  display: none;
+}
+.pv-nav ul {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pv-nav-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-aubergine);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.pv-nav-link:hover {
+  color: var(--color-magenta);
+}
+.pv-header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.pv-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  color: var(--color-aubergine);
+  background: transparent;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+.pv-header-icon:hover {
+  color: var(--color-magenta);
+  background: rgba(217, 48, 110, 0.08);
+}
+.pv-cart-count {
+  position: absolute;
+  top: 5px;
+  right: 3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-magenta);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .pv-logo-img {
+    height: 34px;
+  }
+  .pv-nav {
+    display: block;
+    margin-left: 22px;
+  }
+  .pv-header-actions {
+    gap: 6px;
+  }
+}
+
+/* --- Mobiler Drawer ---------------------------------------------------------- */
+.pv-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+.pv-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(74, 47, 57, 0.45);
+  backdrop-filter: blur(2px);
+}
+.pv-drawer {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(88vw, 380px);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px calc(28px + env(safe-area-inset-bottom));
+  background: var(--color-cream);
+  box-shadow: -20px 0 60px rgba(74, 47, 57, 0.25);
+  overflow-y: auto;
+  animation: pv-drawer-in 0.26s ease;
+}
+@keyframes pv-drawer-in {
+  from {
+    transform: translateX(14%);
+    opacity: 0.5;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.pv-drawer-link {
+  display: block;
+  min-height: 44px;
+  padding: 10px 0;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-aubergine);
+  text-decoration: none;
+}
+.pv-drawer-link:hover {
+  color: var(--color-magenta);
+}
+.pv-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(74, 47, 57, 0.2);
+  color: var(--color-aubergine);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.pv-social:hover {
+  color: var(--color-magenta);
+  border-color: var(--color-magenta);
+}
+.pv-social--cream {
+  border-color: rgba(251, 248, 238, 0.35);
+  color: var(--color-cream);
+}
+.pv-social--cream:hover {
+  color: var(--color-cream);
+  border-color: var(--color-cream);
+}
+
+/* --- Unsere Sorten und Founder Bundles (Aufbau aus dem alten Shop) ----------- */
+.pvshop-section {
+  position: relative;
+  background: #fbfaf3;
+  padding: 80px 6vw 96px;
+  color: #4a2f39;
+}
+.pvshop-section--cream {
+  background: var(--color-cream);
+}
+.pvshop-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 42px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.pvshop-eyebrow {
+  font-size: 14px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #d9306e;
+}
+.pvshop-title {
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 8px 0 0;
+}
+.pvshop-all {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4a2f39;
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 2px;
+  text-decoration: none;
+}
+.pvshop-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+.pvshop-card {
+  display: block;
+  background: #f3f1e7;
+  border-radius: 26px;
+  padding: 30px 30px 26px;
+  position: relative;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s;
+}
+.pvshop-card:hover,
+html.js .pvshop-card.reveal.is-visible:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 50px rgba(74, 47, 57, 0.14);
+}
+html.js .pvshop-card.reveal.is-visible {
+  transition:
+    transform 0.25s,
+    box-shadow 0.25s,
+    opacity 0.7s ease;
+}
+.pvshop-flavor {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  min-height: 2.1em;
+  margin: 0;
+}
+.pvshop-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #702249;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 5px 11px;
+  border-radius: 100px;
+}
+.pvshop-can {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0 18px;
+}
+.pvshop-can img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: var(--shadow-can);
+}
+.pvshop-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pvshop-name {
+  font-size: 15px;
+  font-weight: 500;
+}
+.pvshop-sub {
+  font-size: 14px;
+  font-weight: 300;
+  color: #8a7680;
+}
+.pvshop-price {
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pvshop-fine {
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-weight: 300;
+  color: #8a7680;
+}
+.pvshop-card--bundle {
+  padding: 20px 20px 24px;
+}
+.pvbundle-media {
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  margin-bottom: 18px;
+  background: #e9e6da;
+}
+.pvbundle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pvbundle-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+@media (min-width: 861px) {
+  .pvshop-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .pvshop-flavor {
+    font-size: 34px;
+  }
+  .pvshop-can {
+    height: 340px;
+  }
+  .pvbundle-title {
+    font-size: 26px;
+  }
+}
+
+/* --- Protein for your purse (#pvbanner) -------------------------------------- */
+.pvbanner-section {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 32px;
+  padding: 56px 7vw;
+  background: var(--color-butter);
+  color: var(--color-aubergine);
+}
+.pvbanner-media {
+  display: flex;
+  justify-content: center;
+}
+.pvbanner-img {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 40%;
+}
+.pvbanner-eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-magenta);
+}
+.pvbanner-title {
+  font-size: clamp(30px, 3.4vw, 50px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 10px 0 18px;
+}
+.pvbanner-text {
+  font-size: 17.5px;
+  font-weight: 300;
+  line-height: 1.6;
+  max-width: 42ch;
+  margin: 0 0 26px;
+}
+.pvbanner-link {
+  display: inline-block;
+}
+@media (min-width: 861px) {
+  .pvbanner-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 6vw;
+    min-height: 600px;
+    padding: 70px 7vw;
+  }
+  .pvbanner-img {
+    max-width: 520px;
+  }
+}
+
+/* --- Stimmungs-Sektion mit Schwarzweißbild ----------------------------------- */
+.pvmood {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 80vh;
+  overflow: hidden;
+  background: var(--color-aubergine);
+}
+.pvmood-media {
+  position: absolute;
+  inset: 0;
+}
+.pvmood-img {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.04);
+}
+.pvmood-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-top: auto;
+  padding: 40px 7vw 52px;
+  background: var(--color-magenta);
+  color: var(--color-cream);
+}
+.pvmood-copy {
+  max-width: 46ch;
+}
+.pvmood-eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-cream);
+  opacity: 0.85;
+}
+.pvmood-title {
+  font-size: clamp(28px, 3.2vw, 46px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 10px 0 14px;
+}
+.pvmood-text {
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+.pvmood-button {
+  background: var(--color-cream);
+  color: var(--color-aubergine);
+}
+.pvmood-button:hover {
+  background: #fff;
+}
+@media (min-width: 861px) {
+  .pvmood {
+    min-height: 88vh;
+  }
+  .pvmood-panel {
+    padding: 56px 7vw 64px;
+  }
+}
+
+/* --- Logo-Zoom mit einfliegenden Dosen (#pvlogo) ----------------------------- */
+.pvlogo {
+  --footer-p: 0;
+  position: relative;
+  height: 160vh;
+  background: var(--color-cream);
+}
+.pvlogo-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pvlogo-img {
+  width: min(62vw, 680px);
+  height: auto;
+  transform-origin: center;
+  transform: scale(calc(0.5 + 0.95 * var(--footer-p)));
+  will-change: transform;
+}
+.pvlogo-can {
+  position: absolute;
+  bottom: 2vh;
+  width: 28vw;
+  height: auto;
+  z-index: 2;
+  filter: var(--shadow-can);
+  will-change: transform;
+}
+.pvlogo-can--left {
+  left: 2vw;
+  transform: translateX(calc(-120% + 120% * var(--footer-p)))
+    translateY(calc(150px - 150px * var(--footer-p))) rotate(calc(-18deg + 12deg * var(--footer-p)));
+}
+.pvlogo-can--right {
+  right: 2vw;
+  transform: translateX(calc(120% - 120% * var(--footer-p)))
+    translateY(calc(150px - 150px * var(--footer-p))) rotate(calc(18deg - 12deg * var(--footer-p)));
+}
+/* Die PNG-Dosen sind der Fallback: sobald die 3D-Szene läuft, übernimmt sie */
+html[data-tier="3d"] .pvlogo-can {
+  opacity: 0;
+}
+html.no-js .pvlogo {
+  --footer-p: 1;
+}
+@media (min-width: 861px) {
+  .pvlogo-can {
+    width: 18vw;
+    bottom: 8vh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pvlogo {
+    --footer-p: 1;
+  }
+  .pvlogo-img {
+    transform: none;
+  }
+}
+
+/* --- Footer ------------------------------------------------------------------ */
+.pv-footer {
+  position: relative;
+  background: var(--color-wine);
+  color: var(--color-cream);
+}
+.pv-footer-inner {
+  position: relative;
+  z-index: 2;
+  padding: 56px 6vw 32px;
+}
+.pv-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+.pv-footer-logo {
+  width: 170px;
+  height: auto;
+}
+.pv-footer-claim {
+  margin: 14px 0 20px;
+  font-size: 15px;
+  font-weight: 300;
+  opacity: 0.85;
+}
+.pv-footer-social {
+  display: flex;
+  gap: 12px;
+}
+.pv-footer-heading {
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-pink-light);
+  margin: 0;
+}
+.pv-footer-heading--lg {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--color-cream);
+}
+.pv-footer-links ul {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pv-footer-link {
+  display: inline-block;
+  padding: 3px 0;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--color-cream);
+  text-decoration: none;
+  opacity: 0.9;
+}
+.pv-footer-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+.pv-footer-text {
+  margin: 6px 0 18px;
+  font-size: 15px;
+  font-weight: 300;
+  opacity: 0.85;
+}
+.pv-newsletter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pv-newsletter-input {
+  flex: 1;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(251, 248, 238, 0.35);
+  background: rgba(251, 248, 238, 0.08);
+  color: var(--color-cream);
+  font-size: 15px;
+}
+.pv-newsletter-input::placeholder {
+  color: rgba(251, 248, 238, 0.55);
+}
+.pv-newsletter-button {
+  flex: none;
+}
+.pv-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.pv-newsletter-consent {
+  margin: 12px 0 0;
+  max-width: 54ch;
+  font-size: 12.5px;
+  font-weight: 300;
+  line-height: 1.55;
+  opacity: 0.8;
+}
+.pv-footer-inline-link {
+  color: var(--color-cream);
+  text-decoration: underline;
+}
+.pv-newsletter-status {
+  margin: 10px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+}
+.pv-newsletter-status[data-state="ok"] {
+  color: #c7efd1;
+}
+.pv-newsletter-status[data-state="error"] {
+  color: #ffc9da;
+}
+.pv-footer-pay {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(251, 248, 238, 0.18);
+}
+.pv-pay-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pv-pay-badge {
+  border: 1px solid rgba(251, 248, 238, 0.3);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+.pv-footer-bottom {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(251, 248, 238, 0.18);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 300;
+  opacity: 0.85;
+}
+.pv-footer-bottom p {
+  margin: 0;
+}
+@media (min-width: 520px) {
+  .pv-newsletter-row {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+@media (min-width: 861px) {
+  .pv-footer-grid {
+    grid-template-columns: 1.1fr 1fr 1.5fr;
+    gap: 6vw;
+  }
+  .pv-footer-inner {
+    padding: 72px 6vw 36px;
+  }
+}
+
+/* --- Newsletter-Bestätigungsseite -------------------------------------------- */
+.pv-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 64px 6vw;
+}
+.pv-confirm-card {
+  max-width: 560px;
+  text-align: center;
+  background: var(--color-cream-2);
+  border-radius: var(--radius-card);
+  padding: 40px 28px;
+}
+.pv-confirm-title {
+  font-size: clamp(26px, 3vw, 38px);
+  margin: 10px 0 14px;
+}
+.pv-confirm-text {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+/* Hero, Sequenz, 3D (Arbeitspaket A) */
+
+/* Schichten: Sortenfläche -1, 3D-Canvas 0, Bühne 2, Warenkorb-Button 30.
+   Die Canvas liegt fix über dem Seitenhintergrund, aber unter allem DOM-Inhalt.
+   Alle Maße kommen aus src/components/home/hero-geometry.ts: HeroExperience
+   schreibt sie als Pixelwerte auf #pv-hero, die Werte hier sind der Stand
+   ohne JavaScript. */
+
+.pv-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+html[data-tier="static"] .pv-canvas {
+  display: none;
+}
+
+.pv-hero {
+  position: relative;
+  height: 400vh;
+  color: var(--color-aubergine);
+
+  --pv-vh: 100svh;
+  --pv-can-h: calc(var(--pv-vh) * 0.62);
+  --pv-can-top: calc(var(--pv-vh) * 0.46);
+  --pv-seq-x: 0px;
+  --pv-seq-y: calc(var(--pv-vh) * -0.155);
+  --pv-seq-scale: 0.12;
+  /* Zoomanteil der Sequenz: 0 bis 0,4 des Gesamtfortschritts */
+  --seqz: clamp(0, calc(var(--seq) / 0.4), 1);
+}
+
+.pv-skip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 40;
+  background: #fff;
+  color: var(--color-aubergine);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Sortenfläche: klebt hinter der Canvas, Farben aus --flavor-* */
+.pv-hero__bg {
+  position: sticky;
+  top: 0;
+  height: 0;
+  z-index: -1;
+}
+.pv-hero__bg-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100svh;
+  background: linear-gradient(
+    162deg,
+    var(--flavor-from) 0%,
+    var(--flavor-via) 46%,
+    var(--flavor-to) 100%
+  );
+}
+
+.pv-stage {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 100svh;
+  touch-action: pan-y;
+}
+
+/* --- Dosen-PNG (Fallback und Überblendung zur 3D-Dose) ---------------------- */
+.pv-cans {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pv-can {
+  position: absolute;
+  left: 50%;
+  top: var(--pv-can-top);
+  height: var(--pv-can-h);
+  width: auto;
+  max-width: none;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -50%)
+    translate(calc(var(--seqz) * var(--pv-seq-x)), calc(var(--seqz) * var(--pv-seq-y)))
+    scale(calc(1 + var(--seqz) * var(--pv-seq-scale)));
+  filter: var(--shadow-can);
+  transition: opacity 0.4s ease;
+  will-change: transform, opacity;
+}
+.pv-can[data-active="true"] {
+  opacity: 1;
+}
+.pv-can[data-active="true"][data-model-ready="true"] {
+  opacity: 0;
+}
+
+/* --- Kopf: Logo und H1 ------------------------------------------------------ */
+.pv-stage__top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 0;
+  text-align: center;
+}
+.pv-hero__logo {
+  display: inline-flex;
+}
+.pv-hero__logo img {
+  height: 28px;
+  width: auto;
+}
+.pv-h1 {
+  margin: 0;
+  font-size: clamp(13px, 3.4vw, 17px);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+/* --- Pfeile ----------------------------------------------------------------- */
+.pv-arrow {
+  position: absolute;
+  top: var(--pv-can-top);
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-aubergine);
+  box-shadow: 0 10px 24px rgba(74, 47, 57, 0.18);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+.pv-arrow:hover {
+  background: #fff;
+}
+.pv-arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+.pv-arrow--prev {
+  left: 10px;
+}
+.pv-arrow--next {
+  right: 10px;
+}
+
+/* --- Sortenname, Punkte, Scrollhinweis -------------------------------------- */
+.pv-stage__bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(78px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  text-align: center;
+  opacity: clamp(0, calc(1 - var(--seq) / 0.3), 1);
+  transform: translateY(calc(var(--seq) * -18px));
+}
+.pv-stage[data-seq-past="true"] .pv-stage__bottom {
+  visibility: hidden;
+}
+
+.pv-names {
+  display: grid;
+  min-height: clamp(50px, 13vw, 92px);
+}
+.pv-names__item {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+.pv-names__item[data-active="true"] {
+  opacity: 1;
+  visibility: visible;
+}
+.pv-names__title {
+  margin: 0;
+  font-size: clamp(30px, 9vw, 66px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.pv-names__notes {
+  margin: 6px 0 0;
+  font-size: clamp(12px, 3.4vw, 15px);
+  opacity: 0.82;
+}
+
+.pv-dots {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: -6px 0;
+}
+.pv-dot {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pv-dot__mark {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(74, 47, 57, 0.32);
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+.pv-dot[aria-current="true"] .pv-dot__mark {
+  width: 26px;
+  background: var(--color-aubergine);
+}
+
+.pv-scrollhint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.pv-scrollhint svg {
+  animation: pv-scrollhint-bounce 1.8s ease-in-out infinite;
+}
+@keyframes pv-scrollhint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+@media (max-height: 700px) {
+  .pv-scrollhint {
+    display: none;
+  }
+}
+
+/* --- Zutaten und Nährwerte -------------------------------------------------- */
+.pv-facts {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 66%;
+  bottom: calc(78px + env(safe-area-inset-bottom));
+  display: grid;
+  padding: 0 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: none;
+  opacity: clamp(0, calc((var(--seq) - 0.4) / 0.22), 1);
+}
+.pv-stage[data-facts="true"] .pv-facts {
+  pointer-events: auto;
+}
+.pv-facts__item {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+.pv-facts__item[data-active="true"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Gestaffeltes Aufsteigen der Zeilen, Muster BYQ scroll-text-reveal */
+.pv-facts__item > * {
+  --start: 0.42;
+}
+.pv-facts__item > *:nth-child(2) {
+  --start: 0.46;
+}
+.pv-facts__item > *:nth-child(3) {
+  --start: 0.5;
+}
+.pv-facts__item > *:nth-child(4) {
+  --start: 0.54;
+}
+.pv-facts__item > *:nth-child(5) {
+  --start: 0.58;
+}
+.pv-facts__item > *:nth-child(n + 6) {
+  --start: 0.62;
+}
+.pv-rise {
+  --t: clamp(0, calc((var(--seq) - var(--start)) / 0.14), 1);
+  opacity: var(--t);
+  transform: translateY(calc((1 - var(--t)) * 18px));
+}
+
+.pv-facts__title {
+  margin: 0;
+  font-size: clamp(20px, 5.4vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+.pv-facts__label {
+  margin: 12px 0 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--flavor-accent);
+}
+.pv-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pv-badge {
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(74, 47, 57, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pv-ingredients {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.pv-ingredients p {
+  margin: 0 0 6px;
+}
+.pv-allergens {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.pv-nutrition {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 14px;
+  margin: 0;
+  font-size: 12.5px;
+}
+.pv-nutrition__row {
+  display: inline-flex;
+  gap: 5px;
+}
+.pv-nutrition dt,
+.pv-nutrition dd {
+  margin: 0;
+}
+.pv-nutrition dt {
+  opacity: 0.75;
+}
+.pv-nutrition dd {
+  font-weight: 600;
+}
+
+/* --- Dauerhafter Warenkorb-Button (G5) -------------------------------------- */
+.pv-atc {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+.pv-atc[data-visible="false"] {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+.pv-atc__meta {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-aubergine);
+}
+.pv-atc__button {
+  width: 100%;
+}
+.pv-atc__button[disabled] {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+/* --- Desktop ---------------------------------------------------------------- */
+@media (min-width: 769px) {
+  .pv-hero {
+    --pv-can-h: calc(var(--pv-vh) * 0.7);
+    --pv-can-top: calc(var(--pv-vh) * 0.47);
+    --pv-seq-x: -19vw;
+    --pv-seq-y: calc(var(--pv-vh) * -0.02);
+    --pv-seq-scale: 0.28;
+  }
+  .pv-hero__logo img {
+    height: 34px;
+  }
+  .pv-arrow {
+    width: 52px;
+    height: 52px;
+  }
+  .pv-arrow--prev {
+    left: 4vw;
+  }
+  .pv-arrow--next {
+    right: 4vw;
+  }
+  .pv-stage__bottom {
+    bottom: 40px;
+  }
+  .pv-facts {
+    left: auto;
+    right: 5vw;
+    top: 50%;
+    bottom: auto;
+    width: min(44vw, 520px);
+    max-height: 78svh;
+    transform: translateY(-50%);
+    padding: 0;
+  }
+}
+@media (min-width: 1024px) {
+  .pv-atc {
+    left: 24px;
+    right: auto;
+    bottom: 24px;
+    align-items: flex-start;
+  }
+  .pv-atc__meta {
+    text-align: left;
+    padding-left: 4px;
+  }
+  .pv-atc__button {
+    width: auto;
+  }
+}
+
+/* --- Ohne JavaScript und ohne Bewegung: alles untereinander, nichts versteckt */
+:is(html.no-js, html.pv-flat) #pv-hero {
+  height: auto;
+}
+:is(html.no-js, html.pv-flat) .pv-hero__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: auto;
+}
+:is(html.no-js, html.pv-flat) .pv-hero__bg-fill {
+  inset: 0;
+  height: 100%;
+}
+:is(html.no-js, html.pv-flat) .pv-stage {
+  position: relative;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 16px 40px;
+}
+:is(html.no-js, html.pv-flat) .pv-stage__top {
+  order: 1;
+}
+:is(html.no-js, html.pv-flat) .pv-cans {
+  order: 2;
+}
+:is(html.no-js, html.pv-flat) .pv-stage__bottom {
+  order: 3;
+}
+:is(html.no-js, html.pv-flat) .pv-facts {
+  order: 4;
+}
+:is(html.no-js, html.pv-flat) :is(.pv-stage__top, .pv-stage__bottom, .pv-cans, .pv-facts) {
+  position: static;
+  inset: auto;
+  width: 100%;
+  max-width: 640px;
+  max-height: none;
+  overflow: visible;
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+:is(html.no-js, html.pv-flat) .pv-cans {
+  display: flex;
+  justify-content: center;
+}
+:is(html.no-js, html.pv-flat) .pv-can {
+  position: static;
+  transform: none;
+  height: min(52svh, 420px);
+  display: none;
+}
+:is(html.no-js, html.pv-flat) .pv-can[data-active="true"] {
+  display: block;
+  opacity: 1;
+}
+:is(html.no-js, html.pv-flat) .pv-facts {
+  display: block;
+}
+:is(html.no-js, html.pv-flat) .pv-facts__item {
+  display: none;
+  opacity: 1;
+  visibility: visible;
+}
+:is(html.no-js, html.pv-flat) .pv-facts__item[data-active="true"] {
+  display: block;
+}
+:is(html.no-js, html.pv-flat) .pv-rise {
+  opacity: 1;
+  transform: none;
+}
+/* Ohne Scroll-Sequenz übernehmen die Fortschrittspunkte den Sortenwechsel,
+   die überlagernden Pfeile hätten im Fluss keinen sinnvollen Platz. */
+:is(html.no-js, html.pv-flat) .pv-arrow {
+  display: none;
+}
+:is(html.no-js, html.pv-flat) .pv-scrollhint {
+  display: none;
+}
+html.no-js .pv-dots {
+  display: none;
+}
+html.no-js .pv-atc {
+  position: static;
+  margin: 8px auto 0;
+  width: min(100%, 420px);
 }
