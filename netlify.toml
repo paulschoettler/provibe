@@ -17,6 +17,9 @@
 # Deploy Previews und Branch-Deploys bekommen keine Live-Secrets. Sie laufen komplett
 # gegen die Mock-Provider (APP_INTEGRATIONS=mock). Live-Keys sind in Netlify nur für den
 # Kontext "production" gesetzt (Scope pro Kontext beim Anlegen der Variablen wählen).
+# Achtung: Werte aus [context.*.environment] gelten nur im Build. Für die Laufzeit sind
+# APP_STAGE und APP_INTEGRATIONS zusätzlich als Netlify-Umgebungsvariablen je Kontext gesetzt.
+# PR-Deploys sind auf der Site abgeschaltet (skip_prs), es baut nur der Produktionsbranch.
 [context.deploy-preview.environment]
   APP_INTEGRATIONS = "mock"
   APP_STAGE = "preview"
@@ -29,7 +32,9 @@
   APP_STAGE = "production"
 
 # Bis zum Go-live: kein Crawler indexiert die Netlify-Domain. Der Header fällt
-# im Zuge des DNS-Umzugs (docs/golive.md).
+# im Zuge des DNS-Umzugs (docs/golive.md). Diese Header gelten für statische Dateien;
+# für gerenderte Seiten setzt next.config.ts dieselben Header (Netlify wendet toml-Header
+# nicht auf Antworten des Next-Runtimes an).
 [[headers]]
   for = "/*"
   [headers.values]
