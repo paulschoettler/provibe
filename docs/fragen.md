@@ -166,3 +166,5 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **H2. Steuersatz.** Alle Produkte stehen auf dem Regelsatz 19 %. Ist der Eistee mit Protein als Lebensmittel mit 7 % einzustufen? Das ist eine Frage an den Steuerberater; bis zur Antwort rechnet der Shop mit 19 %, so wie Shopify heute. Änderung wäre nur ein Datenwert (`products.tax_class`).
 
 **H3. Bestand.** Laut Antwort C5 läuft die Bestandsführung erst ab dem Import. Migration `20260921160000_inventory_unlimited_until_import` schaltet `track_inventory` bis dahin ab, sonst wäre jede Variante mit Bestand 0 im Warenkorb ausverkauft. Keine Aktion nötig, nur zur Kenntnis.
+
+**Antworten vom 17.10.2026 (H und Arbeitsweise):** Stripe und Resend bleiben Mock, Erinnerung vor dem Go-live in `docs/golive.md`. Admin-Zugänge: hello@provibe-drinks.de als Owner, mail@paulschoettler.de als Admin. Alle Unterseiten werden nach den Figma-Screens ohne weitere Rückfrage gebaut. Kundenkonto und Abo: Plan in `docs/konto-und-abo-plan.md`, Konto wird gebaut, Abo wartet auf Freigabe des Plans.

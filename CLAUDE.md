@@ -13,7 +13,8 @@ Weitere Projektdokumente:
 - `docs/quelltexte/`: Originaltexte aller Shopify-Seiten (Rechtstexte, Produkttexte), `assets/source/`: Originalmedien und Shopify-Snapshot
 - `supabase/migrations/`: Schema- und Seed-Migrationen, lokal per `pnpm db:local` prüfbar (PostgreSQL 16 ohne Docker), remote per Supabase-MCP `apply_migration` mit identischem Namen anwenden. Supabase-Projekt: `ajscwnbgaijknmdrtihn`.
 - `src/lib/pricing/`: einzige Stelle für Preis-, Pfand-, Grundpreis-, Rabatt-, Versand- und Steuerlogik. `src/lib/integrations/`: Provider-Interfaces mit Mocks (APP_INTEGRATIONS=mock).
-- `docs/redirects.md`, `docs/legal-checklist.md`, `docs/rechtstexte-aenderungen.md`, `docs/golive.md`, `docs/handbuch.md` entstehen in späteren Phasen
+- `docs/golive.md`: Go-live-Checkliste mit Erinnerungen (Stripe, Resend, Lexware, DHL, Rechtstexte, Lieferungen). `docs/konto-und-abo-plan.md`: Plan für Kundenkonto und Abo.
+- `docs/redirects.md`, `docs/legal-checklist.md`, `docs/rechtstexte-aenderungen.md`, `docs/handbuch.md` entstehen in späteren Phasen
 
 ## Arbeitsweise
 
