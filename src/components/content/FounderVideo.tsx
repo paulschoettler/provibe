@@ -24,7 +24,7 @@ const FORMAT: "hoch" | "quer" = "hoch";
  * Alternative zur Datei im Repo: öffentliche URL aus dem Supabase-Speicher (Bucket product-media,
  * Ordner videos). Große Videos gehören nicht ins Git. Leer lassen, solange keine URL vorliegt.
  */
-const REMOTE_VIDEO_URL = "";
+const REMOTE_VIDEO_URL: string = "";
 const POSTER = "/images/team/celine.jpg";
 
 function videoSources(): VideoSource[] {

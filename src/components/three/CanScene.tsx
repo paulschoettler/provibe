@@ -38,7 +38,8 @@ import { CAN_FRONT_ROTATION_Y, prepareCanMaterial } from "./can-material";
  * - Sequenz: 0 bis 0,4 Kamerazoom, 0,4 bis 0,7 aktive Dose dreht 180 Grad, dann halten.
  * - Finale (#pvlogo): drei Dosen fliegen zum Logo-Zoom ins Bild. Lage, Größe,
  *   Winkel und Deckkraft kommen von den PNG-Platzhaltern im DOM
- *   ([data-finale-can], siehe finaleCanPose), die LogoZoomMotion bewegt.
+ *   ([data-finale-can], siehe finaleCanPose), die LogoZoomMotion bewegt. In der
+ *   Tiefe stehen sie gestaffelt (FINALE_CAN_LAYER), am Ziel schweben sie leicht.
  *
  * Die Datei wird per next/dynamic mit ssr:false eingebunden und darf deshalb
  * three direkt importieren. Ohne tier "3d" rendert sie nichts.
@@ -103,6 +104,43 @@ const FINALE_CAN_SLUGS = ["wildberry", "peach", "raspberry-lime"] as const;
  * Dose wirkte oben waagerecht abgeschnitten (Feedback vom 17.10.2026).
  */
 const FINALE_VIEW_TILT = 8 * DEG;
+/**
+ * Tiefenstaffel der Finale-Dosen, gleiche Reihenfolge wie FINALE_CAN_SLUGS:
+ * Raspberry Lime vorn (Ebene 0), Wildberry eine Ebene dahinter, Peach eine halbe
+ * Ebene weiter hinten, damit sich auch die beiden nach innen gekippten Böden der
+ * hinteren Dosen nicht berühren. Die PNG-Platzhalter überlappen sich in der
+ * Bildebene; stünden die Modelle alle bei z = 0, steckten sie ineinander.
+ */
+const FINALE_CAN_LAYER = [1, 1.5, 0] as const;
+/** Dosenradius geteilt durch die Höhe (Bounding Box der GLB, siehe hero-geometry). */
+const FINALE_CAN_RADIUS = 0.25;
+/**
+ * Idle-Bewegung im Endzustand: Schweben (Anteil der Dosenhöhe), Hin- und Herdrehen
+ * um die Hochachse (Grad, das Etikett bleibt lesbar) und Vor und Zurück in der Tiefe
+ * (Anteil der Dosenhöhe). Je Dose versetzt, damit sie nicht im Gleichtakt laufen.
+ */
+const FINALE_IDLE_FLOAT = 0.022;
+const FINALE_IDLE_YAW = 5 * DEG;
+const FINALE_IDLE_DEPTH = 0.07;
+const FINALE_IDLE_PHASE = [0, 2.1, 4.2] as const;
+/** Ab hier stehen die Dosen am Ziel (Choreografie: letzte Dose bei 0,8, Haltezone ab 0,95). */
+const FINALE_SETTLE_FROM = 0.8;
+const FINALE_SETTLE_TO = 0.95;
+
+/**
+ * Abstand in der Tiefe zwischen zwei Ebenen der Finale-Staffel, in Welteinheiten.
+ * Vordere und hintere Dose dürfen sich nicht durchdringen, egal wie weit sich ihre
+ * Platzhalter überlappen: Achsabstand mindestens Radius vorn plus Radius hinten plus
+ * ein halber Dosendurchmesser Luft plus der Ausschlag der Idle-Bewegung beider Dosen.
+ * Die hintere Dose wird mit der Tiefe größer skaliert (Faktor (D + dz) / D), deshalb
+ * ist dz nach sich selbst aufgelöst.
+ */
+function finaleLayerGap(frontHeight: number, backHeight: number, distance: number): number {
+  const front = FINALE_CAN_RADIUS * frontHeight + FINALE_IDLE_DEPTH * frontHeight;
+  const back = (2 * FINALE_CAN_RADIUS + FINALE_IDLE_DEPTH) * backHeight;
+  const grow = back / Math.max(distance, 0.0001);
+  return (front + back) / Math.max(0.2, 1 - grow);
+}
 
 interface FinaleCanPose {
   x: number;
@@ -359,6 +397,7 @@ function Scene({ flavors, mobileModels }: SceneProps) {
   const footerOpacity = useRef<number[]>([]);
   const footerFrames = useRef<number[]>([]);
   const footerAnchors = useRef<Array<HTMLElement | null>>([]);
+  const finalePoses = useRef<Array<FinaleCanPose | null>>([]);
   /** Wiederverwendete Rechenobjekte für die Ausrichtung der Finale-Dosen. */
   const finalePose = useMemo(
     () => ({
@@ -421,8 +460,11 @@ function Scene({ flavors, mobileModels }: SceneProps) {
 
     const ring = ringRef.current;
     if (ring) {
-      const hidden = seq >= 1 && !heroVisible.current;
-      ring.visible = !hidden;
+      // Nur sichtbar, solange die Hero-Bühne im Bild ist und das Finale nicht.
+      // Früher hing das zusätzlich an seq >= 1: Nach einem Neuladen weiter unten
+      // (Scroll-Wiederherstellung) oder wenn scrub noch hinterherläuft, steht seq
+      // unter 1, und das ganze Karussell stand mitten im Finale (Feedback 17.10.2026).
+      ring.visible = heroVisible.current && store.footerProgress === 0;
       // Die Plätze stehen auf einer Ellipse und werden einzeln gesetzt, deshalb
       // dreht sich die Gruppe selbst nicht.
       ring.rotation.y = 0;
@@ -479,9 +521,8 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     // "Sektion im Bild"; die Bewegung selbst steckt in Lage und data-r/data-o im DOM.
     const footer = store.footerProgress;
     const distance = state.camera.position.z;
-    for (let index = 0; index < footerRefs.current.length; index += 1) {
-      const group = footerRefs.current[index];
-      if (!group) continue;
+    const poses = finalePoses.current;
+    for (let index = 0; index < FINALE_CAN_SLUGS.length; index += 1) {
       let anchor = footerAnchors.current[index] ?? null;
       if (!anchor || !anchor.isConnected) {
         anchor = document.querySelector<HTMLElement>(
@@ -489,18 +530,50 @@ function Scene({ flavors, mobileModels }: SceneProps) {
         );
         footerAnchors.current[index] = anchor;
       }
-      const pose = footer > 0 && anchor ? finaleCanPose(anchor, size, distance) : null;
+      poses[index] = footer > 0 && anchor ? finaleCanPose(anchor, size, distance) : null;
+    }
+    // Tiefenstaffel aus den Höhen der Platzhalter: vordere Dose gegen die größere
+    // der hinteren, damit der Abstand für beide Seiten reicht.
+    const frontPose = poses[FINALE_CAN_LAYER.indexOf(0)];
+    const backHeight = Math.max(
+      ...poses.map((pose, index) => (pose && FINALE_CAN_LAYER[index] > 0 ? pose.height : 0)),
+    );
+    const layerGap = frontPose ? finaleLayerGap(frontPose.height, backHeight, distance) : 0;
+    /** 0 im Flug, 1 am Ziel: blendet die Idle-Bewegung weich ein. */
+    const settle = still
+      ? 0
+      : THREE.MathUtils.smoothstep(footer, FINALE_SETTLE_FROM, FINALE_SETTLE_TO);
+
+    for (let index = 0; index < footerRefs.current.length; index += 1) {
+      const group = footerRefs.current[index];
+      if (!group) continue;
+      const anchor = footerAnchors.current[index] ?? null;
+      const pose = poses[index] ?? null;
       if (!pose) {
         group.visible = false;
         continue;
       }
       group.visible = pose.opacity > 0.01;
-      group.position.set(pose.x, pose.y, 0);
+
+      // Jede Dose bekommt ihre eigene Tiefe. Lage und Größe wachsen mit dem Abstand
+      // zur Kamera, damit sie auf dem Schirm genau auf ihrem Platzhalter bleibt.
+      const z = -(FINALE_CAN_LAYER[index] ?? 0) * layerGap;
+      const grow = (distance - z) / distance;
+      const phase = FINALE_IDLE_PHASE[index] ?? 0;
+      const floatY = Math.sin(time * 0.9 + phase) * FINALE_IDLE_FLOAT * pose.height * settle;
+      const idleYaw = Math.sin(time * 0.55 + phase * 1.3) * FINALE_IDLE_YAW * settle;
+      // Vor und zurück ohne Ausgleich der Größe: Die Dose wird dabei sichtbar ein
+      // wenig größer und kleiner. Der Ausschlag steckt schon in layerGap.
+      const idleZ = Math.sin(time * 0.6 + phase * 0.7) * FINALE_IDLE_DEPTH * pose.height * settle;
+      const x = pose.x * grow;
+      const y = pose.y * grow + floatY;
+      group.position.set(x, y, z + idleZ);
+
       // Erst um die eigene Achse (im Flug zur Bildmitte, am Ziel frontal), dann
       // mit dem Deckel zur Kamera neigen, dann in der Bildebene kippen wie CSS rotate.
       finalePose.euler.set(
         FINALE_VIEW_TILT,
-        CAN_BASE_ROTATION_Y - pose.turn * 1.2 * DEG,
+        CAN_BASE_ROTATION_Y - pose.turn * 1.2 * DEG + idleYaw,
         -pose.rotate * DEG,
         "ZXY",
       );
@@ -510,11 +583,11 @@ function Scene({ flavors, mobileModels }: SceneProps) {
       // oder von oben. Deshalb zeigt ihre Vorderseite immer genau zur Kamera: Jede
       // Dose sieht an jeder Bildposition so aus wie in der Bildmitte.
       finalePose.ray
-        .set(state.camera.position.x - pose.x, state.camera.position.y - pose.y, distance)
+        .set(state.camera.position.x - x, state.camera.position.y - y, distance - z)
         .normalize();
       finalePose.look.setFromUnitVectors(FORWARD, finalePose.ray);
       group.quaternion.multiplyQuaternions(finalePose.look, finalePose.local);
-      group.scale.setScalar(pose.height);
+      group.scale.setScalar(pose.height * grow);
       if (group.children.length === 0) footerOpacity.current[index] = -1;
       if (Math.abs((footerOpacity.current[index] ?? -1) - pose.opacity) > 0.004) {
         footerOpacity.current[index] = pose.opacity;
