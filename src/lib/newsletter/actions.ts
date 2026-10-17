@@ -5,6 +5,7 @@ import { z } from "zod";
 import { publicEnv } from "@/lib/env/public";
 import { integrations } from "@/lib/integrations";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { buildSignUpEvent, emitTrackingEvent } from "@/lib/tracking/events";
 import {
   CONSENT_TEXT,
   CONSENT_VERSION,
@@ -104,6 +105,7 @@ export async function subscribeToNewsletter(
       template: "newsletter_double_opt_in",
     });
 
+    await emitTrackingEvent(buildSignUpEvent(`sign_up_${hashToken(token).slice(0, 24)}`));
     return { status: "ok", message: NEWSLETTER_SUCCESS_MESSAGE };
   } catch (error) {
     console.error("[newsletter] Anmeldung fehlgeschlagen", error);

@@ -11,6 +11,12 @@ import {
   useTransition,
 } from "react";
 import { addToCart, readCart, removeCartLine, updateCartLine } from "@/lib/cart/actions";
+import {
+  trackAddToCart,
+  trackQuantityChange,
+  trackRemoveFromCart,
+  trackViewCart,
+} from "@/components/tracking/cart-events";
 import type { CartActionResult, CartView } from "@/lib/cart/types";
 import { CartContext, type CartContextValue } from "./cart-context";
 
@@ -63,7 +69,10 @@ export function CartProvider({
     });
   }, [initialCart]);
 
-  const open = useCallback(() => setIsOpen(true), []);
+  const open = useCallback(() => {
+    setIsOpen(true);
+    trackViewCart(cart);
+  }, [cart]);
   const close = useCallback(() => {
     setIsOpen(false);
     setError(null);
@@ -99,31 +108,43 @@ export function CartProvider({
   );
 
   const addLine = useCallback(
-    (variantId: string, quantity = 1) => run(() => addToCart(variantId, quantity), true),
+    (variantId: string, quantity = 1, options?: { subscriptionIntervalWeeks?: number | null }) =>
+      run(() => addToCart(variantId, quantity, options ?? {}), true).then((result) => {
+        if (result.ok) trackAddToCart(result.cart, variantId, quantity);
+        return result;
+      }),
     [run],
   );
 
   const updateLine = useCallback(
     (lineId: string, quantity: number) => {
+      const before = cart.lines.find((l) => l.id === lineId);
       // Optimistisch: die Menge sofort anzeigen, der Server liefert gleich die echten Summen
       setCart((current) => ({
         ...current,
         lines: current.lines.map((l) => (l.id === lineId ? { ...l, quantity } : l)),
       }));
-      return run(() => updateCartLine(lineId, quantity), false);
+      return run(() => updateCartLine(lineId, quantity), false).then((result) => {
+        if (result.ok) trackQuantityChange(before, quantity);
+        return result;
+      });
     },
-    [run],
+    [run, cart],
   );
 
   const removeLine = useCallback(
     (lineId: string) => {
+      const before = cart.lines.find((l) => l.id === lineId);
       setCart((current) => ({
         ...current,
         lines: current.lines.filter((l) => l.id !== lineId),
       }));
-      return run(() => removeCartLine(lineId), false);
+      return run(() => removeCartLine(lineId), false).then((result) => {
+        if (result.ok) trackRemoveFromCart(before);
+        return result;
+      });
     },
-    [run],
+    [run, cart],
   );
 
   const value = useMemo<CartContextValue>(

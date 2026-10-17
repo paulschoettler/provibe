@@ -8,6 +8,7 @@ import { FilterBar } from "@/components/catalog/FilterBar";
 import { breadcrumbLd, itemListLd, JsonLd } from "@/components/catalog/JsonLd";
 import { PriceFootnote } from "@/components/catalog/parts";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import { TrackCollectionView } from "@/components/tracking/views";
 import {
   getCollection,
   getShippingInfo,
@@ -86,6 +87,7 @@ export default async function CollectionPage({
           itemListLd(collection.title, products),
         ]}
       />
+      <TrackCollectionView id={collection.handle} name={collection.title} products={products} />
       <CollectionHero
         crumbs={crumbs}
         title={collection.title}

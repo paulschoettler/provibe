@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { checkRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/security/rate-limit";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { buildGenerateLeadEvent, emitTrackingEvent } from "@/lib/tracking/events";
 import { echoValues, isTestAddress, readFields, sendMail, setSummaryCookie } from "./common";
 import { partnerConfirmationMail, partnerInternalMail } from "./emails";
 import { BUSINESS_TYPES, fieldErrors, labelFor, partnerSchema } from "./schemas";
@@ -95,6 +96,7 @@ export async function submitPartnerForm(_prev: FormState, formData: FormData): P
     }),
   ]);
 
+  await emitTrackingEvent(buildGenerateLeadEvent(`generate_lead_${leadId}`));
   await setSummaryCookie("pv_partner_sent", "/pages/partner", {
     company: d.company,
     businessType: businessLabel,

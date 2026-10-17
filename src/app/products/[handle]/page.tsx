@@ -10,6 +10,7 @@ import { FaqSection, LmivSections } from "@/components/catalog/ProductDetails";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductGallery, type GallerySlide } from "@/components/catalog/ProductGallery";
 import { ProductPurchase } from "@/components/catalog/ProductPurchase";
+import { TrackProductView } from "@/components/tracking/views";
 import {
   getProductByHandle,
   getShippingInfo,
@@ -21,6 +22,7 @@ import {
   type ShippingInfo,
 } from "@/lib/catalog/products";
 import { formatEur } from "@/lib/money";
+import { getSubscriptionOffer } from "@/lib/subscriptions/offer";
 
 /**
  * Produktseite mit vier Darstellungen nach Produkttyp (Figma Sorte 32:1166 / 35:10340,
@@ -74,6 +76,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
 
   const isDrink = product.type === "sorte" || product.type === "mixed";
   const isBundle = product.type === "bundle";
+  // Abo-Angebot für Sorten und Mixed (Paket Abo), statisch mitgerendert
+  const subscription = isDrink ? await getSubscriptionOffer(product.id) : null;
   const collection = product.breadcrumbCollection;
   const heading = product.type === "sorte" ? product.shortTitle : product.title;
   const faq = product.faq.length ? product.faq : isDrink ? defaultFaq(product, shipping) : [];
@@ -105,6 +109,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   return (
     <SiteShell>
       <JsonLd data={ld} />
+      <TrackProductView product={product} />
 
       <div className="mx-auto grid w-full max-w-[1200px] gap-6 pb-12 lg:grid-cols-[minmax(0,588px)_minmax(0,564px)] lg:justify-between lg:gap-12 lg:px-6 lg:pt-7 lg:pb-16">
         {/* Galerie (mobil randlos), bei Bundles darunter "Über das Set" */}
@@ -238,6 +243,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             optionName={product.optionName}
             bundleCans={bundleCans}
             deliveryTimeText={deliveryTime}
+            subscription={subscription}
           />
 
           <ShippingNote product={product} shipping={shipping} deliveryTime={deliveryTime} />

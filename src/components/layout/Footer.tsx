@@ -87,7 +87,12 @@ export function Footer({ quickLinks }: FooterProps) {
         </div>
 
         <div className="pv-footer-bottom">
-          <p>© {year} provibe</p>
+          <p>
+            © {year} provibe
+            <a href="/cookie-einstellungen" data-consent-open="" className="pv-consent-footer-link">
+              Cookie-Einstellungen
+            </a>
+          </p>
           <p className="pv-footer-bottom-links">
             <SiteLink href="/pages/impressum" className="pv-footer-inline-link">
               Impressum

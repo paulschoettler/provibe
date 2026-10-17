@@ -11,6 +11,7 @@ import {
 } from "@/components/catalog/icons";
 import { Eyebrow, PageBand } from "@/components/catalog/parts";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import { TrackSearch } from "@/components/tracking/views";
 import { listProducts } from "@/lib/catalog/products";
 import {
   normalizeQuery,
@@ -51,6 +52,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   return (
     <SiteShell>
+      <TrackSearch query={q} />
       <PageBand innerClassName="max-w-[800px]">
         <Blob
           className="pvc-band-deco top-[-60px] right-[-120px] h-[300px] w-[300px] lg:hidden"

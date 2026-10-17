@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { ConsentRoot } from "@/components/consent/ConsentRoot";
 import { EMPTY_CART } from "@/lib/cart/types";
 import "./globals.css";
 
@@ -57,6 +58,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider initialCart={EMPTY_CART}>
           {children}
           <CartDrawer />
+          {/* Consent-Banner, Einstellungsdialog und Tracking (nur nach Einwilligung) */}
+          <ConsentRoot />
         </CartProvider>
       </body>
     </html>
