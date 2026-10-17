@@ -65,10 +65,25 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
       </div>
 
       <div id="pv-sequence" className="pv-stage">
+        {/* Deckend-Filter für die Dosen-PNGs: Die Freisteller haben teils
+            halbtransparente Pixel (Wildberry-Deckel mit Alpha 0,58 bis 0,9), durch
+            die sonst die Riesentypo dahinter scheint. Alpha mal 2 macht die Dose
+            deckend, die weichen Kanten bleiben weich. Nicht display: none, sonst
+            greift der Filter in Chromium nicht. */}
+        <svg className="pv-svgdefs" aria-hidden="true" focusable="false" width="0" height="0">
+          <filter id="pv-can-solid" colorInterpolationFilters="sRGB">
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="2" />
+            </feComponentTransfer>
+          </filter>
+        </svg>
+
         {/* Freigestellte Dosen als Server-HTML: eine vorn, je eine links und rechts.
-            Sie bleiben sichtbar, bis die 3D-Szene die aktive Sorte gerendert hat,
-            und sind der dauerhafte Fallback ohne WebGL (G11: kein Loader).
-            data-pos hält dieselbe Anordnung wie der Ring der 3D-Szene. */}
+            Sie sind Ladeplatzhalter, bis die 3D-Szene die aktive Sorte gerendert
+            hat, und verschwinden dann ohne Überblendung; ohne WebGL sind sie der
+            dauerhafte Fallback (G11: kein Loader). Immer deckend, damit nie ein
+            Sortenwort durch eine Dose scheint. data-pos hält dieselbe Anordnung wie
+            der Ring der 3D-Szene. */}
         <div className="pv-cans" aria-hidden="true">
           {flavors.map((flavor, index) => (
             // eslint-disable-next-line @next/next/no-img-element

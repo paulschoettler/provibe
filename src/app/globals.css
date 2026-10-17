@@ -1810,17 +1810,25 @@ html[data-tier="static"] .pv-canvas {
 }
 
 /* --- Dosen-PNG (Ladeplatzhalter und Ersatz ohne WebGL) ---------------------- */
+/* Der Filter aus Hero.tsx braucht ein SVG im Baum, das nicht display: none ist. */
+.pv-svgdefs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
 .pv-cans {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transition:
-    opacity 0.25s ease,
-    visibility 0s linear 0.25s;
 }
 /* Sobald die 3D-Szene die aktive Sorte wirklich gerendert hat, verschwinden alle
-   PNGs. Es steht nie ein PNG neben oder hinter der 3D-Dose. */
-#pv-hero[data-canvas-ready="true"] .pv-cans {
+   PNGs, hart und ohne Überblendung: Eine halb ausgeblendete PNG-Dose ließ das
+   Sortenwort dahinter durchscheinen (Feedback vom 17.10.2026). Es steht nie ein
+   PNG neben, vor oder hinter der 3D-Dose. Nur im 3D-Modus, damit eine liegen
+   gebliebene Marke ohne Canvas nie beide Dosen verschluckt. */
+html[data-tier="3d"] #pv-hero[data-canvas-ready="true"] .pv-cans {
   opacity: 0;
   visibility: hidden;
 }
@@ -1835,7 +1843,8 @@ html[data-tier="static"] .pv-canvas {
   visibility: hidden;
   transform-origin: 50% 50%;
   transform: translate(-50%, -50%) translate(var(--pv-x), var(--pv-y)) scale(var(--pv-k));
-  filter: var(--shadow-can);
+  /* Erst deckend machen (halbtransparente Freistellerpixel), dann der Schatten. */
+  filter: url(#pv-can-solid) var(--shadow-can);
   will-change: transform, opacity;
 }
 .pv-can[data-active="true"] {
@@ -1843,10 +1852,11 @@ html[data-tier="static"] .pv-canvas {
   visibility: visible;
 }
 /* Nachbardosen: dieselbe Anordnung wie auf dem Ring der 3D-Szene, nach außen
-   gekippt und etwas kleiner. */
+   gekippt und etwas kleiner. Voll deckend wie die 3D-Dosen, sonst scheint die
+   hintere Zeile der Riesentypo durch. */
 .pv-can[data-pos="prev"],
 .pv-can[data-pos="next"] {
-  opacity: 0.9;
+  opacity: 1;
   visibility: visible;
   transform: translate(-50%, -50%)
     translate(calc(var(--pv-x) + var(--pv-side) * var(--pv-neighbor-x)), var(--pv-y))
@@ -2613,7 +2623,7 @@ html:not([data-flat])
 html:not([data-flat])
   :is(#pv-hero[data-layout="compact"], #pv-hero[data-layout="vignette"])
   .pv-can:is([data-pos="prev"], [data-pos="next"]) {
-  opacity: calc(0.9 * (1 - var(--seqz)));
+  opacity: calc(1 - var(--seqz));
 }
 
 /* Vignette (Telefon unter 700 px Höhe): Die Dose steht in einem ovalen Fenster
