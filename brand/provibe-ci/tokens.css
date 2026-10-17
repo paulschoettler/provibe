@@ -1,0 +1,61 @@
+/* PROVIBE Design Tokens
+   Quelle: newsletter 1 2.ai (Artboard 1080 px breit), Werte für Web auf 600 px skaliert (Faktor 0.556).
+   Siehe CI-GUIDE.md für Regeln und Verwendung. */
+
+/* Adobe Fonts Web-Kit (Filson Pro, Kepler Std, Prenton Condensed).
+   Alternativ im HTML-<head>: <link rel="stylesheet" href="https://use.typekit.net/sne6rux.css"> */
+@import url("https://use.typekit.net/sne6rux.css");
+
+:root {
+  /* Farben */
+  --pv-wildberry: #702249;       /* Sortenfarbe Wildberry + Markenbasis: Hintergrund, Headlines, Buttons, Infoboxen */
+  --pv-cream: #F3F1B8;       /* Primär: Karten-Hintergrund, Text auf Wildberry, Logo auf Wildberry */
+  --pv-lime-raspberry: #E4DF6A; /* Sortenfarbe Lime-Raspberry: Frucht-Icons, Akzentflächen. Nie Text auf Cream */
+  --pv-burgundy: #470E14;       /* Textfarbe in Peach-Kommunikation */
+  --pv-peach: #F4A076;          /* Sortenfarbe Peach: CTA-Button, Akzente */
+  --pv-white: #FFFFFF;       /* Text auf Wildberry-Boxen und Buttons */
+
+  /* Schriften: font-family-Namen exakt wie im Adobe-Kit sne6rux.
+     Kursive immer mit font-style: italic verwenden. */
+  --pv-font-sans: "filson-pro", sans-serif;                          /* Kit: 400, 700 (+ italic) */
+  --pv-font-serif-italic: "kepler-std-semicondensed-dis", serif;      /* Kit: 400, 700 italic – große Akzentwörter (script-xl) */
+  --pv-font-serif-italic-sub: "kepler-std-semicondensed-sub", serif;  /* Kit: 400, 700 italic – Akzentzeilen (script-l, script-m) */
+  --pv-font-condensed: "prenton-condensed", sans-serif;              /* Kit: 400, 700 */
+
+  /* Gewichte (Sollwerte laut Design; siehe Hinweis "Kit-Abdeckung" im CI-GUIDE) */
+  --pv-fw-regular: 400;
+  --pv-fw-medium: 500;   /* Filson Medium – fehlt im Kit, Browser fällt auf 400 zurück */
+  --pv-fw-bold: 700;
+  --pv-fw-black: 900;    /* Filson Black – fehlt im Kit, Browser fällt auf 700 zurück */
+  --pv-fw-script: 600;   /* Kepler Semibold – Kit hat 400/700, Browser nimmt 700 */
+
+  /* Schriftgrößen (Web, Basis 600 px Layoutbreite) */
+  --pv-fs-display: 134px;    /* "Peach" – Filson Medium, tracking -0.09em */
+  --pv-fs-hero: 63px;        /* "Unser Vorrat ist limitiert!" – Filson Medium, tracking -0.09em */
+  --pv-fs-h1: 52px;          /* "Taste The Trio!" – Filson Medium, tracking -0.015em */
+  --pv-fs-script-xl: 75px;   /* Kepler Semibold Italic Akzentwort ("Pre-Sale", "Klassiker") */
+  --pv-fs-script-l: 62px;    /* Kepler Medium Italic Zeile ("sei schnell", "unsere erste Sorte ist") */
+  --pv-fs-script-m: 44px;    /* Kepler Medium Italic Box-Headline ("Unsere Lieferkonditionen") */
+  --pv-fs-h2: 35px;          /* Filson Medium/Book ("Es ist soweit!") */
+  --pv-fs-usp: 23px;         /* Filson Regular ("0g Zucker  15g Protein  100% natürlich") */
+  --pv-fs-label: 22px;       /* Prenton Cond Regular, Produkt-Callouts */
+  --pv-fs-body: 19px;        /* Filson Regular, line-height 1.2 */
+  --pv-fs-button: 19px;      /* Filson Bold, weiß */
+  --pv-fs-social: 18px;      /* Prenton Cond Bold, cream */
+  --pv-fs-legal: 11.5px;     /* Filson Regular, cream, zentriert */
+
+  --pv-lh-tight: 1.0;
+  --pv-lh-body: 1.2;
+  --pv-lh-label: 1.27;
+  --pv-track-display: -0.09em;
+  --pv-track-headline: -0.015em;
+
+  /* Radien & Abstände */
+  --pv-radius-card: 31px;    /* Cream-Karte auf Wildberry (55 px @1080) */
+  --pv-radius-box: 24px;     /* Wildberry-Infobox in der Karte (44 px @1080) */
+  --pv-radius-button: 12px;  /* URL-/CTA-Button (22 px @1080) */
+  --pv-gutter: 24px;         /* Abstand Karte zum Rand (43 px @1080) */
+  --pv-card-padding: 32px;   /* Innenabstand Karte (58 px @1080) */
+  --pv-box-padding: 35px;    /* Innenabstand Infobox (63 px @1080) */
+  --pv-button-height: 52px;  /* (94 px @1080) */
+}
