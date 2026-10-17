@@ -7,7 +7,9 @@ export class MockEmailProvider implements EmailProvider {
   readonly contacts = new Map<string, { firstName?: string; unsubscribed: boolean }>();
 
   async send(input: SendEmailInput): Promise<SendEmailResult> {
-    const id = `mock_${this.outbox.length + 1}`;
+    // Eindeutig über Prozessneustarts hinweg: email_messages.provider_message_id ist unique,
+    // ein reiner Zähler kollidierte nach jedem Neustart mit den vorhandenen Zeilen.
+    const id = `mock_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}_${this.outbox.length + 1}`;
     this.outbox.push({ ...input, id, sentAt: new Date() });
     return { status: "sent", providerMessageId: id };
   }
