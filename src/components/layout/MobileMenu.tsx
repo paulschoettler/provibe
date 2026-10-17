@@ -1,10 +1,10 @@
 "use client";
 
 import { SiteLink } from "./SiteLink";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { MenuItem } from "@/lib/catalog/home";
-import { BurgerIcon, CloseIcon, InstagramIcon, TiktokIcon } from "./icons";
+import { BurgerIcon, CloseIcon } from "./icons";
 import { SOCIAL_LINKS } from "./social";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
@@ -16,8 +16,17 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input, [tabindex]:not([tabin
  *
  * Der Drawer hängt per Portal am Body, weil der Header einen backdrop-filter hat und
  * damit ein position: fixed darin nicht mehr am Viewport ausgerichtet wäre.
+ *
+ * Die Social-Icons (CI-SVGs, serverseitig aus brand/ gelesen) reicht der Header als
+ * fertige Elemente herein, weil diese Client-Komponente kein Dateisystem lesen kann.
  */
-export function MobileMenu({ menus }: { menus: MenuItem[] }) {
+export function MobileMenu({
+  menus,
+  socialIcons,
+}: {
+  menus: MenuItem[];
+  socialIcons: { instagram: ReactNode; tiktok: ReactNode };
+}) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -107,11 +116,7 @@ export function MobileMenu({ menus }: { menus: MenuItem[] }) {
                 className="pv-social"
                 aria-label={`provibe auf ${social.label}`}
               >
-                {social.label === "Instagram" ? (
-                  <InstagramIcon className="h-5 w-5" />
-                ) : (
-                  <TiktokIcon className="h-5 w-5" />
-                )}
+                {social.label === "Instagram" ? socialIcons.instagram : socialIcons.tiktok}
               </a>
             ))}
           </div>

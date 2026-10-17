@@ -94,7 +94,12 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
         <div className="pv-stage__top">
           <Link className="pv-hero__logo" href="/">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/brand/logo-wine.png" alt="provibe" width={1000} height={297} />
+            <img
+              src="/brand/logo/provibe-logo-wildberry.svg"
+              alt="provibe"
+              width={202}
+              height={79}
+            />
           </Link>
           <h1 className="pv-h1">Eistee mit 15 g Protein</h1>
         </div>

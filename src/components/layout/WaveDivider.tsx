@@ -13,7 +13,7 @@ export type WaveShape = "soft" | "swell" | "double";
 
 export interface WaveDividerProps {
   shape?: WaveShape;
-  /** CSS-Farbe oder Token, z.B. "var(--color-butter)" */
+  /** CSS-Farbe oder Token, z.B. "var(--pv-lime-raspberry)" */
   fill: string;
   /** "top": Welle liegt über der Sektion. "bottom": Welle liegt unter der Sektion. */
   position?: "top" | "bottom";

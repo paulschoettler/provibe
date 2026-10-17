@@ -4,8 +4,8 @@ import { WaveDivider, type WaveShape } from "@/components/layout/WaveDivider";
 
 /**
  * Dekorative Bausteine der Inhaltsseiten (Figma Richtung A): Eyebrow, Protein-Sticker,
- * Frucht-Sticker, Blobs und Icons. Alles rein dekorativ (aria-hidden), Assets aus
- * public/images/inhalte (aus Figma geladen).
+ * Blobs und Icons. Alles rein dekorativ (aria-hidden), Assets aus public/images/inhalte
+ * (aus Figma geladen). Frucht-Sticker kommen aus dem CI: src/components/brand/FruitSticker.tsx.
  */
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -31,39 +31,6 @@ export function ProteinSticker({
       <b>15 g</b>
       <span>Protein</span>
     </span>
-  );
-}
-
-const STICKERS = {
-  brombeere: { src: "/images/inhalte/sticker-brombeere.svg", w: 64, h: 67 },
-  erdbeere: { src: "/images/inhalte/sticker-erdbeere.svg", w: 76, h: 88 },
-  pfirsich: { src: "/images/inhalte/sticker-pfirsich.svg", w: 84, h: 84 },
-} as const;
-
-/** Frucht-Sticker (A/Sticker Brombeere, Erdbeere, Pfirsich). Breite über className steuern. */
-export function FruitSticker({
-  kind,
-  className = "",
-  rotate = 0,
-  style,
-}: {
-  kind: keyof typeof STICKERS;
-  className?: string;
-  rotate?: number;
-  style?: CSSProperties;
-}) {
-  const s = STICKERS[kind];
-  return (
-    <Image
-      src={s.src}
-      alt=""
-      aria-hidden="true"
-      width={s.w}
-      height={s.h}
-      unoptimized
-      className={`pv-sticker-img ${className}`}
-      style={{ ["--pv-rot" as string]: `${rotate}deg`, ...style }}
-    />
   );
 }
 
@@ -134,7 +101,7 @@ export function InhaltIcon({
  * mit overflow hidden). Höhe 0, die Welle ragt per WaveDivider nach oben.
  */
 export function WaveCut({
-  fill = "#fbf8ee",
+  fill = "var(--pv-cream)",
   shape = "soft",
   flip,
 }: {

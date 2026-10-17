@@ -20,10 +20,10 @@ export function AuthCard({
   return (
     <section className="rounded-admin-karte border-admin-rahmen bg-admin-karte flex flex-col gap-5 border p-6 md:p-8">
       <Image
-        src="/images/brand/logo-wine.png"
+        src="/brand/logo/provibe-logo-wildberry.svg"
         alt="provibe"
-        width={1000}
-        height={297}
+        width={202}
+        height={79}
         className="h-10 w-auto self-start"
         priority
       />
@@ -33,7 +33,7 @@ export function AuthCard({
         </span>
       ) : null}
       <div className="flex flex-col gap-1.5">
-        <h1 className="text-[24px] leading-[1.4] font-semibold">{title}</h1>
+        <h1 className="text-[24px] leading-[1.4] font-medium">{title}</h1>
         {subtitle ? <p className="text-admin-text-2 text-[14px]">{subtitle}</p> : null}
       </div>
       {children}

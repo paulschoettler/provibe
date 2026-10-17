@@ -1,3 +1,4 @@
+import { FruitIcon } from "@/components/brand/BrandIcon";
 import type { HomeFlavor } from "@/lib/catalog/home";
 import { charsStyle } from "./HeroBackdrop";
 import { fruitsFor } from "./FruitStickers";
@@ -6,8 +7,9 @@ import { heroWords } from "./words";
 /**
  * Vordere Ebene des Heros (Richtung A), liegt in der Bühne über der 3D-Canvas:
  * vordere Zeile der Riesentypo, runder Protein-Sticker, Vibe-Sticker und drei
- * Frucht-Sticker je Sorte. Rein dekorativ (aria-hidden, keine Zeigerereignisse);
- * Sortenname, Badges und Slogan stehen zusätzlich als echter Text im HTML.
+ * Frucht-Sticker je Sorte (CI-Icons, siehe FruitStickers.tsx). Rein dekorativ
+ * (aria-hidden, keine Zeigerereignisse); Sortenname, Badges und Slogan stehen
+ * zusätzlich als echter Text im HTML.
  *
  * Positionen hängen an der aktiven Dose (Mittelpunkt und Höhe aus
  * hero-geometry.ts), die Werte je Sticker stehen in globals.css.
@@ -42,10 +44,10 @@ export default function HeroDeco({ flavors }: { flavors: HomeFlavor[] }) {
             data-pv-flavor={index}
             data-active={index === 0 ? "true" : "false"}
           >
-            {fruits.map((Fruit, slot) => (
+            {fruits.map((fruit, slot) => (
               <span key={slot} className={`pv-sticker pv-sticker--f${slot + 1}`}>
                 <span className="pv-sticker__float">
-                  <Fruit />
+                  <FruitIcon name={fruit.name} flip={fruit.flip} />
                 </span>
               </span>
             ))}

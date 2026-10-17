@@ -7,6 +7,7 @@ import { CartIconButton } from "./CartIconButton";
 import { HeaderScrollEffect } from "./HeaderScrollEffect";
 import { MobileMenu } from "./MobileMenu";
 import { AccountMenu } from "@/components/account/AccountMenu";
+import { InstagramIcon, TiktokIcon } from "@/components/brand/BrandIcon";
 import { SearchIcon } from "./icons";
 import { MAIN_MENU_FALLBACK } from "./social";
 
@@ -44,12 +45,11 @@ export function Header({ menus, announcements, variant = "default" }: HeaderProp
         <div className="pv-headerbar-inner">
           <Link href="/" className="pv-logo-link" aria-label="provibe, zur Startseite">
             <Image
-              src="/images/brand/logo-wine.png"
+              src="/brand/logo/provibe-logo-wildberry.svg"
               alt="provibe"
-              width={1000}
-              height={297}
+              width={202}
+              height={79}
               priority={variant === "default"}
-              sizes="(min-width: 1024px) 150px, 120px"
               className="pv-logo-img"
             />
           </Link>
@@ -78,7 +78,13 @@ export function Header({ menus, announcements, variant = "default" }: HeaderProp
             </SiteLink>
             <AccountMenu />
             <CartIconButton />
-            <MobileMenu menus={items} />
+            <MobileMenu
+              menus={items}
+              socialIcons={{
+                instagram: <InstagramIcon className="h-4 w-4" />,
+                tiktok: <TiktokIcon className="h-4 w-4" />,
+              }}
+            />
           </div>
         </div>
       </div>

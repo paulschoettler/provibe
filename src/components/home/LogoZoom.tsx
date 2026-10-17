@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { SiteLink } from "@/components/layout/SiteLink";
 import type { HomeFlavor } from "@/lib/catalog/home";
-import { Brombeere, Erdbeere, Pfirsichhaelfte } from "./hero/FruitStickers";
+import { FruitIcon } from "@/components/brand/BrandIcon";
 import { LogoZoomMotion } from "./LogoZoomMotion";
 import { FinaleMarquee } from "./finale/FinaleMarquee";
 import type { FinaleCanKey } from "./finale/choreography";
@@ -108,11 +108,10 @@ export function LogoZoom({ flavors }: LogoZoomProps) {
               data-finale="blob"
             />
             <Image
-              src="/images/brand/logo-wine.png"
+              src="/brand/logo/provibe-logo-wildberry.svg"
               alt="provibe"
-              width={1000}
-              height={297}
-              sizes="(min-width: 900px) 66vw, 88vw"
+              width={202}
+              height={79}
               className="finale-logo"
               data-finale="logo"
             />
@@ -154,7 +153,7 @@ export function LogoZoom({ flavors }: LogoZoomProps) {
               aria-hidden="true"
             >
               <span className="finale-fruit__float">
-                <Brombeere />
+                <FruitIcon name="heidelbeere" />
               </span>
             </span>
             <span
@@ -163,7 +162,7 @@ export function LogoZoom({ flavors }: LogoZoomProps) {
               aria-hidden="true"
             >
               <span className="finale-fruit__float">
-                <Erdbeere />
+                <FruitIcon name="erdbeere" />
               </span>
             </span>
             <span
@@ -172,7 +171,7 @@ export function LogoZoom({ flavors }: LogoZoomProps) {
               aria-hidden="true"
             >
               <span className="finale-fruit__float">
-                <Pfirsichhaelfte />
+                <FruitIcon name="pfirsich-rund" />
               </span>
             </span>
           </div>

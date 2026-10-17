@@ -1,5 +1,6 @@
 /**
  * Eigene SVG-Icons (keine fremden Logos, keine Icon-Library, kein CDN).
+ * Instagram und TikTok kommen aus dem CI (src/components/brand/BrandIcon.tsx).
  * Alle Icons sind rein dekorativ: Bedeutung steht im aria-label des umgebenden Links oder Buttons.
  */
 
@@ -92,38 +93,6 @@ export function CloseIcon({ className = "" }: IconProps) {
       focusable="false"
     >
       <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  );
-}
-
-export function InstagramIcon({ className = "" }: IconProps) {
-  return (
-    <svg
-      className={`${base} ${className}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" />
-      <circle cx="12" cy="12" r="4.1" />
-      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-export function TiktokIcon({ className = "" }: IconProps) {
-  return (
-    <svg
-      className={`${base} ${className}`}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M14.1 3h2.3c.2 1.6 1.1 2.9 2.5 3.5.6.3 1.3.4 2 .5v2.4c-1.6 0-3.1-.5-4.4-1.4v5.9a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.5a3.2 3.2 0 1 0 2.3 3V3z" />
     </svg>
   );
 }

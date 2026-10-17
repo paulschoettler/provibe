@@ -16,7 +16,7 @@ export interface ShellUser {
 }
 
 /**
- * Inhalt der Seitenleiste (Figma 26:3601): Logo, Navigation mit aktivem Punkt in Magenta,
+ * Inhalt der Seitenleiste (Figma 26:3601): Logo, Navigation mit aktivem Punkt in Cream auf Wildberry,
  * unten Benutzer mit Rolle und Abmelden. Wird am Desktop fest und mobil im Drawer genutzt.
  */
 export function SidebarContent({
@@ -39,10 +39,10 @@ export function SidebarContent({
           aria-label="provibe Backoffice, Dashboard"
         >
           <Image
-            src="/images/brand/logo-cream.png"
+            src="/brand/logo/provibe-logo-cream.svg"
             alt="provibe"
-            width={1000}
-            height={297}
+            width={202}
+            height={79}
             className="h-[38px] w-auto"
             priority
           />
@@ -60,8 +60,8 @@ export function SidebarContent({
                     className={cx(
                       "rounded-admin-feld flex h-11 items-center gap-2.5 px-3 text-[14px] leading-[1.4] lg:h-10",
                       active
-                        ? "bg-admin-akzent text-admin-auf-akzent font-semibold"
-                        : "font-medium hover:bg-white/10",
+                        ? "bg-admin-seitenleiste-aktiv text-admin-seitenleiste-aktiv-text font-bold"
+                        : "hover:bg-admin-seitenleiste-hover font-medium",
                     )}
                   >
                     <Icon name={item.icon} size={18} />
@@ -69,10 +69,10 @@ export function SidebarContent({
                     {item.count ? (
                       <span
                         className={cx(
-                          "rounded-admin-badge flex h-5 min-w-5 items-center justify-center px-[7px] text-[12px] font-semibold",
+                          "rounded-admin-badge flex h-5 min-w-5 items-center justify-center px-[7px] text-[12px] font-bold",
                           active
-                            ? "bg-admin-karte text-admin-akzent"
-                            : "bg-admin-akzent text-admin-auf-akzent",
+                            ? "bg-admin-seitenleiste text-admin-seitenleiste-text"
+                            : "bg-admin-seitenleiste-aktiv text-admin-seitenleiste-aktiv-text",
                         )}
                       >
                         <span className="sr-only">offen: </span>
@@ -87,22 +87,22 @@ export function SidebarContent({
         </nav>
       </div>
       <div className="flex flex-col gap-2">
-        <div className="bg-admin-seitenleiste-text h-px opacity-15" />
+        <div className="bg-admin-seitenleiste-hover h-px" />
         <div className="flex items-center gap-2.5 px-3 py-2">
-          <span className="bg-admin-akzent text-admin-auf-akzent flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold">
+          <span className="bg-admin-seitenleiste-aktiv text-admin-seitenleiste-aktiv-text flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-bold">
             {user.initials}
           </span>
           <span className="min-w-0 flex-1 leading-[1.4]">
             <span className="block truncate text-[14px] font-medium" title={user.email}>
               {user.name}
             </span>
-            <span className="block text-[12px] opacity-70">{user.roleLabel}</span>
+            <span className="block text-[12px]">{user.roleLabel}</span>
           </span>
         </div>
         <form action={logoutAction}>
           <button
             type="submit"
-            className="rounded-admin-feld flex h-11 w-full items-center gap-2.5 px-3 text-[14px] font-medium hover:bg-white/10 lg:h-10"
+            className="rounded-admin-feld hover:bg-admin-seitenleiste-hover flex h-11 w-full items-center gap-2.5 px-3 text-[14px] font-medium lg:h-10"
           >
             <Icon name="abmelden" size={18} />
             Abmelden

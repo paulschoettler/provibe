@@ -3,7 +3,7 @@ import { SiteLink } from "./SiteLink";
 import type { MenuItem } from "@/lib/catalog/home";
 import { NewsletterForm } from "./NewsletterForm";
 import { WaveDivider } from "./WaveDivider";
-import { InstagramIcon, TiktokIcon } from "./icons";
+import { InstagramIcon, TiktokIcon } from "@/components/brand/BrandIcon";
 import { FOOTER_QUICK_FALLBACK, PAYMENT_METHODS, SOCIAL_LINKS } from "./social";
 
 export interface FooterProps {
@@ -21,17 +21,16 @@ export function Footer({ quickLinks }: FooterProps) {
 
   return (
     <footer className="pv-footer">
-      <WaveDivider shape="soft" fill="var(--color-wine)" position="top" />
+      <WaveDivider shape="soft" fill="var(--pv-wildberry)" position="top" />
 
       <div className="pv-footer-inner">
         <div className="pv-footer-grid">
           <div className="pv-footer-brand">
             <Image
-              src="/images/brand/logo-cream.png"
+              src="/brand/logo/provibe-logo-cream.svg"
               alt="provibe"
-              width={1000}
-              height={297}
-              sizes="180px"
+              width={202}
+              height={79}
               className="pv-footer-logo"
             />
             <p className="pv-footer-claim">Powered by Protein</p>
@@ -46,9 +45,9 @@ export function Footer({ quickLinks }: FooterProps) {
                   aria-label={`provibe auf ${social.label}`}
                 >
                   {social.label === "Instagram" ? (
-                    <InstagramIcon className="h-5 w-5" />
+                    <InstagramIcon className="h-4 w-4" />
                   ) : (
-                    <TiktokIcon className="h-5 w-5" />
+                    <TiktokIcon className="h-4 w-4" />
                   )}
                 </a>
               ))}
