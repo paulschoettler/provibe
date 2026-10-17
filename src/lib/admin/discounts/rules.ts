@@ -264,3 +264,21 @@ export function maskEmail(email: string): string {
   if (!domain) return "***";
   return `${local.slice(0, 2)}***@${domain}`;
 }
+
+/** Zeichen für generierte Codes, ohne leicht verwechselbare (0/O, 1/I/L). */
+const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+/**
+ * Zufälligen Code erzeugen ("PV-7KQ3M9XA"), optional mit eigenem Präfix. Nutzt
+ * crypto.getRandomValues (Browser und Node), damit Codes nicht erratbar sind.
+ */
+export function generateDiscountCode(prefix = "PV", length = 8): string {
+  const bytes = new Uint8Array(length);
+  globalThis.crypto.getRandomValues(bytes);
+  let body = "";
+  for (const b of bytes) body += CODE_ALPHABET[b % CODE_ALPHABET.length];
+  const p = normalizeCode(prefix)
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 12);
+  return p ? `${p}-${body}` : body;
+}

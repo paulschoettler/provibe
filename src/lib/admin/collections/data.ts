@@ -23,6 +23,8 @@ import {
   computeMembership,
   diffMembership,
   parseStoredRules,
+  ruleSchema,
+  SORT_KEYS,
   type CollectionInput,
   type CollectionRule,
   type ProductFacts,
@@ -580,4 +582,94 @@ export async function deleteCollection(
   });
   revalidateCatalog({ collectionHandles: [c.handle] });
   return ok({ id: collectionId });
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Vorschau regelbasierter Kollektionen                                                        */
+/* ------------------------------------------------------------------------------------------ */
+
+export interface RulePreviewItem {
+  id: string;
+  handle: string;
+  title: string;
+  status: "active" | "draft" | "archived";
+  priceCents: number | null;
+  imageUrl: string | null;
+}
+
+/**
+ * Welche Produkte passen auf diese Bedingungen? Gleiche Auswertung wie beim Speichern
+ * (computeMembership), aber ohne zu schreiben. Ungültige Bedingungen kommen als Feldfehler.
+ */
+export async function previewCollectionRules(
+  rawRules: unknown[],
+  sortKey: string,
+): Promise<AdminResult<{ items: RulePreviewItem[]; total: number }>> {
+  const rules: CollectionRule[] = [];
+  const errors: Record<string, string> = {};
+  rawRules.forEach((r, i) => {
+    const parsed = ruleSchema.safeParse(r);
+    if (parsed.success) rules.push(parsed.data);
+    else
+      for (const issue of parsed.error.issues)
+        errors[`rules.${i}.${issue.path.join(".") || "value"}`] ??= issue.message;
+  });
+  if (Object.keys(errors).length) return fail(INVALID_INPUT, errors);
+  if (!rules.length) return ok({ items: [], total: 0 });
+  const key = (
+    SORT_KEYS.some((s) => s.value === sortKey) && sortKey !== "manual" ? sortKey : "title-asc"
+  ) as SortKey;
+  const facts = await loadProductFacts();
+  const ids = computeMembership(facts, rules, key);
+  const byId = new Map(facts.map((f) => [f.id, f]));
+  const { data: imgs } = ids.length
+    ? await db()
+        .from("product_images")
+        .select("product_id, storage_bucket, storage_path, position")
+        .in("product_id", ids)
+        .order("position")
+    : { data: [] as { product_id: string; storage_bucket: string; storage_path: string }[] };
+  const firstImg = new Map<string, string>();
+  for (const i of imgs ?? [])
+    if (!firstImg.has(i.product_id))
+      firstImg.set(i.product_id, imageUrl(i.storage_bucket, i.storage_path));
+  const items = ids.map((id) => {
+    const f = byId.get(id)!;
+    return {
+      id,
+      handle: f.handle,
+      title: f.title,
+      status: f.status,
+      priceCents: f.priceCents,
+      imageUrl: firstImg.get(id) ?? null,
+    };
+  });
+  return ok({ items, total: items.length });
+}
+
+/** Ist der Handle einer Kollektion frei? */
+export async function isCollectionHandleFree(handle: string, exceptId?: string): Promise<boolean> {
+  let q = db().from("collections").select("id").eq("handle", handle).limit(1);
+  if (exceptId) q = q.neq("id", exceptId);
+  const { data } = await q;
+  return !data?.length;
+}
+
+/**
+ * Regelbasierte Kollektionen, deren Bedingungen ein Produkt gerade erfüllt (live ausgewertet,
+ * wie die Storefront), unabhängig davon, ob die Zuordnung schon gespeichert ist.
+ */
+export async function automaticMatchesFor(productId: string): Promise<Set<string>> {
+  const [{ data: autos }, facts] = await Promise.all([
+    db().from("collections").select("id, rules").eq("kind", "automatic"),
+    loadProductFacts(),
+  ]);
+  const self = facts.find((f) => f.id === productId);
+  const out = new Set<string>();
+  if (!self) return out;
+  for (const c of autos ?? []) {
+    const rules = parseStoredRules(c.rules);
+    if (rules.length && computeMembership([self], rules, "title-asc").length) out.add(c.id);
+  }
+  return out;
 }

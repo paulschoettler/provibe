@@ -638,6 +638,8 @@ export const productListFilterSchema = z.object({
   q: z.string().trim().max(100).optional(),
   status: z.enum(["all", "active", "draft", "archived"]).default("all"),
   kind: z.enum(["all", "simple", "bundle"]).default("all"),
+  /** Typ aus lines.ts (Sorte, Mixed, Bundle, Merch) */
+  line: z.enum(["all", "sorte", "mixed", "bundle", "merch"]).default("all"),
   collectionId: z.guid().optional(),
   tag: z.string().trim().max(40).optional(),
   sort: z.enum(["position", "title", "updated", "created"]).default("position"),

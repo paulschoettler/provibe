@@ -3,6 +3,7 @@ import type { Database, Json } from "@/lib/supabase/database.types";
 import { publicEnv } from "@/lib/env/public";
 import { buildPublicImageUrl } from "@/lib/admin/media/rules";
 import { db } from "./access";
+import { productLineOf, type ProductLine } from "./lines";
 import { escapeSearch } from "./result";
 import {
   basePricePreview,
@@ -61,6 +62,12 @@ export interface ProductListItem {
   trackedVariants: number;
   updatedAt: string;
   createdAt: string;
+  /** Typ im Backoffice (Sorte, Mixed, Bundle, Merch), siehe lines.ts */
+  line: ProductLine;
+  /** Titel der Kollektionen, in denen das Produkt steht */
+  collections: string[];
+  /** Anzahl Komponenten der ersten Bundle-Variante (nur Bundles) */
+  componentCount: number;
 }
 
 export interface ProductListPage {
@@ -88,7 +95,7 @@ export async function listProducts(filter: ProductListFilter = {}): Promise<Prod
   let query = client
     .from("products")
     .select(
-      "id, handle, status, kind, tags, position, updated_at, created_at, product_translations (locale, title), product_variants (id, price_cents, is_active), product_images (storage_bucket, storage_path, position, alt)",
+      "id, handle, status, kind, tags, position, updated_at, created_at, product_type, is_food, attributes, product_translations (locale, title), product_variants (id, price_cents, is_active, bundle_components!bundle_components_bundle_variant_id_fkey (component_variant_id)), product_images (storage_bucket, storage_path, position, alt), collection_products (collections (handle, collection_translations (locale, title)))",
     )
     .limit(2000);
   if (f.status !== "all") query = query.eq("status", f.status);
@@ -122,7 +129,7 @@ export async function listProducts(filter: ProductListFilter = {}): Promise<Prod
   const levels = await loadLevels(variantIds);
 
   const allTags = new Set<string>();
-  const items: ProductListItem[] = rows.map((r) => {
+  const mapped: ProductListItem[] = rows.map((r) => {
     r.tags.forEach((t) => allTags.add(t));
     const title =
       r.product_translations.find((t) => t.locale === "de")?.title ??
@@ -160,8 +167,34 @@ export async function listProducts(filter: ProductListFilter = {}): Promise<Prod
       trackedVariants: tracked,
       updatedAt: r.updated_at,
       createdAt: r.created_at,
+      line: productLineOf({
+        kind: r.kind,
+        handle: r.handle,
+        tags: r.tags,
+        productType: r.product_type,
+        isFood: r.is_food,
+        attributes: asRecord(r.attributes),
+      }),
+      collections: (r.collection_products ?? []).flatMap((cp) => {
+        const c = cp.collections as unknown as {
+          handle: string;
+          collection_translations: { locale: string; title: string }[];
+        } | null;
+        if (!c) return [];
+        return [c.collection_translations.find((t) => t.locale === "de")?.title ?? c.handle];
+      }),
+      componentCount:
+        r.kind === "bundle"
+          ? Math.max(
+              0,
+              ...r.product_variants.map(
+                (v) => (v.bundle_components as unknown as unknown[] | null)?.length ?? 0,
+              ),
+            )
+          : 0,
     };
   });
+  const items = f.line === "all" ? mapped : mapped.filter((i) => i.line === f.line);
 
   const collator = new Intl.Collator("de");
   items.sort((a, b) => {
@@ -691,4 +724,186 @@ export async function listComponentCandidates(): Promise<ComponentCandidate[]> {
         a.productTitle.localeCompare(b.productTitle, "de") ||
         a.variantTitle.localeCompare(b.variantTitle, "de"),
     );
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Zähler, Auswahllisten, Preis-Historie                                                       */
+/* ------------------------------------------------------------------------------------------ */
+
+/** Anzahl Produkte je Status für die Status-Tabs der Liste. */
+export async function countProductsByStatus(): Promise<Record<ProductStatus | "all", number>> {
+  const { data, error } = await db().from("products").select("status").limit(5000);
+  if (error) throw new Error(`Produktzähler: ${error.message}`);
+  const out: Record<ProductStatus | "all", number> = { all: 0, active: 0, draft: 0, archived: 0 };
+  for (const r of data ?? []) {
+    out.all++;
+    out[r.status]++;
+  }
+  return out;
+}
+
+export interface ProductOption {
+  id: string;
+  handle: string;
+  title: string;
+  status: ProductStatus;
+  imageUrl: string | null;
+  priceMinCents: number | null;
+}
+
+/** Schlanke Produktliste für Auswahlfelder (Kollektionen, Rabatte). */
+export async function listProductOptions(locale = "de"): Promise<ProductOption[]> {
+  const { data, error } = await db()
+    .from("products")
+    .select(
+      "id, handle, status, position, product_translations (locale, title), product_variants (price_cents, is_active), product_images (storage_bucket, storage_path, position)",
+    )
+    .order("position")
+    .limit(2000);
+  if (error) throw new Error(`Produktauswahl: ${error.message}`);
+  return (data ?? []).map((p) => {
+    const img = [...p.product_images].sort((a, b) => a.position - b.position)[0];
+    const prices = p.product_variants.filter((v) => v.is_active).map((v) => v.price_cents);
+    return {
+      id: p.id,
+      handle: p.handle,
+      title:
+        p.product_translations.find((t) => t.locale === locale)?.title ??
+        p.product_translations[0]?.title ??
+        p.handle,
+      status: p.status,
+      imageUrl: img ? imageUrl(img.storage_bucket, img.storage_path) : null,
+      priceMinCents: prices.length ? Math.min(...prices) : null,
+    };
+  });
+}
+
+/** Ist der Handle frei? (Prüfung im Editor beim Tippen) */
+export async function isProductHandleFree(handle: string, exceptId?: string): Promise<boolean> {
+  let q = db().from("products").select("id").eq("handle", handle).limit(1);
+  if (exceptId) q = q.neq("id", exceptId);
+  const { data } = await q;
+  return !data?.length;
+}
+
+export interface PriceHistoryEntry {
+  id: number;
+  variantId: string;
+  variantTitle: string;
+  priceCents: number;
+  compareAtCents: number | null;
+  validFrom: string;
+  validTo: string | null;
+  source: string;
+  changedBy: string | null;
+}
+
+/**
+ * Preis-Historie aller Varianten eines Produkts (price_history, Trigger auf product_variants),
+ * neueste zuerst. changedBy ist der Anzeigename aus staff_users, sonst die E-Mail oder null.
+ */
+export async function listPriceHistory(
+  productId: string,
+  limit = 200,
+): Promise<PriceHistoryEntry[]> {
+  const client = db();
+  const { data: variants } = await client
+    .from("product_variants")
+    .select("id, title")
+    .eq("product_id", productId);
+  const ids = (variants ?? []).map((v) => v.id);
+  if (!ids.length) return [];
+  const { data, error } = await client
+    .from("price_history")
+    .select("*")
+    .in("variant_id", ids)
+    .order("valid_from", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(limit);
+  if (error) throw new Error(`Preis-Historie: ${error.message}`);
+  const titles = new Map((variants ?? []).map((v) => [v.id, v.title]));
+  const userIds = [...new Set((data ?? []).flatMap((r) => (r.changed_by ? [r.changed_by] : [])))];
+  const names = new Map<string, string>();
+  if (userIds.length) {
+    const { data: staff } = await client
+      .from("staff_users")
+      .select("user_id, display_name, email")
+      .in("user_id", userIds);
+    for (const s of staff ?? []) names.set(s.user_id, s.display_name ?? s.email);
+  }
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    variantId: r.variant_id,
+    variantTitle: titles.get(r.variant_id) ?? "Variante",
+    priceCents: r.price_cents,
+    compareAtCents: r.compare_at_cents,
+    validFrom: r.valid_from,
+    validTo: r.valid_to,
+    source: r.source,
+    changedBy: r.changed_by ? (names.get(r.changed_by) ?? null) : null,
+  }));
+}
+
+/** Steuerklassen (Deutschland) für den Editor eines neuen Produkts. */
+export async function listTaxClasses(): Promise<
+  { value: string; label: string; rateBp: number }[]
+> {
+  const { data } = await db()
+    .from("tax_rates")
+    .select("tax_class, rate_bp, name")
+    .eq("country_code", "DE");
+  return (data ?? [])
+    .map((t) => ({ value: t.tax_class, label: t.name, rateBp: t.rate_bp }))
+    .filter((t, i, all) => all.findIndex((x) => x.value === t.value) === i);
+}
+
+/** Verfügbare Menge je Variante (available_quantity; 999999 heißt: Bestand nicht geführt). */
+export async function availableByVariant(variantIds: string[]): Promise<Record<string, number>> {
+  const out: Record<string, number> = {};
+  await Promise.all(
+    [...new Set(variantIds)].map(async (id) => {
+      const { data } = await db().rpc("available_quantity", { p_variant_id: id });
+      if (typeof data === "number") out[id] = data;
+    }),
+  );
+  return out;
+}
+
+export const UNLIMITED_STOCK = 999999;
+
+/** Wer hat zuletzt etwas am Datensatz geändert? (audit_log, für die Kopfzeile des Editors) */
+export async function lastEditorOf(entityType: string, entityId: string): Promise<string | null> {
+  const { data } = await db()
+    .from("audit_log")
+    .select("actor_user_id, actor_email")
+    .eq("entity_type", entityType)
+    .eq("entity_id", entityId)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const row = data?.[0];
+  if (!row) return null;
+  if (row.actor_user_id) {
+    const { data: s } = await db()
+      .from("staff_users")
+      .select("display_name, email")
+      .eq("user_id", row.actor_user_id)
+      .maybeSingle();
+    if (s) return s.display_name ?? s.email;
+  }
+  return row.actor_email ?? null;
+}
+
+/** Pfand je Einheit des Produkts der jeweiligen Variante (Bundle-Komponenten, H1). */
+export async function depositByVariant(variantIds: string[]): Promise<Record<string, number>> {
+  if (!variantIds.length) return {};
+  const { data } = await db()
+    .from("product_variants")
+    .select("id, unit_count, products (deposit_cents_per_unit)")
+    .in("id", [...new Set(variantIds)]);
+  const out: Record<string, number> = {};
+  for (const v of data ?? []) {
+    const p = v.products as unknown as { deposit_cents_per_unit: number } | null;
+    out[v.id] = (p?.deposit_cents_per_unit ?? 0) * v.unit_count;
+  }
+  return out;
 }

@@ -20,6 +20,7 @@ import {
   altTextFor,
   buildPublicImageUrl,
   checkImage,
+  collectionImagePath,
   IMAGE_TYPES,
   imageOrderSchema,
   imageStoragePath,
@@ -392,4 +393,102 @@ export async function deleteImage(
   });
   revalidateCatalog({ productHandles: [handle], allCollections: true });
   return ok({ fileRemoved });
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Kollektionsbilder                                                                           */
+/* ------------------------------------------------------------------------------------------ */
+
+/** Datei im Bucket löschen, wenn sie ein eigener Upload ist und nichts mehr auf sie zeigt. */
+async function removeCollectionFileIfUnused(path: string | null): Promise<boolean> {
+  if (!path || !isRemovableUploadPath(path)) return false;
+  const client = db();
+  const [{ count: c1 }, { count: c2 }] = await Promise.all([
+    client.from("collections").select("id", { count: "exact", head: true }).eq("image_path", path),
+    client
+      .from("product_images")
+      .select("id", { count: "exact", head: true })
+      .eq("storage_path", path),
+  ]);
+  if (c1 || c2) return false;
+  const { error } = await client.storage.from(PRODUCT_MEDIA_BUCKET).remove([path]);
+  if (error) console.error("product-media remove:", error.message);
+  return !error;
+}
+
+/**
+ * Bild einer Kollektion hochladen (Server Action, bis 2 MB). Ersetzt ein vorhandenes Bild;
+ * die alte Datei wird gelöscht, wenn sie ein eigener Upload war.
+ */
+export async function uploadCollectionImage(
+  collectionId: string,
+  file: { bytes: Uint8Array | ArrayBuffer; contentType?: string | null },
+  actor: StaffSession,
+): Promise<AdminResult<{ imagePath: string; url: string }>> {
+  if (!can(actor, "editProducts")) return fail(NO_PERMISSION);
+  const client = db();
+  const { data: c } = await client
+    .from("collections")
+    .select("id, handle, image_path")
+    .eq("id", collectionId)
+    .maybeSingle();
+  if (!c) return fail(NOT_FOUND);
+  const bytes = toBytes(file.bytes);
+  const checked = checkImage(bytes, file.contentType);
+  if (!checked.ok) return fail(checked.error, { file: checked.error });
+  const hash = createHash("sha256").update(bytes).digest("hex");
+  const path = collectionImagePath(c.handle, hash, checked.image.extension);
+  const { error: upErr } = await client.storage.from(PRODUCT_MEDIA_BUCKET).upload(path, bytes, {
+    contentType: checked.image.type,
+    cacheControl: "31536000",
+    upsert: false,
+  });
+  if (upErr && !/exist|duplicate/i.test(upErr.message)) {
+    console.error("product-media upload:", upErr.message);
+    return fail("Das Bild konnte nicht gespeichert werden. Bitte versuche es noch einmal.");
+  }
+  const { error } = await client.from("collections").update({ image_path: path }).eq("id", c.id);
+  if (error) return fail(dbErrorMessage(error));
+  if (c.image_path && c.image_path !== path) await removeCollectionFileIfUnused(c.image_path);
+  await writeAudit(actor, {
+    action: "collection.image.update",
+    entityType: "collection",
+    entityId: c.id,
+    before: { image_path: c.image_path },
+    after: { image_path: path },
+  });
+  revalidateCatalog({ collectionHandles: [c.handle] });
+  return ok({ imagePath: path, url: getPublicImageUrl(path) });
+}
+
+export async function removeCollectionImage(
+  collectionId: string,
+  actor: StaffSession,
+): Promise<AdminResult<{ fileRemoved: boolean }>> {
+  if (!can(actor, "editProducts")) return fail(NO_PERMISSION);
+  const client = db();
+  const { data: c } = await client
+    .from("collections")
+    .select("id, handle, image_path")
+    .eq("id", collectionId)
+    .maybeSingle();
+  if (!c) return fail(NOT_FOUND);
+  if (!c.image_path) return ok({ fileRemoved: false });
+  const { error } = await client.from("collections").update({ image_path: null }).eq("id", c.id);
+  if (error) return fail(dbErrorMessage(error));
+  const fileRemoved = await removeCollectionFileIfUnused(c.image_path);
+  await writeAudit(actor, {
+    action: "collection.image.delete",
+    entityType: "collection",
+    entityId: c.id,
+    before: { image_path: c.image_path },
+    after: { image_path: null, file_removed: fileRemoved },
+  });
+  revalidateCatalog({ collectionHandles: [c.handle] });
+  return ok({ fileRemoved });
+}
+
+/** Nach dem Löschen einer Kollektion: eigene Bilddatei entfernen, wenn nichts mehr auf sie zeigt. */
+export async function deleteCollectionImageFile(path: string | null): Promise<boolean> {
+  return removeCollectionFileIfUnused(path);
 }

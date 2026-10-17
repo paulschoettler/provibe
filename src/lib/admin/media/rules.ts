@@ -28,6 +28,8 @@ export type ImageMime = keyof typeof IMAGE_TYPES;
 /** Präfix für hochgeladene Bilder; seed/ (Shopify-Import) wird nie gelöscht. */
 export const UPLOAD_PREFIX = "products";
 export const PENDING_PREFIX = "uploads";
+/** Kollektionsbilder (Kopfbild der Kollektionsseite) */
+export const COLLECTION_PREFIX = "collections";
 
 function ascii(bytes: Uint8Array, start: number, length: number): string {
   let s = "";
@@ -209,8 +211,17 @@ export function pendingUploadPath(handle: string, token: string, fileName: strin
   return `${PENDING_PREFIX}/${handle}/${token}-${fileStem(fileName)}`;
 }
 
+/** Speicherpfad eines Kollektionsbilds: collections/<handle>/<handle>-<hash12>.<ext> */
+export function collectionImagePath(handle: string, sha256Hex: string, extension: string): string {
+  return `${COLLECTION_PREFIX}/${handle}/${handle}-${sha256Hex.slice(0, 12)}.${extension}`;
+}
+
 export function isRemovableUploadPath(path: string): boolean {
-  return path.startsWith(`${UPLOAD_PREFIX}/`) || path.startsWith(`${PENDING_PREFIX}/`);
+  return (
+    path.startsWith(`${UPLOAD_PREFIX}/`) ||
+    path.startsWith(`${PENDING_PREFIX}/`) ||
+    path.startsWith(`${COLLECTION_PREFIX}/`)
+  );
 }
 
 /** Öffentliche URL im Supabase-Storage (Bucket product-media ist öffentlich lesbar). */

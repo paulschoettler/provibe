@@ -1,4 +1,5 @@
 import "server-only";
+import { z } from "zod";
 import type { StaffSession } from "@/lib/admin/auth";
 import { writeAudit } from "@/lib/admin/audit";
 import { applyAutomaticCollections, upsertRedirect } from "@/lib/admin/collections/data";
@@ -917,4 +918,158 @@ export async function setBundleComponents(
   });
   revalidateCatalog({ productHandles: [bp.handle], allCollections: true });
   return ok({ componentsSumCents: typeof sum === "number" ? sum : 0 });
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Sammelaktionen und Reihenfolge (Produktliste)                                               */
+/* ------------------------------------------------------------------------------------------ */
+
+const idsSchema = z.array(z.guid()).min(1, "Bitte wähle mindestens ein Produkt.").max(500);
+
+/**
+ * Status für mehrere Produkte setzen (Sammelaktion "Aktiv" oder "Entwurf"). Aktiv wird nur,
+ * wer die Pflichtangaben erfüllt (publishErrors wie im Editor); die übrigen werden mit Grund
+ * übersprungen, damit eine Sammelaktion kein unvollständiges Lebensmittel veröffentlicht.
+ */
+export async function setProductsStatus(
+  ids: string[],
+  status: "active" | "draft",
+  actor: StaffSession,
+): Promise<
+  AdminResult<{ changed: string[]; skipped: { id: string; title: string; reason: string }[] }>
+> {
+  if (!can(actor, "editProducts")) return fail(NO_PERMISSION);
+  const parsed = idsSchema.safeParse(ids);
+  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT);
+  const client = db();
+  const { data: rows, error } = await client
+    .from("products")
+    .select("*, product_translations (*), product_variants (price_cents, is_active)")
+    .in("id", [...new Set(parsed.data)]);
+  if (error) return fail(dbErrorMessage(error));
+
+  const changed: string[] = [];
+  const handles: string[] = [];
+  const skipped: { id: string; title: string; reason: string }[] = [];
+  for (const p of rows ?? []) {
+    const t = p.product_translations.find((x) => x.locale === "de") ?? p.product_translations[0];
+    const title = t?.title ?? p.handle;
+    if (p.status === status) continue;
+    if (status === "active") {
+      const errors = publishErrors(
+        {
+          isFood: p.is_food,
+          kind: p.kind,
+          netContentPerUnit: p.net_content_per_unit == null ? null : Number(p.net_content_per_unit),
+          netContentMeasure: p.net_content_measure,
+          basePriceMeasure: p.base_price_measure,
+          lmiv: {
+            foodName: t?.food_name ?? null,
+            ingredientsHtml: t?.ingredients_html ?? null,
+            allergens: t?.allergens ?? null,
+            nutrition: (t?.nutrition ?? null) as never,
+            storageInstructions: t?.storage_instructions ?? null,
+            foodBusinessOperator: t?.food_business_operator ?? null,
+            countryOfOrigin: t?.country_of_origin ?? null,
+          },
+        },
+        p.product_variants.map((v) => ({ priceCents: v.price_cents, isActive: v.is_active })),
+      );
+      const first = Object.values(errors)[0];
+      if (first) {
+        skipped.push({ id: p.id, title, reason: first });
+        continue;
+      }
+    }
+    const { error: upErr } = await client
+      .from("products")
+      .update({
+        status,
+        ...(status === "active" && !p.published_at
+          ? { published_at: new Date().toISOString() }
+          : {}),
+      })
+      .eq("id", p.id);
+    if (upErr) {
+      skipped.push({ id: p.id, title, reason: dbErrorMessage(upErr) });
+      continue;
+    }
+    await writeAudit(actor, {
+      action: "product.status",
+      entityType: "product",
+      entityId: p.id,
+      before: { status: p.status },
+      after: { status },
+    });
+    changed.push(p.id);
+    handles.push(p.handle);
+  }
+  if (changed.length) {
+    await applyAutomaticCollections(actor);
+    revalidateCatalog({ productHandles: handles, allCollections: true });
+  }
+  return ok({ changed, skipped });
+}
+
+/**
+ * Neue Reihenfolge für die übergebenen Produkte (Ziehen in der Liste). Die Produkte behalten
+ * ihre bisherigen Positionswerte als Menge und tauschen sie untereinander; so lässt sich auch
+ * eine gefilterte Teilliste sortieren, ohne die übrigen Produkte zu verschieben.
+ */
+export async function reorderProducts(
+  orderedIds: string[],
+  actor: StaffSession,
+): Promise<AdminResult<{ updated: number }>> {
+  if (!can(actor, "editProducts")) return fail(NO_PERMISSION);
+  const parsed = idsSchema.safeParse(orderedIds);
+  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? INVALID_INPUT);
+  const ids = parsed.data;
+  if (new Set(ids).size !== ids.length) return fail("Ein Produkt steht doppelt in der Liste.");
+  const client = db();
+  const { data: rows } = await client.from("products").select("id, position").in("id", ids);
+  if ((rows ?? []).length !== ids.length)
+    return fail("Die Liste ist nicht mehr aktuell. Bitte lade die Seite neu.");
+  const current = new Map((rows ?? []).map((r) => [r.id, r.position]));
+  // eindeutige, aufsteigende Positionen; doppelte Werte werden auseinandergezogen
+  const slots = [...current.values()].sort((a, b) => a - b);
+  for (let i = 1; i < slots.length; i++) if (slots[i] <= slots[i - 1]) slots[i] = slots[i - 1] + 1;
+  let updated = 0;
+  for (const [i, id] of ids.entries()) {
+    if (current.get(id) === slots[i]) continue;
+    const { error } = await client.from("products").update({ position: slots[i] }).eq("id", id);
+    if (error) return fail(dbErrorMessage(error));
+    updated++;
+  }
+  if (updated) {
+    await writeAudit(actor, {
+      action: "product.reorder",
+      entityType: "product",
+      entityId: null,
+      before: { order: [...current.entries()].sort((a, b) => a[1] - b[1]).map(([id]) => id) },
+      after: { order: ids },
+    });
+    revalidateCatalog({ allCollections: true });
+  }
+  return ok({ updated });
+}
+
+/** Ein Produkt um einen Platz nach oben oder unten schieben (Fallback ohne Ziehen). */
+export async function moveProduct(
+  productId: string,
+  direction: "up" | "down",
+  actor: StaffSession,
+): Promise<AdminResult<{ updated: number }>> {
+  if (!can(actor, "editProducts")) return fail(NO_PERMISSION);
+  const { data: all } = await db()
+    .from("products")
+    .select("id, position, created_at")
+    .order("position")
+    .order("created_at");
+  const order = (all ?? []).map((r) => r.id);
+  const i = order.indexOf(productId);
+  if (i < 0) return fail(NOT_FOUND);
+  const j = direction === "up" ? i - 1 : i + 1;
+  if (j < 0 || j >= order.length) return ok({ updated: 0 });
+  [order[i], order[j]] = [order[j], order[i]];
+  return reorderProducts(order, actor);
 }
