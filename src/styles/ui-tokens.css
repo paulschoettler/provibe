@@ -1,0 +1,35 @@
+/* Funktionsfarben (Ausnahme laut CLAUDE.md, Abschnitt "Design: CI-Guide ist verpflichtend").
+   Einzige Datei außerhalb von brand/provibe-ci/, in der Farbwerte stehen dürfen.
+   Nur für Fehler, Erfolg, Warnung, Hinweis, neutrale Grautöne in Formularen und im Backoffice
+   sowie für Schatten und Abdunkelungen (Dialoghintergrund). Nie für Markenflächen. */
+:root {
+  /* Zustände (Formulare, Backoffice-Badges) */
+  --pv-ui-error: #c53030;
+  --pv-ui-error-hover: #a82828;
+  --pv-ui-error-bg: #fbe8e8;
+  --pv-ui-success: #1f7a4d;
+  --pv-ui-success-bg: #e3f3ea;
+  --pv-ui-warning: #b7791f;
+  --pv-ui-warning-text: #87570f;
+  --pv-ui-warning-bg: #fbf0da;
+  --pv-ui-info: #2b6cb0;
+  --pv-ui-info-bg: #e4eef8;
+
+  /* Neutrale Grautöne (Backoffice-Flächen, Formularrahmen, Platzhaltertext) */
+  --pv-ui-gray-50: #f6f6f7;
+  --pv-ui-gray-100: #f1f1f2;
+  --pv-ui-gray-200: #e3e3e3;
+  --pv-ui-gray-300: #c9cccf;
+  --pv-ui-gray-500: #6b7280;
+  --pv-ui-gray-600: #616161;
+  --pv-ui-gray-700: #4b5563;
+  --pv-ui-gray-900: #1a1a1a;
+
+  /* Schatten und Abdunkelung: aus Wildberry abgeleitet, damit kein neuer Farbton entsteht */
+  --pv-ui-shadow-color: rgb(from var(--pv-wildberry) r g b / 0.14);
+  --pv-ui-shadow-strong: rgb(from var(--pv-wildberry) r g b / 0.24);
+  --pv-ui-shadow-card: 0 24px 50px var(--pv-ui-shadow-color);
+  --pv-ui-overlay: rgb(from var(--pv-wildberry) r g b / 0.45);
+  --pv-ui-hairline: rgb(from var(--pv-wildberry) r g b / 0.15);
+  --pv-ui-surface-translucent: rgb(from var(--pv-white) r g b / 0.8);
+}

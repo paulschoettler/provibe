@@ -1,21 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { ConsentRoot } from "@/components/consent/ConsentRoot";
 import { EMPTY_CART } from "@/lib/cart/types";
+import { BRAND_COLORS } from "@/lib/brand/tokens";
+// CI-Tokens zuerst (lädt über @import einmal das Adobe-Kit sne6rux), dann die Site-Styles
+import "../../brand/provibe-ci/tokens.css";
 import "./globals.css";
-
-/** Jost, selbst gehostet (SIL Open Font License 1.1, siehe src/fonts/OFL.txt). Keine Google-Fonts-CDN-Einbindung. */
-const jost = localFont({
-  src: [
-    { path: "../fonts/jost-variable.woff2", weight: "100 900", style: "normal" },
-    { path: "../fonts/jost-italic-variable.woff2", weight: "100 900", style: "italic" },
-  ],
-  variable: "--font-jost",
-  display: "swap",
-  preload: true,
-});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -29,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fbf8ee",
+  themeColor: BRAND_COLORS.cream,
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -37,8 +28,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={jost.variable} suppressHydrationWarning>
+    <html lang="de" suppressHydrationWarning>
       <head>
+        {/* Adobe-Fonts-Kit: geladen über brand/provibe-ci/tokens.css (ein @import), hier nur der Preconnect */}
+        <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
         {/* Progressive Enhancement: Effekte nur mit JS, Inhalte immer im HTML.
             Als data-Attribut statt Klasse, weil React bei einer Hydration-Wiederholung
             (zum Beispiel durch Browser-Erweiterungen, die vor dem Start ins DOM schreiben)

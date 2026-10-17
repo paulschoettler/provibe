@@ -1,43 +1,81 @@
 @import "tailwindcss";
+/* Die CI-Tokens (brand/provibe-ci/tokens.css) importiert src/app/layout.tsx vor dieser Datei,
+   weil ihr @import des Adobe-Kits am Dateianfang stehen muss und Tailwind diese Datei umsortiert. */
+/* Funktionsfarben (Fehler, Erfolg, Warnung, Grautöne, Schatten), siehe CLAUDE.md */
+@import "../styles/ui-tokens.css";
 
-/* PROVIBE Design-Tokens (Quelle: docs/analyse.md, Abschnitt 6) */
+/* Tailwind-Theme auf den CI-Tokens. Nur Variablen, keine Werte (CLAUDE.md). */
 @theme {
-  --font-sans: var(--font-jost), "Jost", system-ui, sans-serif;
+  --font-sans: var(--pv-font-sans);
+  --font-serif-italic: var(--pv-font-serif-italic);
+  --font-serif-italic-sub: var(--pv-font-serif-italic-sub);
+  --font-condensed: var(--pv-font-condensed);
 
-  --color-magenta: #d9306e;
-  --color-aubergine: #4a2f39;
-  --color-wine: #6b1d49;
-  --color-plum: #7e2856;
-  --color-berry: #702249;
-  --color-cream: #fbf8ee;
-  --color-cream-2: #f3f1e7;
-  --color-cream-3: #f4f1d4;
-  --color-butter: #f3eda4;
-  --color-butter-2: #f2f0b7;
-  --color-yellow: #e4df6a;
-  --color-peach-cream: #f5e6cc;
-  --color-pink: #e98ab0;
-  --color-pink-light: #f7dceb;
-  --color-peach: #f7ca99;
-  --color-mauve: #8a7680;
-  --color-mauve-2: #b58aa0;
-  --color-sand: #e2d9d0;
-  --color-ink: #121212;
-  --color-success: #5bb572;
+  --color-pv-wildberry: var(--pv-wildberry);
+  --color-pv-cream: var(--pv-cream);
+  --color-pv-lime-raspberry: var(--pv-lime-raspberry);
+  --color-pv-burgundy: var(--pv-burgundy);
+  --color-pv-peach: var(--pv-peach);
+  --color-pv-white: var(--pv-white);
+
+  --color-pv-ui-error: var(--pv-ui-error);
+  --color-pv-ui-error-hover: var(--pv-ui-error-hover);
+  --color-pv-ui-error-bg: var(--pv-ui-error-bg);
+  --color-pv-ui-success: var(--pv-ui-success);
+  --color-pv-ui-success-bg: var(--pv-ui-success-bg);
+  --color-pv-ui-warning: var(--pv-ui-warning);
+  --color-pv-ui-warning-text: var(--pv-ui-warning-text);
+  --color-pv-ui-warning-bg: var(--pv-ui-warning-bg);
+  --color-pv-ui-info: var(--pv-ui-info);
+  --color-pv-ui-info-bg: var(--pv-ui-info-bg);
+  --color-pv-ui-gray-50: var(--pv-ui-gray-50);
+  --color-pv-ui-gray-100: var(--pv-ui-gray-100);
+  --color-pv-ui-gray-200: var(--pv-ui-gray-200);
+  --color-pv-ui-gray-300: var(--pv-ui-gray-300);
+  --color-pv-ui-gray-500: var(--pv-ui-gray-500);
+  --color-pv-ui-gray-600: var(--pv-ui-gray-600);
+  --color-pv-ui-gray-700: var(--pv-ui-gray-700);
+  --color-pv-ui-gray-900: var(--pv-ui-gray-900);
+  --color-pv-ui-hairline: var(--pv-ui-hairline);
+  --color-pv-ui-overlay: var(--pv-ui-overlay);
+  --color-pv-ui-surface-translucent: var(--pv-ui-surface-translucent);
+
+  /* Übergangs-Aliasse der alten Farbnamen (werden mit der CI-Angleichung entfernt) */
+  --color-magenta: var(--pv-wildberry);
+  --color-aubergine: var(--pv-wildberry);
+  --color-wine: var(--pv-wildberry);
+  --color-plum: var(--pv-wildberry);
+  --color-berry: var(--pv-wildberry);
+  --color-cream: var(--pv-cream);
+  --color-cream-2: var(--pv-cream);
+  --color-cream-3: var(--pv-cream);
+  --color-butter: var(--pv-lime-raspberry);
+  --color-butter-2: var(--pv-cream);
+  --color-yellow: var(--pv-lime-raspberry);
+  --color-peach-cream: var(--pv-cream);
+  --color-pink: var(--pv-peach);
+  --color-pink-light: var(--pv-cream);
+  --color-peach: var(--pv-peach);
+  --color-mauve: var(--pv-wildberry);
+  --color-mauve-2: var(--pv-wildberry);
+  --color-sand: var(--pv-cream);
+  --color-ink: var(--pv-burgundy);
+  --color-success: var(--pv-ui-success);
 
   --radius-card: 26px;
   --radius-pill: 100px;
-  --shadow-card: 0 24px 50px rgba(74, 47, 57, 0.14);
-  --shadow-can: drop-shadow(0 18px 26px rgba(74, 47, 57, 0.22));
+  --shadow-card: var(--pv-ui-shadow-card);
+  --shadow-can: drop-shadow(0 18px 26px var(--pv-ui-shadow-strong));
 }
 
 :root {
   color-scheme: light;
-  /* Aktive Sortenfarben, werden per JS gewechselt (Fallback: Wildberry) */
-  --flavor-from: #f7dceb;
-  --flavor-via: #e98ab0;
-  --flavor-to: #b5578c;
-  --flavor-accent: #702249;
+  /* Aktive Sortenfarben, werden per JS gewechselt (Fallback: Wildberry). Zwei Stufen je Sorte:
+     Cream zur Sortenfarbe (CI-Guide, keine erfundenen Zwischentöne). */
+  --flavor-from: var(--pv-cream);
+  --flavor-via: var(--pv-cream);
+  --flavor-to: var(--pv-wildberry);
+  --flavor-accent: var(--pv-wildberry);
   /* Fortschritt der Scroll-Sequenz (0 bis 1), setzt die Zutaten-Einblendung */
   --seq: 0;
 }
@@ -48,45 +86,51 @@ html {
 }
 
 body {
-  @apply bg-cream text-aubergine font-sans antialiased;
+  @apply bg-pv-cream text-pv-wildberry font-sans antialiased;
   overflow-x: hidden;
 }
 
 /* Typografie-Muster aus dem alten Shop */
 .eyebrow {
-  @apply text-magenta text-[13px] font-semibold tracking-[0.24em] uppercase;
+  @apply text-pv-wildberry font-condensed text-[13px] tracking-[0.24em] uppercase;
+  font-weight: var(--pv-fw-bold);
 }
 .headline {
-  @apply leading-[1.05] font-semibold tracking-[-0.02em];
+  @apply leading-[1.05] tracking-[-0.02em];
+  font-weight: var(--pv-fw-medium);
 }
 /* Als @utility, damit .btn-primary und .btn-secondary es per @apply verwenden können
    (Tailwind 4 erlaubt @apply nur für Utilities, nicht für gewöhnliche Klassen). */
 @utility btn-pill {
-  @apply rounded-pill inline-flex items-center justify-center gap-2 px-6 py-3.5 text-[15px] font-semibold transition-[transform,background-color,box-shadow] duration-200 select-none;
+  @apply rounded-pill inline-flex items-center justify-center gap-2 px-6 py-3.5 text-[15px] transition-[transform,background-color,box-shadow] duration-200 select-none;
   min-height: 48px;
+  font-weight: var(--pv-fw-bold);
 }
 .btn-pill:active {
   transform: scale(0.98);
 }
 .btn-primary {
-  @apply btn-pill bg-magenta text-white shadow-[0_12px_28px_rgba(217,48,110,0.32)];
+  @apply btn-pill bg-pv-wildberry text-pv-white;
+  box-shadow: 0 12px 28px var(--pv-ui-shadow-strong);
 }
 .btn-primary:hover {
-  @apply bg-[#c22860];
+  @apply bg-pv-burgundy;
 }
 .btn-secondary {
-  @apply btn-pill text-aubergine border-aubergine/15 border bg-white/80;
+  @apply btn-pill text-pv-wildberry border-pv-ui-hairline bg-pv-ui-surface-translucent border;
 }
 .link-underline {
-  @apply text-aubergine border-b-[1.5px] border-current pb-0.5 text-[15px] font-medium no-underline;
+  @apply text-pv-wildberry border-b-[1.5px] border-current pb-0.5 text-[15px] no-underline;
+  font-weight: var(--pv-fw-medium);
 }
 .link-caps {
-  @apply text-magenta border-magenta border-b-[1.5px] pb-1 text-[13px] font-semibold tracking-[0.18em] uppercase no-underline;
+  @apply text-pv-wildberry border-pv-wildberry font-condensed border-b-[1.5px] pb-1 text-[13px] tracking-[0.18em] uppercase no-underline;
+  font-weight: var(--pv-fw-bold);
 }
 
 /* Fokus sichtbar (WCAG 2.4.7) */
 :where(a, button, input, select, textarea, summary):focus-visible {
-  outline: 3px solid var(--color-magenta);
+  outline: 3px solid var(--pv-wildberry);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -6319,7 +6363,7 @@ select.pv-acc-input {
   min-height: 100dvh;
   background: var(--admin-farbe-hintergrund);
   color: var(--admin-farbe-text);
-  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-family: var(--pv-font-sans);
   font-size: 14px;
   line-height: 1.4;
 }
