@@ -33,31 +33,31 @@ export function StatusStepper({
           >
             <div className="flex w-full items-center">
               <span
-                className={`h-[3px] flex-1 ${i === 0 ? "" : leftOn ? "bg-magenta" : "bg-mauve/40"}`}
+                className={`h-[3px] flex-1 ${i === 0 ? "" : leftOn ? "bg-pv-wildberry" : "bg-pv-ui-hairline"}`}
                 aria-hidden="true"
               />
               <span
                 className={`flex size-7 shrink-0 items-center justify-center rounded-full border-[1.5px] ${
                   step.state === "done"
-                    ? "bg-magenta border-magenta text-white"
+                    ? "bg-pv-wildberry border-pv-wildberry text-pv-white"
                     : step.state === "current"
-                      ? "border-magenta bg-white"
-                      : "bg-cream-2 border-mauve/60"
+                      ? "border-pv-wildberry bg-pv-white"
+                      : "bg-pv-cream border-pv-ui-hairline"
                 }`}
                 aria-hidden="true"
               >
                 {step.state === "done" ? <CheckIcon className="size-4" /> : null}
                 {step.state === "current" ? (
-                  <span className="bg-magenta size-2.5 rounded-full" />
+                  <span className="bg-pv-wildberry size-2.5 rounded-full" />
                 ) : null}
               </span>
               <span
-                className={`h-[3px] flex-1 ${i === steps.length - 1 ? "" : rightOn ? "bg-magenta" : "bg-mauve/40"}`}
+                className={`h-[3px] flex-1 ${i === steps.length - 1 ? "" : rightOn ? "bg-pv-wildberry" : "bg-pv-ui-hairline"}`}
                 aria-hidden="true"
               />
             </div>
             <span
-              className={`text-center text-[13px] leading-[1.4] ${step.state === "open" ? "font-normal" : "font-semibold"}`}
+              className={`text-center text-[13px] leading-[1.4] ${step.state === "open" ? "font-normal" : "font-bold"}`}
             >
               {step.label}
               <span className="sr-only">, {STATE_TEXT[step.state]}</span>

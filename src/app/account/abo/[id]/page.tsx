@@ -51,7 +51,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-
 type DialogKey =
   "pausieren" | "kuendigen" | "adresse" | "zahlungsmittel" | "ueberspringen" | "fortsetzen";
 const DIALOGS: DialogKey[] = [
@@ -134,12 +133,12 @@ export default async function AboDetailPage({
       </Link>
       <Eyebrow className="mt-2">Abo seit {formatDay(row.created_at)}</Eyebrow>
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <h1 className="headline text-wine text-[44px] leading-none lg:text-[64px]">
+        <h1 className="headline text-pv-wildberry text-[44px] leading-none lg:text-[64px]">
           {card.productTitle}
         </h1>
         <StatusBadge status={row.status} />
       </div>
-      <p className="text-mauve mt-2 text-[13px]">Abo-Nummer {row.number}</p>
+      <p className="text-pv-wildberry mt-2 text-[13px]">Abo-Nummer {row.number}</p>
 
       <div className="mt-6 flex flex-col gap-3" aria-live="polite">
         {hint ? (
@@ -213,22 +212,22 @@ export default async function AboDetailPage({
             }
           >
             <div className="flex items-start gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-white">
+              <span className="bg-pv-white flex size-10 shrink-0 items-center justify-center rounded-[10px]">
                 <CardIcon className="size-5" />
               </span>
               <div className="text-[14px] leading-[1.45]">
-                <p className="text-[15px] font-semibold">{view.paymentLabel}</p>
+                <p className="text-[15px] font-bold">{view.paymentLabel}</p>
                 {paymentOpen && row.last_payment_failed_at ? (
-                  <p className="text-berry text-[13px] font-semibold">
+                  <p className="text-pv-wildberry text-[13px] font-bold">
                     Abgelehnt am {formatDay(row.last_payment_failed_at)}
                   </p>
                 ) : view.paymentMethod?.exp_month && view.paymentMethod.exp_year ? (
-                  <p className="text-plum text-[13px]">
+                  <p className="text-pv-wildberry text-[13px]">
                     Gültig bis {String(view.paymentMethod.exp_month).padStart(2, "0")}/
                     {view.paymentMethod.exp_year} · gespeichert für dein Abo
                   </p>
                 ) : (
-                  <p className="text-plum text-[13px]">gespeichert für dein Abo</p>
+                  <p className="text-pv-wildberry text-[13px]">gespeichert für dein Abo</p>
                 )}
               </div>
             </div>
@@ -266,14 +265,16 @@ export default async function AboDetailPage({
           <SectionCard id="lieferhistorie" title="Lieferhistorie">
             <ul className="flex flex-col">
               {upcoming(view) ? (
-                <li className="border-aubergine/15 flex items-start justify-between gap-3 border-t py-3 text-[14px]">
+                <li className="border-pv-ui-hairline flex items-start justify-between gap-3 border-t py-3 text-[14px]">
                   <span>
-                    <span className="block font-semibold">{upcoming(view)}</span>
-                    <span className="text-plum text-[13px]">
+                    <span className="block font-bold">{upcoming(view)}</span>
+                    <span className="text-pv-wildberry text-[13px]">
                       {paymentOpen ? "offen" : "geplant"} · {formatEur(card.totalCents)}
                     </span>
                   </span>
-                  <span className={`text-[13px] font-semibold ${paymentOpen ? "text-berry" : ""}`}>
+                  <span
+                    className={`text-[13px] font-bold ${paymentOpen ? "text-pv-wildberry" : ""}`}
+                  >
                     {paymentOpen ? "Zahlung offen" : "Geplant"}
                   </span>
                 </li>
@@ -281,18 +282,18 @@ export default async function AboDetailPage({
               {view.history.map((h) => (
                 <li
                   key={h.orderNumber}
-                  className="border-aubergine/15 flex items-start justify-between gap-3 border-t py-3 text-[14px]"
+                  className="border-pv-ui-hairline flex items-start justify-between gap-3 border-t py-3 text-[14px]"
                 >
                   <span>
-                    <span className="block font-semibold">{formatDay(h.placedAt)}</span>
+                    <span className="block font-bold">{formatDay(h.placedAt)}</span>
                     <Link
                       href={`/account/bestellungen/${encodeURIComponent(h.orderNumber)}` as Route}
-                      className="text-plum text-[13px] underline underline-offset-2"
+                      className="text-pv-wildberry text-[13px] underline underline-offset-2"
                     >
                       {h.orderNumber} · {formatEur(h.totalCents)}
                     </Link>
                   </span>
-                  <span className="text-[13px] font-semibold">
+                  <span className="text-[13px] font-bold">
                     {ORDER_STATUS[h.status] ?? h.status}
                   </span>
                 </li>
@@ -443,20 +444,22 @@ function DeliveryCard({ view, base }: { view: SubscriptionDetailView; base: stri
           size="sm"
         />
         <div className="min-w-0">
-          <p className="text-plum text-[13px]">{label}</p>
+          <p className="text-pv-wildberry text-[13px]">{label}</p>
           {date ? (
-            <p className={`text-[28px] leading-[1.15] font-semibold ${alert ? "text-berry" : ""}`}>
+            <p
+              className={`text-[28px] leading-[1.15] font-bold ${alert ? "text-pv-wildberry" : ""}`}
+            >
               {date}
             </p>
           ) : null}
           <p className="mt-1 text-[14px] leading-[1.45]">{amount}</p>
           {row.skip_next && row.status === "active" && row.next_order_at ? (
-            <p className="text-plum mt-1 text-[13px]">
+            <p className="text-pv-wildberry mt-1 text-[13px]">
               Die Lieferung am {formatDay(row.next_order_at)} ist übersprungen.
             </p>
           ) : null}
           {row.cancel_effective_at && row.status !== "cancelled" ? (
-            <p className="text-berry mt-1 text-[13px] font-semibold">
+            <p className="text-pv-wildberry mt-1 text-[13px] font-bold">
               Gekündigt zum {formatDay(row.cancel_effective_at)}.
             </p>
           ) : null}
@@ -464,7 +467,7 @@ function DeliveryCard({ view, base }: { view: SubscriptionDetailView; base: stri
       </div>
       {row.status === "active" ? (
         <>
-          <p className="text-plum text-[13px]">
+          <p className="text-pv-wildberry text-[13px]">
             Wir erinnern dich {view.settings.reminderDays} Tage vorher per E-Mail. Bis dahin kannst
             du alles ändern.
           </p>
@@ -623,7 +626,7 @@ function DialogFor({
           <Link
             href={base as Route}
             scroll={false}
-            className="btn-pill border-aubergine text-aubergine border-[1.5px]"
+            className="btn-pill border-pv-wildberry text-pv-wildberry border-[1.5px]"
           >
             Abbrechen
           </Link>
@@ -649,7 +652,7 @@ function DialogFor({
           <Link
             href={base as Route}
             scroll={false}
-            className="btn-pill border-aubergine text-aubergine border-[1.5px]"
+            className="btn-pill border-pv-wildberry text-pv-wildberry border-[1.5px]"
           >
             Abbrechen
           </Link>

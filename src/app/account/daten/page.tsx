@@ -41,9 +41,9 @@ function Section({
     <section
       id={id}
       aria-labelledby={`${id}-titel`}
-      className={`${CARD_FLAT} scroll-mt-28 p-5 sm:p-6 ${tone === "danger" ? "border-magenta/40 border-[1.5px]" : ""}`}
+      className={`${CARD_FLAT} scroll-mt-28 p-5 sm:p-6 ${tone === "danger" ? "border-pv-wildberry border-[1.5px]" : ""}`}
     >
-      <h2 id={`${id}-titel`} className="mb-4 text-[20px] leading-[1.2] font-semibold">
+      <h2 id={`${id}-titel`} className="mb-4 text-[20px] leading-[1.2] font-medium">
         {title}
       </h2>
       {children}
@@ -61,7 +61,7 @@ export default async function DataPage({
 
   return (
     <AccountShell active="daten">
-      <h1 className="headline text-wine text-[40px] lg:text-[56px]">Deine Daten</h1>
+      <h1 className="headline text-pv-wildberry text-[40px] lg:text-[56px]">Deine Daten</h1>
 
       {params.email === "bestaetigt" ? (
         <Notice tone="success" role="status" title="E-Mail-Adresse bestätigt" className="mt-5">

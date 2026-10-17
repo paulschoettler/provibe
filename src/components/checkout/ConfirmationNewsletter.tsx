@@ -14,23 +14,23 @@ export function ConfirmationNewsletter({ email }: { email: string }) {
   return (
     <section
       aria-labelledby="h-newsletter"
-      className="bg-pink-light flex flex-col gap-3.5 rounded-[26px] p-[22px]"
+      className="bg-pv-cream flex flex-col gap-3.5 rounded-[26px] p-[22px]"
     >
       <MailIcon className="h-[26px] w-[26px]" />
-      <h2 id="h-newsletter" className="text-[20px] leading-[1.2] font-semibold">
+      <h2 id="h-newsletter" className="text-[20px] leading-[1.2] font-medium">
         Zum Newsletter. Versprochen ohne Spam.
       </h2>
       <p className="text-[14px] leading-[1.5]">
         Du bekommst vorher eine Bestätigungsmail. Abmeldung jederzeit.
       </p>
       {state.status === "ok" ? (
-        <p role="status" className="text-[15px] font-semibold">
+        <p role="status" className="text-[15px] font-bold">
           {state.message}
         </p>
       ) : (
         <form action={action} className="flex flex-col gap-3.5" noValidate>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="danke-newsletter-email" className="text-[14px] font-semibold">
+            <label htmlFor="danke-newsletter-email" className="text-[14px] font-bold">
               E-Mail
             </label>
             <input
@@ -48,7 +48,7 @@ export function ConfirmationNewsletter({ email }: { email: string }) {
               <p
                 id="danke-newsletter-fehler"
                 role="alert"
-                className="text-berry text-[13px] font-semibold"
+                className="text-pv-wildberry text-[13px] font-bold"
               >
                 {state.message}
               </p>
@@ -61,7 +61,7 @@ export function ConfirmationNewsletter({ email }: { email: string }) {
           <button
             type="submit"
             disabled={pending}
-            className="border-aubergine bg-cream h-12 rounded-full border-2 px-[22px] text-[15px] font-semibold disabled:opacity-60"
+            className="border-pv-wildberry bg-pv-cream h-12 rounded-full border-2 px-[22px] text-[15px] font-bold disabled:opacity-60"
           >
             {pending ? "Einen Moment …" : "Anmelden"}
           </button>

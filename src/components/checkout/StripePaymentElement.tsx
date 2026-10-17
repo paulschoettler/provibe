@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BRAND_COLORS, BRAND_FONTS } from "@/lib/brand/tokens";
 
 /**
  * Stripe Payment Element (APP_INTEGRATIONS=live). @stripe/stripe-js wird erst hier und nur
@@ -52,12 +53,13 @@ export function StripePaymentElement({
           appearance: {
             theme: "flat",
             variables: {
-              colorPrimary: "#d9306e",
-              colorText: "#4a2f39",
-              colorBackground: "#ffffff",
-              colorDanger: "#702249",
+              // Stripe rendert im iframe ohne unsere CSS-Variablen: Werte aus tokens.json
+              colorPrimary: BRAND_COLORS.wildberry,
+              colorText: BRAND_COLORS.wildberry,
+              colorBackground: BRAND_COLORS.white,
+              colorDanger: BRAND_COLORS.wildberry,
               borderRadius: "14px",
-              fontFamily: "Jost, system-ui, sans-serif",
+              fontFamily: BRAND_FONTS.sans,
             },
           },
         });
@@ -94,7 +96,7 @@ export function StripePaymentElement({
       <div ref={mountRef} />
       {status === "loading" ? <p className="text-[14px]">Zahlarten werden geladen …</p> : null}
       {status === "error" ? (
-        <p role="alert" className="text-berry text-[14px] font-semibold">
+        <p role="alert" className="text-pv-wildberry text-[14px] font-bold">
           Die Zahlungsfelder konnten nicht geladen werden. Bitte lade die Seite neu.
         </p>
       ) : null}

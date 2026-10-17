@@ -14,26 +14,28 @@ export function CheckoutProgress({ step }: { step: 1 | 2 }) {
   return (
     <ol className="flex items-center gap-2.5" aria-label="Fortschritt der Bestellung">
       <li className="flex items-center gap-2" aria-current={step === 1 ? "step" : undefined}>
-        <span className="bg-magenta border-magenta flex h-7 w-7 items-center justify-center rounded-full border-[1.5px] text-[14px] leading-none font-bold text-white">
+        <span className="bg-pv-wildberry border-pv-wildberry text-pv-white flex h-7 w-7 items-center justify-center rounded-full border-[1.5px] text-[14px] leading-none font-bold">
           {step === 2 ? <CheckIcon className="h-4 w-4" /> : "1"}
         </span>
-        <span className={`text-[15px] ${step === 1 ? "font-semibold" : ""}`}>
+        <span className={`text-[15px] ${step === 1 ? "font-bold" : ""}`}>
           Adresse{step === 2 ? <span className="sr-only"> (erledigt)</span> : null}
         </span>
       </li>
       <li
         aria-hidden="true"
-        className={`h-0.5 w-10 ${step === 2 ? "bg-magenta" : "bg-aubergine/30"}`}
+        className={`h-0.5 w-10 ${step === 2 ? "bg-pv-wildberry" : "bg-pv-ui-hairline"}`}
       />
       <li className="flex items-center gap-2" aria-current={step === 2 ? "step" : undefined}>
         <span
           className={`flex h-7 w-7 items-center justify-center rounded-full border-[1.5px] text-[14px] leading-none font-bold ${
-            step === 2 ? "bg-magenta border-magenta text-white" : "bg-cream border-aubergine/40"
+            step === 2
+              ? "bg-pv-wildberry border-pv-wildberry text-pv-white"
+              : "bg-pv-cream border-pv-wildberry"
           }`}
         >
           2
         </span>
-        <span className={`text-[15px] ${step === 2 ? "font-semibold" : ""}`}>Zahlung</span>
+        <span className={`text-[15px] ${step === 2 ? "font-bold" : ""}`}>Zahlung</span>
       </li>
     </ol>
   );
@@ -43,7 +45,7 @@ export function CheckoutTitle({ title, eyebrow = "Kasse" }: { title: string; eye
   return (
     <div className="flex flex-col gap-2">
       <p className="co-eyebrow">{eyebrow}</p>
-      <h1 className="text-wine text-[40px] leading-[1.08] font-semibold tracking-[-0.01em] lg:text-[56px] lg:leading-[1.05]">
+      <h1 className="text-pv-wildberry text-[40px] leading-[1.08] font-medium tracking-[-0.01em] lg:text-[56px] lg:leading-[1.05]">
         {title}
       </h1>
     </div>
@@ -59,7 +61,7 @@ export function OrderLine({ line }: { line: SnapshotLine }) {
   const { goodsCents, depositCents } = lineAmounts(line);
   return (
     <li className="flex items-center gap-3">
-      <div className="bg-pink-light flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
+      <div className="bg-pv-cream flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
         {line.imageUrl ? (
           <Image
             src={line.imageUrl}
@@ -71,7 +73,7 @@ export function OrderLine({ line }: { line: SnapshotLine }) {
         ) : null}
       </div>
       <div className="min-w-0 flex-1 leading-[1.4]">
-        <p className="text-[15px] font-semibold">
+        <p className="text-[15px] font-bold">
           {line.productTitle}
           {line.subscription ? " im Abo" : ""}
         </p>
@@ -82,7 +84,7 @@ export function OrderLine({ line }: { line: SnapshotLine }) {
         </p>
       </div>
       <div className="shrink-0 text-right leading-[1.4] whitespace-nowrap">
-        <p className="text-[15px] font-semibold">{formatEur(goodsCents)}</p>
+        <p className="text-[15px] font-bold">{formatEur(goodsCents)}</p>
         {line.basePriceText && !line.basePriceText.endsWith("Stück") ? (
           <p className="text-[12px]">
             <span className="sr-only">Grundpreis </span>
@@ -105,7 +107,7 @@ function Row({ label, children }: { label: React.ReactNode; children: React.Reac
 
 export function FreePill({ children = "kostenlos" }: { children?: React.ReactNode }) {
   return (
-    <span className="bg-butter border-aubergine inline-flex rounded-full border-[1.5px] px-2.5 py-0.5 text-[13px] leading-[1.4] font-semibold">
+    <span className="bg-pv-lime-raspberry border-pv-wildberry inline-flex rounded-full border-[1.5px] px-2.5 py-0.5 text-[13px] leading-[1.4] font-bold">
       {children}
     </span>
   );
@@ -149,7 +151,7 @@ export function OrderSummary({
     <div className="flex flex-col gap-3.5">
       {title ? (
         <div className="flex items-center justify-between leading-[1.4]">
-          <Heading className="text-[20px] font-semibold">{title}</Heading>
+          <Heading className="text-[20px] font-medium">{title}</Heading>
           <p className="text-[14px]">
             {snapshot.itemCount} {snapshot.itemCount === 1 ? "Artikel" : "Artikel"}
           </p>
@@ -163,7 +165,7 @@ export function OrderSummary({
           />
         ))}
       </ul>
-      <hr className="border-aubergine/20" />
+      <hr className="border-pv-ui-hairline" />
       <dl className="flex flex-col gap-2">
         {aboSavings > 0 ? (
           <>
@@ -171,7 +173,7 @@ export function OrderSummary({
               {formatEur(snapshot.subtotalCents + aboSavings)}
             </Row>
             <Row label={`Abo-Rabatt${aboPercent ? ` ${aboPercent}` : ""} (nur auf den Warenwert)`}>
-              <span className="text-plum font-semibold">−{formatEur(aboSavings)}</span>
+              <span className="text-pv-wildberry font-bold">−{formatEur(aboSavings)}</span>
             </Row>
           </>
         ) : (
@@ -179,7 +181,9 @@ export function OrderSummary({
         )}
         {snapshot.discountCents > 0 ? (
           <Row label={`Rabatt${snapshot.discountCode ? ` (${snapshot.discountCode})` : ""}`}>
-            <span className="text-plum font-semibold">−{formatEur(snapshot.discountCents)}</span>
+            <span className="text-pv-wildberry font-bold">
+              −{formatEur(snapshot.discountCents)}
+            </span>
           </Row>
         ) : null}
         {snapshot.depositCents > 0 ? (
@@ -198,10 +202,10 @@ export function OrderSummary({
           <Row label="Lieferzeit">{snapshot.shipping?.deliveryTimeText ?? "3 bis 5 Werktage"}</Row>
         ) : null}
       </dl>
-      <hr className="border-aubergine/20" />
+      <hr className="border-pv-ui-hairline" />
       <div className="flex items-end justify-between py-1">
         <div className="leading-[1.4]">
-          <p className="text-[18px] font-semibold">Gesamt</p>
+          <p className="text-[18px] font-bold">Gesamt</p>
           <p className="text-[13px]">
             Zahlbetrag inkl. Pfand und MwSt. (darin{" "}
             {taxText || `${formatEur(snapshot.taxCents)} MwSt.`})
@@ -223,10 +227,10 @@ export function MobileSummary({
   children?: React.ReactNode;
 }) {
   return (
-    <details className="co-mobile-summary bg-pink-light lg:hidden">
+    <details className="co-mobile-summary bg-pv-cream lg:hidden">
       <summary className="flex h-14 cursor-pointer list-none items-center gap-2 px-4">
         <BagIcon className="h-5 w-5" />
-        <span className="text-plum text-[15px] font-semibold underline underline-offset-4">
+        <span className="text-pv-wildberry text-[15px] font-bold underline underline-offset-4">
           <span className="co-when-closed">Bestellübersicht anzeigen</span>
           <span className="co-when-open">Bestellübersicht ausblenden</span>
         </span>
@@ -261,13 +265,13 @@ export function Notice({
       role={isError ? "alert" : undefined}
       className={`flex items-start gap-3 rounded-[18px] p-4 ${
         isError
-          ? "border-magenta bg-pink-light/60 text-berry border-2"
-          : "bg-butter border-aubergine border-[1.5px]"
+          ? "border-pv-wildberry bg-pv-cream text-pv-wildberry border-2"
+          : "bg-pv-lime-raspberry border-pv-wildberry border-[1.5px]"
       }`}
     >
       {isError ? <AlertIcon className="mt-0.5 h-6 w-6" /> : <InfoIcon className="mt-0.5 h-6 w-6" />}
       <div className="min-w-0 flex-1">
-        <p className="text-[15px] leading-[1.4] font-semibold">{title}</p>
+        <p className="text-[15px] leading-[1.4] font-bold">{title}</p>
         {children ? <div className="text-[14px] leading-[1.45]">{children}</div> : null}
       </div>
     </div>
@@ -282,7 +286,7 @@ export function PaymentBadges() {
         {["Karte", "Apple Pay", "Google Pay", "PayPal", "Klarna"].map((m) => (
           <li
             key={m}
-            className="border-aubergine/40 rounded-full border bg-white/60 px-2.5 py-1 text-[12px] font-semibold"
+            className="border-pv-wildberry bg-pv-ui-surface-translucent rounded-full border px-2.5 py-1 text-[12px] font-bold"
           >
             {m}
           </li>

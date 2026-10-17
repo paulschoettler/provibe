@@ -72,7 +72,7 @@ export function NutritionTableView({ table, caption }: { table: NutritionTable; 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <p>
-      <strong className="font-semibold">{label}:</strong> {children}
+      <strong className="font-bold">{label}:</strong> {children}
     </p>
   );
 }
@@ -113,7 +113,7 @@ export function LmivSections({ product }: { product: ProductDetail }) {
               {isBundle ? (
                 product.componentFoods.map((f) => (
                   <div key={f.handle} className="mb-3">
-                    <p className="font-semibold">{f.name}</p>
+                    <p className="font-bold">{f.name}</p>
                     {f.ingredientsHtml ? (
                       <div dangerouslySetInnerHTML={{ __html: f.ingredientsHtml }} />
                     ) : null}
@@ -124,7 +124,7 @@ export function LmivSections({ product }: { product: ProductDetail }) {
               )}
               {product.allergens ? (
                 <p className="mt-3">
-                  <strong className="font-semibold">Allergene:</strong> {product.allergens}
+                  <strong className="font-bold">Allergene:</strong> {product.allergens}
                 </p>
               ) : null}
             </div>
@@ -140,7 +140,7 @@ export function LmivSections({ product }: { product: ProductDetail }) {
               />
               <div>
                 {product.proteinPerUnitG && product.netContentText ? (
-                  <p className="text-berry text-[20px] leading-[1.3] font-semibold lg:mt-4 lg:text-[24px]">
+                  <p className="text-pv-wildberry text-[20px] leading-[1.3] font-bold lg:mt-4 lg:text-[24px]">
                     Je Dose ({product.netContentText}):{" "}
                     {product.proteinPerUnitG.toLocaleString("de-DE")} g Eiweiß.
                   </p>

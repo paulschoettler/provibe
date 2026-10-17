@@ -24,12 +24,12 @@ export function FilterBar({
   count: number;
 }) {
   return (
-    <div className="border-mauve/40 flex flex-col gap-4 border-b pb-5 lg:flex-row lg:items-center lg:justify-between">
+    <div className="border-pv-ui-hairline flex flex-col gap-4 border-b pb-5 lg:flex-row lg:items-center lg:justify-between">
       <nav
         aria-label="Filtern"
         className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
       >
-        <span className="text-[15px] font-semibold">Filtern:</span>
+        <span className="text-[15px] font-bold">Filtern:</span>
         <ul className="flex flex-wrap gap-2">
           {CATALOG_FILTERS.map((f) => {
             const active = f.value === filter;
@@ -51,11 +51,11 @@ export function FilterBar({
       </nav>
 
       <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2">
-        <p className="text-plum text-[14px] font-medium" aria-live="polite">
+        <p className="text-pv-wildberry text-[14px] font-medium" aria-live="polite">
           {count} {count === 1 ? "Produkt" : "Produkte"}
         </p>
         <nav aria-label="Sortieren" className="flex items-center gap-3">
-          <span className="sr-only text-[15px] font-semibold sm:not-sr-only">Sortieren:</span>
+          <span className="sr-only text-[15px] font-bold sm:not-sr-only">Sortieren:</span>
           <ul className="flex flex-wrap gap-2">
             {CATALOG_SORTS.map((s) => {
               const active = s.value === sort;

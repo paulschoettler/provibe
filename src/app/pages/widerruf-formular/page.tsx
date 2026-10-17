@@ -64,10 +64,10 @@ export default async function WiderrufFormularPage() {
             </p>
           </Notice>
           <section
-            className="bg-pink-light flex flex-col gap-3 rounded-[16px] px-5 py-5"
+            className="bg-pv-cream flex flex-col gap-3 rounded-[16px] px-5 py-5"
             aria-labelledby="ruecksendung-titel"
           >
-            <h2 id="ruecksendung-titel" className="text-wine m-0 text-[20px] font-semibold">
+            <h2 id="ruecksendung-titel" className="text-pv-wildberry m-0 text-[20px] font-medium">
               Rücksendung
             </h2>
             <address className="text-[15px] leading-[1.55] not-italic">

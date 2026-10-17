@@ -70,14 +70,14 @@ export function AccountShell({
                     <Icon className="size-[18px]" />
                     <span className="flex-1">{label}</span>
                     {key === active ? (
-                      <span className="bg-magenta size-1.5 rounded-full" aria-hidden="true" />
+                      <span className="bg-pv-wildberry size-1.5 rounded-full" aria-hidden="true" />
                     ) : null}
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
-          <div className="border-aubergine/15 mt-3 border-t pt-3">
+          <div className="border-pv-ui-hairline mt-3 border-t pt-3">
             <form action={signOut}>
               <button type="submit" className="pv-acc-side w-full">
                 <LogoutIcon className="size-[18px]" />

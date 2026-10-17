@@ -37,7 +37,7 @@ describe("productTypeOf", () => {
       productTypeOf({
         kind: "simple",
         tags: ["eistee"],
-        attributes: { palette: { from: "#fff" } },
+        attributes: { palette: { from: "cream" } },
       }),
     ).toBe("sorte");
     expect(productTypeOf({ kind: "simple", tags: ["eistee"], attributes: {} })).toBe("mixed");

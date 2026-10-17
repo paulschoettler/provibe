@@ -50,12 +50,9 @@ export const CATALOG_SORTS: {
   { value: "preis-ab", label: "Preis", arrow: "↓", srText: "absteigend" },
 ];
 
-export interface FlavorPalette {
-  from: string;
-  via: string;
-  to: string;
-  accent: string;
-}
+import { flavorPalette, type FlavorPalette } from "./palette";
+
+export type { FlavorPalette };
 
 export interface CatalogImage {
   src: string;
@@ -230,12 +227,6 @@ const FLAVOR_SHORT: Record<string, string> = {
   wildberry: "Wildberry",
   "raspberry-lime": "Raspberry Lime",
   peach: "Peach",
-};
-const DEFAULT_PALETTE: FlavorPalette = {
-  from: "#F7DCEB",
-  via: "#E98AB0",
-  to: "#B5578C",
-  accent: "#702249",
 };
 /** Feste Motive wie auf der Startseite (src/lib/catalog/home.ts) und im Warenkorb */
 const FIXED_IMAGES: Record<string, CatalogImage> = {
@@ -914,7 +905,7 @@ function toCatalogProduct(raw: RawCatalog, p: ProductRow): CatalogProduct | null
     line2,
     tags: p.tags,
     isFood: p.is_food,
-    palette: { ...DEFAULT_PALETTE, ...(asRecord(attrs.palette) as Partial<FlavorPalette>) },
+    palette: flavorPalette(p.handle),
     image: cardImage(raw, p, shortTitle, type),
     variants,
     defaultVariant,

@@ -47,7 +47,7 @@ export function DetailsForm({
         {state.status === "error" && state.message ? (
           <p
             role="alert"
-            className="border-magenta bg-pink-light/60 text-berry flex items-center gap-2 rounded-[18px] border-2 px-4 py-3 text-[15px] font-semibold"
+            className="border-pv-wildberry bg-pv-cream text-pv-wildberry flex items-center gap-2 rounded-[18px] border-2 px-4 py-3 text-[15px] font-bold"
           >
             <AlertIcon className="h-5 w-5" />
             {state.message}
@@ -56,12 +56,12 @@ export function DetailsForm({
 
         <section className="flex flex-col gap-3" aria-labelledby="h-kontakt">
           <div className="flex items-center justify-between">
-            <h2 id="h-kontakt" className="text-[20px] leading-[1.2] font-semibold">
+            <h2 id="h-kontakt" className="text-[20px] leading-[1.2] font-medium">
               Kontakt
             </h2>
             <Link
               href={"/account/login?next=/checkout" as Route}
-              className="text-plum flex h-11 items-center text-[14px] font-semibold underline underline-offset-4"
+              className="text-pv-wildberry flex h-11 items-center text-[14px] font-bold underline underline-offset-4"
             >
               Schon ein Konto? Anmelden
             </Link>
@@ -80,7 +80,7 @@ export function DetailsForm({
         </section>
 
         <fieldset className="flex flex-col gap-3.5">
-          <legend className="mb-3.5 text-[20px] leading-[1.2] font-semibold">Lieferadresse</legend>
+          <legend className="mb-3.5 text-[20px] leading-[1.2] font-medium">Lieferadresse</legend>
           <div className="grid gap-3.5 lg:grid-cols-2 lg:gap-3">
             <Field
               name="firstName"
@@ -165,7 +165,7 @@ export function DetailsForm({
               defaultChecked={billingChecked}
             />
             <div className="co-billing__fields mt-2 flex flex-col gap-3.5">
-              <p className="text-[17px] font-semibold">Rechnungsadresse</p>
+              <p className="text-[17px] font-bold">Rechnungsadresse</p>
               <div className="grid gap-3.5 lg:grid-cols-2 lg:gap-3">
                 <Field
                   name="billingFirstName"
@@ -222,7 +222,7 @@ export function DetailsForm({
         </fieldset>
 
         <fieldset className="flex flex-col gap-3">
-          <legend className="mb-3 text-[20px] leading-[1.2] font-semibold">Versand</legend>
+          <legend className="mb-3 text-[20px] leading-[1.2] font-medium">Versand</legend>
           {shippingOptions.map((opt) => (
             <label key={opt.id} className="co-choice">
               <input
@@ -234,21 +234,21 @@ export function DetailsForm({
               />
               <TruckIcon className="h-[22px] w-[22px]" />
               <span className="flex min-w-0 flex-1 flex-col items-start gap-[3px] leading-[1.4]">
-                <span className="text-[16px] font-semibold">{opt.name}</span>
+                <span className="text-[16px] font-bold">{opt.name}</span>
                 <span className="text-[14px]">
                   {opt.deliveryText} · {opt.listPriceText}
                 </span>
                 {opt.freeAboveText ? (
-                  <span className="bg-butter border-aubergine rounded-full border-[1.5px] px-2.5 py-[3px] text-[12px] font-semibold">
+                  <span className="bg-pv-lime-raspberry border-pv-wildberry rounded-full border-[1.5px] px-2.5 py-[3px] text-[12px] font-bold">
                     {opt.freeAboveText}
                   </span>
                 ) : null}
               </span>
-              <span className="text-[16px] font-semibold whitespace-nowrap">{opt.priceText}</span>
+              <span className="text-[16px] font-bold whitespace-nowrap">{opt.priceText}</span>
             </label>
           ))}
           {e.shippingRateId ? (
-            <p className="text-berry text-[13px] font-semibold">{e.shippingRateId}</p>
+            <p className="text-pv-wildberry text-[13px] font-bold">{e.shippingRateId}</p>
           ) : null}
         </fieldset>
 

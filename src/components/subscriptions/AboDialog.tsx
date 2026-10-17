@@ -81,13 +81,13 @@ export function AboDialog({
         className="pv-abo-dialog__panel"
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 id={`${id}-titel`} className="text-[24px] leading-[1.2] font-semibold lg:text-[28px]">
+          <h2 id={`${id}-titel`} className="text-[24px] leading-[1.2] font-medium lg:text-[28px]">
             {title}
           </h2>
           <Link
             href={closeHref as Route}
             scroll={false}
-            className="bg-cream-2 hover:bg-sand flex size-11 shrink-0 items-center justify-center rounded-full"
+            className="bg-pv-cream hover:bg-pv-ui-hairline flex size-11 shrink-0 items-center justify-center rounded-full"
             aria-label="Schließen"
           >
             <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">

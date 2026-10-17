@@ -22,7 +22,7 @@ export function EmptyState({
   return (
     <div className="mx-auto flex max-w-[520px] flex-col items-center py-12 text-center lg:py-16">
       <div className="pvc-empty-blob" aria-hidden="true">
-        <Blob opacity={1} />
+        <Blob />
         <span className="relative flex items-center gap-4">
           {icon === "merch" ? (
             <>
@@ -34,7 +34,7 @@ export function EmptyState({
           )}
         </span>
       </div>
-      <H className="mt-6 text-[28px] leading-[1.1] font-bold tracking-[-0.02em] lg:text-[34px]">
+      <H className="mt-6 text-[28px] leading-[1.1] font-medium tracking-[-0.02em] lg:text-[34px]">
         {title}
       </H>
       <div className="mt-3 text-[16px] leading-[1.5]">{text}</div>

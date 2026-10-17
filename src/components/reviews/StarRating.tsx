@@ -35,9 +35,9 @@ export function StarRating({
       className={`relative inline-flex w-max shrink-0 ${className}`}
       style={{ height: size }}
     >
-      <span className="text-mauve flex gap-[2px]">{row(false)}</span>
+      <span className="text-pv-wildberry flex gap-[2px]">{row(false)}</span>
       <span
-        className="text-magenta absolute inset-y-0 left-0 flex gap-[2px] overflow-hidden"
+        className="text-pv-wildberry absolute inset-y-0 left-0 flex gap-[2px] overflow-hidden"
         style={{ width: pct }}
       >
         {row(true)}

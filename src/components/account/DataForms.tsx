@@ -84,7 +84,7 @@ export function EmailForm({ current, pending }: { current: string; pending: stri
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
       <p className="text-[15px] leading-[1.5]">
-        Aktuell: <strong className="font-semibold break-all">{current}</strong>
+        Aktuell: <strong className="font-bold break-all">{current}</strong>
       </p>
       {pending && state.status === "idle" ? (
         <Notice tone="info" title="Bestätigung ausstehend">
@@ -218,7 +218,7 @@ export function DeleteAccountForm() {
       />
       <div>
         <SubmitButton
-          className="btn-pill bg-berry hover:bg-wine text-white"
+          className="btn-pill bg-pv-wildberry hover:bg-pv-burgundy text-pv-white"
           pendingLabel="Konto wird gelöscht …"
         >
           Konto endgültig löschen

@@ -42,9 +42,9 @@ export function PurchaseTypeChoice({
 }) {
   return (
     <fieldset>
-      <legend className="float-left mb-2.5 text-[16px] leading-6 font-semibold">Kaufart</legend>
+      <legend className="float-left mb-2.5 text-[16px] leading-6 font-bold">Kaufart</legend>
       <p
-        className="text-plum float-right mb-2.5 text-[14px] leading-6 font-medium"
+        className="text-pv-wildberry float-right mb-2.5 text-[14px] leading-6 font-medium"
         aria-live="polite"
       >
         Gewählt: {value === "abo" ? "Abo" : "Einmal kaufen"}
@@ -61,13 +61,13 @@ export function PurchaseTypeChoice({
             id={`${uid}-einmal`}
           />
           <span className="flex min-w-0 flex-1 flex-col leading-[1.35]">
-            <span className="text-[16px] font-semibold">Einmal kaufen</span>
-            <span className="text-plum text-[13px]">Einmalige Lieferung, kein Vertrag</span>
+            <span className="text-[16px] font-bold">Einmal kaufen</span>
+            <span className="text-pv-wildberry text-[13px]">Einmalige Lieferung, kein Vertrag</span>
           </span>
           <span className="flex shrink-0 flex-col items-end leading-[1.35]">
             <span className="text-[16px] font-bold">{formatEur(onceGoodsCents)}</span>
             {onceBasePriceText ? (
-              <span className="text-plum text-[12px]">{onceBasePriceText}</span>
+              <span className="text-pv-wildberry text-[12px]">{onceBasePriceText}</span>
             ) : null}
           </span>
         </label>
@@ -84,15 +84,19 @@ export function PurchaseTypeChoice({
               id={`${uid}-abo`}
             />
             <span className="flex min-w-0 flex-1 flex-col leading-[1.35]">
-              <span className="flex flex-wrap items-center gap-2 text-[16px] font-semibold">
+              <span className="flex flex-wrap items-center gap-2 text-[16px] font-bold">
                 Im Abo sparen
                 <span className="pv-abo-badge">{percent(offer.discountBp)} sparen</span>
               </span>
-              <span className="text-plum text-[13px]">Lieferung im Rhythmus deiner Wahl</span>
+              <span className="text-pv-wildberry text-[13px]">
+                Lieferung im Rhythmus deiner Wahl
+              </span>
             </span>
             <span className="flex shrink-0 flex-col items-end leading-[1.35]">
-              <span className="text-wine text-[16px] font-bold">{formatEur(offer.goodsCents)}</span>
-              <span className="text-plum text-[12px]">{offer.basePriceText}</span>
+              <span className="text-pv-wildberry text-[16px] font-bold">
+                {formatEur(offer.goodsCents)}
+              </span>
+              <span className="text-pv-wildberry text-[12px]">{offer.basePriceText}</span>
             </span>
           </label>
           <div className="pv-abo-panel">{children}</div>
@@ -120,7 +124,7 @@ export function SubscriptionIntervalPicker({
   return (
     <div className="flex flex-col gap-2.5">
       <fieldset>
-        <legend className="mb-2 text-[14px] font-semibold">Liefern alle</legend>
+        <legend className="mb-2 text-[14px] font-bold">Liefern alle</legend>
         <div className="grid grid-cols-4 gap-2">
           {intervals.map((weeks) => (
             <div key={weeks}>
@@ -140,12 +144,12 @@ export function SubscriptionIntervalPicker({
           ))}
         </div>
       </fieldset>
-      <p className="text-plum text-[13px] leading-[1.45]">
+      <p className="text-pv-wildberry text-[13px] leading-[1.45]">
         Standard: alle {defaultInterval} Wochen. Erste Lieferung jetzt, die nächste am{" "}
         <span aria-live="polite">{addWeeksToDay(today, value)}</span>.
       </p>
       <p className="pv-abo-flex">
-        <svg viewBox="0 0 24 24" className="text-magenta size-4 shrink-0" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="text-pv-wildberry size-4 shrink-0" aria-hidden="true">
           <path
             d="M5 12.5l4.5 4.5L19 7.5"
             fill="none"
@@ -180,7 +184,7 @@ export function AboPriceBlock({
         <span className="text-[40px] leading-none font-bold tracking-[-0.01em] lg:text-[44px]">
           {formatEur(offer.goodsCents)}
         </span>
-        <span className="text-plum pb-0.5 text-[17px] font-medium">
+        <span className="text-pv-wildberry pb-0.5 text-[17px] font-medium">
           je Lieferung · {unitCount} Dosen
         </span>
       </p>
@@ -215,7 +219,11 @@ export function AboPriceBlock({
 export function SubscriptionNote() {
   return (
     <p className="flex items-start gap-2 text-[13px] leading-[1.45]">
-      <svg viewBox="0 0 24 24" className="text-plum mt-0.5 size-4 shrink-0" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        className="text-pv-wildberry mt-0.5 size-4 shrink-0"
+        aria-hidden="true"
+      >
         <path
           d="M4 9h13l-3-3M20 15H7l3 3"
           fill="none"

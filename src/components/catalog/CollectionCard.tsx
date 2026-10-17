@@ -9,11 +9,12 @@ import { ArrowRightIcon, Blob, CupIcon, ShirtIcon } from "./icons";
  */
 export type CollectionMotif = "alle" | "eistee" | "bundles" | "merch";
 
+/** Flächen nach CI: Wildberry mit Cream-Text, Peach mit Burgundy-Text, Lime-Raspberry mit Wildberry-Text. */
 const BG: Record<CollectionMotif, string> = {
-  alle: "bg-pink-light",
-  eistee: "bg-peach",
-  bundles: "bg-butter",
-  merch: "bg-cream-2 border border-mauve",
+  alle: "pvc-coll--wildberry bg-pv-wildberry",
+  eistee: "pvc-coll--peach bg-pv-peach",
+  bundles: "bg-pv-lime-raspberry",
+  merch: "bg-pv-cream border border-pv-wildberry",
 };
 
 export function CollectionCard({
@@ -40,7 +41,7 @@ export function CollectionCard({
           {title}
         </SiteLink>
       </H>
-      <p className="text-plum flex items-center gap-1.5 text-[14px] font-semibold">
+      <p className="flex items-center gap-1.5 text-[14px] font-bold">
         Alle ansehen
         {typeof count === "number" ? <span className="sr-only">, {count} Produkte</span> : null}
         <ArrowRightIcon className="h-4 w-4" />
@@ -56,7 +57,7 @@ function Motif({ motif }: { motif: CollectionMotif }) {
     case "eistee":
       return (
         <>
-          <Blob className="pvc-coll-blob text-butter" opacity={0.9} />
+          <Blob className="pvc-coll-blob text-pv-lime-raspberry" />
           <Image
             src="/images/cans/peach.webp"
             alt=""
@@ -80,7 +81,7 @@ function Motif({ motif }: { motif: CollectionMotif }) {
       );
     default:
       return (
-        <span className="text-aubergine flex items-center gap-3.5">
+        <span className="text-pv-wildberry flex items-center gap-3.5">
           <ShirtIcon className="h-11 w-11" />
           <CupIcon className="h-10 w-10" />
         </span>

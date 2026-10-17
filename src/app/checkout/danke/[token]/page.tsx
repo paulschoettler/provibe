@@ -43,7 +43,7 @@ export default async function ThankYouPage({ params }: { params: Promise<{ token
         {!failed ? <meta httpEquiv="refresh" content="4" /> : null}
         <section className="mx-auto max-w-[720px] px-4 py-16 lg:py-24">
           <p className="co-eyebrow">{failed ? "Zahlung" : "Einen Moment"}</p>
-          <h1 className="text-wine mt-3 text-[40px] leading-[1.08] font-semibold">
+          <h1 className="text-pv-wildberry mt-3 text-[40px] leading-[1.08] font-medium">
             {failed ? "Die Zahlung hat nicht geklappt." : "Wir bestätigen gerade deine Zahlung."}
           </h1>
           <p className="mt-4 text-[17px] leading-[1.5]">
@@ -64,8 +64,8 @@ export default async function ThankYouPage({ params }: { params: Promise<{ token
   return (
     <SiteShell>
       <ThankYouHero order={order} />
-      <div className="bg-cream relative -mt-px">
-        <WaveDivider shape="soft" fill="var(--color-cream)" position="top" />
+      <div className="bg-pv-cream relative -mt-px">
+        <WaveDivider shape="soft" fill="var(--pv-cream)" position="top" />
         <div className="relative z-[2] mx-auto grid max-w-[1280px] gap-5 px-4 pt-1 pb-12 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-10 lg:px-[120px] lg:pb-20">
           <div className="flex min-w-0 flex-col gap-5">
             <OrderFacts order={order} />
@@ -98,7 +98,7 @@ function ThankYouHero({ order }: { order: OrderView }) {
       <div className="relative mx-auto flex max-w-[1280px] flex-col items-start gap-[18px] px-4 pt-7 pb-[72px] lg:min-h-[400px] lg:px-[120px] lg:pt-[72px] lg:pb-[110px]">
         <p className="co-eyebrow">Bestellung eingegangen</p>
         <h1 className="co-sticker-headline">Danke, dein Vibe ist unterwegs!</h1>
-        <p className="border-aubergine bg-cream rounded-full border-2 px-3.5 py-1.5 text-[14px] font-semibold lg:hidden">
+        <p className="border-pv-wildberry bg-pv-cream rounded-full border-2 px-3.5 py-1.5 text-[14px] font-bold lg:hidden">
           Bestellung {order.orderNumber}
         </p>
         <p className="hidden max-w-[520px] text-[17px] leading-[1.5] lg:block">
@@ -143,7 +143,7 @@ function OrderFacts({ order }: { order: OrderView }) {
   return (
     <section
       aria-label="Bestelldaten"
-      className="bg-cream-2 flex flex-col gap-3.5 rounded-[22px] p-[18px] lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-8 lg:gap-y-3 lg:px-6"
+      className="bg-pv-cream flex flex-col gap-3.5 rounded-[22px] p-[18px] lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-8 lg:gap-y-3 lg:px-6"
     >
       <div className="leading-[1.2]">
         <p className="text-[13px] leading-[1.4]">Bestellnummer</p>
@@ -153,7 +153,7 @@ function OrderFacts({ order }: { order: OrderView }) {
         <CalendarIcon className="h-[22px] w-[22px]" />
         <div className="leading-[1.4]">
           <p className="text-[13px]">Bestellt am</p>
-          <p className="text-[15px] font-semibold whitespace-nowrap">
+          <p className="text-[15px] font-bold whitespace-nowrap">
             {formatGermanDate(window.orderDate)}
           </p>
         </div>
@@ -162,9 +162,7 @@ function OrderFacts({ order }: { order: OrderView }) {
         <TruckIcon className="h-[22px] w-[22px]" />
         <div className="leading-[1.4]">
           <p className="text-[13px]">Zustellung voraussichtlich</p>
-          <p className="text-[15px] font-semibold whitespace-nowrap">
-            {formatDeliveryWindow(window)}
-          </p>
+          <p className="text-[15px] font-bold whitespace-nowrap">{formatDeliveryWindow(window)}</p>
         </div>
       </div>
     </section>
@@ -176,10 +174,10 @@ function OrderCard({ order }: { order: OrderView }) {
   return (
     <section
       aria-labelledby="h-bestellung"
-      className="bg-cream-2 flex flex-col gap-3.5 rounded-[22px] p-[18px] lg:p-6"
+      className="bg-pv-cream flex flex-col gap-3.5 rounded-[22px] p-[18px] lg:p-6"
     >
       <div className="flex items-center justify-between">
-        <h2 id="h-bestellung" className="text-[20px] font-semibold">
+        <h2 id="h-bestellung" className="text-[20px] font-medium">
           Deine Bestellung
         </h2>
         <p className="text-[14px]">{order.itemCount} Artikel</p>
@@ -189,7 +187,7 @@ function OrderCard({ order }: { order: OrderView }) {
           const amounts = lineAmounts(item);
           return (
             <li key={`${item.title}-${i}`} className="flex items-center gap-3">
-              <div className="bg-pink-light flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
+              <div className="bg-pv-cream flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
                 {item.imageUrl ? (
                   <Image
                     src={item.imageUrl}
@@ -201,7 +199,7 @@ function OrderCard({ order }: { order: OrderView }) {
                 ) : null}
               </div>
               <div className="min-w-0 flex-1 leading-[1.4]">
-                <p className="text-[15px] font-semibold">{item.title}</p>
+                <p className="text-[15px] font-bold">{item.title}</p>
                 <p className="text-[13px]">{item.description}</p>
                 <p className="text-[13px]">
                   Menge {item.quantity}
@@ -211,7 +209,7 @@ function OrderCard({ order }: { order: OrderView }) {
                 </p>
               </div>
               <div className="shrink-0 text-right leading-[1.4]">
-                <p className="text-[15px] font-semibold">{formatEur(amounts.goodsCents)}</p>
+                <p className="text-[15px] font-bold">{formatEur(amounts.goodsCents)}</p>
                 {item.basePriceText && !item.basePriceText.endsWith("Stück") ? (
                   <p className="text-[12px]">{item.basePriceText.replace(" / ", "/")}</p>
                 ) : null}
@@ -220,7 +218,7 @@ function OrderCard({ order }: { order: OrderView }) {
           );
         })}
       </ul>
-      <hr className="border-aubergine/20" />
+      <hr className="border-pv-ui-hairline" />
       <dl className="flex flex-col gap-2 text-[15px]">
         <div className="flex justify-between">
           <dt>Zwischensumme (ohne Pfand)</dt>
@@ -229,7 +227,7 @@ function OrderCard({ order }: { order: OrderView }) {
         {order.discountCents > 0 ? (
           <div className="flex justify-between">
             <dt>Rabatt{order.discountCode ? ` (${order.discountCode})` : ""}</dt>
-            <dd className="text-plum font-semibold">−{formatEur(order.discountCents)}</dd>
+            <dd className="text-pv-wildberry font-bold">−{formatEur(order.discountCents)}</dd>
           </div>
         ) : null}
         {order.depositCents > 0 ? (
@@ -243,10 +241,10 @@ function OrderCard({ order }: { order: OrderView }) {
           <dd>{order.shippingFree ? <FreePill /> : formatEur(order.shippingCents)}</dd>
         </div>
       </dl>
-      <hr className="border-aubergine/20" />
+      <hr className="border-pv-ui-hairline" />
       <div className="flex items-end justify-between">
         <div className="leading-[1.4]">
-          <p className="text-[18px] font-semibold">Gesamt</p>
+          <p className="text-[18px] font-bold">Gesamt</p>
           <p className="text-[13px]">
             Zahlbetrag inkl. Pfand und MwSt. (darin{" "}
             {taxText || `${formatEur(order.taxCents)} MwSt.`})
@@ -262,10 +260,10 @@ function DeliveryCard({ order }: { order: OrderView }) {
   return (
     <section
       aria-label="Lieferung und Zahlung"
-      className="bg-cream-2 grid gap-4 rounded-[22px] p-[18px] lg:grid-cols-3 lg:p-6"
+      className="bg-pv-cream grid gap-4 rounded-[22px] p-[18px] lg:grid-cols-3 lg:p-6"
     >
       <div>
-        <h2 className="text-[15px] font-semibold">Lieferadresse</h2>
+        <h2 className="text-[15px] font-medium">Lieferadresse</h2>
         <address className="mt-1 text-[14px] leading-[1.5] not-italic">
           {formatAddressLines(order.shippingAddress).map((line) => (
             <span key={line} className="block">
@@ -275,7 +273,7 @@ function DeliveryCard({ order }: { order: OrderView }) {
         </address>
       </div>
       <div>
-        <h2 className="text-[15px] font-semibold">Rechnungsadresse</h2>
+        <h2 className="text-[15px] font-medium">Rechnungsadresse</h2>
         <address className="mt-1 text-[14px] leading-[1.5] not-italic">
           {order.billingAddress
             ? formatAddressLines(order.billingAddress).map((line) => (
@@ -288,9 +286,9 @@ function DeliveryCard({ order }: { order: OrderView }) {
       </div>
       <div>
         <div className="flex items-center gap-2">
-          <h2 className="text-[15px] font-semibold">Zahlart</h2>
+          <h2 className="text-[15px] font-medium">Zahlart</h2>
           {order.paymentStatus === "paid" ? (
-            <span className="bg-butter border-aubergine rounded-full border-[1.5px] px-2.5 py-0.5 text-[12px] font-semibold">
+            <span className="bg-pv-lime-raspberry border-pv-wildberry rounded-full border-[1.5px] px-2.5 py-0.5 text-[12px] font-bold">
               Bezahlt
             </span>
           ) : null}
@@ -306,12 +304,12 @@ function AccountCard({ email }: { email: string }) {
   return (
     <section
       aria-labelledby="h-konto"
-      className="border-aubergine bg-cream flex flex-col gap-3.5 rounded-[26px] border-2 p-[22px] shadow-[0_6px_12px_rgba(74,46,56,0.22)]"
+      className="border-pv-wildberry bg-pv-cream flex flex-col gap-3.5 rounded-[26px] border-2 p-[22px] shadow-[0_6px_12px_var(--pv-ui-shadow-strong)]"
     >
-      <span className="bg-pink-light flex h-12 w-12 items-center justify-center rounded-full">
+      <span className="bg-pv-cream flex h-12 w-12 items-center justify-center rounded-full">
         <UserPlusIcon className="h-6 w-6" />
       </span>
-      <h2 id="h-konto" className="text-[20px] leading-[1.2] font-semibold">
+      <h2 id="h-konto" className="text-[20px] leading-[1.2] font-medium">
         Konto anlegen, ein Klick
       </h2>
       <p className="text-[14px] leading-[1.5]">
@@ -333,7 +331,7 @@ function Buttons({ orderNumber }: { orderNumber: string }) {
       </Link>
       <Link
         href={`/account/bestellungen/${orderNumber}` as Route}
-        className="border-aubergine bg-cream flex h-[52px] items-center justify-center gap-2 rounded-full border-2 px-[22px] text-[15px] font-semibold lg:w-[230px]"
+        className="border-pv-wildberry bg-pv-cream flex h-[52px] items-center justify-center gap-2 rounded-full border-2 px-[22px] text-[15px] font-bold lg:w-[230px]"
       >
         <PackageIcon className="h-[18px] w-[18px]" />
         Bestellung ansehen

@@ -33,25 +33,25 @@ export function DiscountForm({
     return (
       <form action={removeAction} className="flex flex-col gap-1.5">
         <input type="hidden" name="back" value={back} />
-        <p className="text-[14px] font-semibold">Rabattcode</p>
+        <p className="text-[14px] font-bold">Rabattcode</p>
         <div className="flex items-center justify-between gap-3">
           <p className="flex items-center gap-1.5 text-[15px]">
-            <CheckIcon className="text-plum h-5 w-5" />
+            <CheckIcon className="text-pv-wildberry h-5 w-5" />
             <span>
-              <strong className="font-semibold">{appliedCode}</strong>{" "}
+              <strong className="font-bold">{appliedCode}</strong>{" "}
               {rejection ? "gespeichert" : "eingelöst"}
             </span>
           </p>
           <button
             type="submit"
             disabled={removing}
-            className="text-plum flex h-11 items-center text-[14px] font-semibold underline underline-offset-4"
+            className="text-pv-wildberry flex h-11 items-center text-[14px] font-bold underline underline-offset-4"
           >
             Entfernen
           </button>
         </div>
         {rejection ? (
-          <p role="status" className="text-berry text-[13px] font-semibold">
+          <p role="status" className="text-pv-wildberry text-[13px] font-bold">
             {rejection}
           </p>
         ) : null}
@@ -65,7 +65,7 @@ export function DiscountForm({
   return (
     <form action={action} className="flex flex-col gap-1.5" noValidate>
       <input type="hidden" name="back" value={back} />
-      <label htmlFor={fieldId} className="text-[14px] font-semibold">
+      <label htmlFor={fieldId} className="text-[14px] font-bold">
         Rabattcode
       </label>
       <div className="flex items-start gap-2">
@@ -84,7 +84,7 @@ export function DiscountForm({
         <button
           type="submit"
           disabled={pending}
-          className="border-aubergine bg-cream h-[52px] shrink-0 rounded-full border-2 px-[22px] text-[15px] font-semibold disabled:opacity-60"
+          className="border-pv-wildberry bg-pv-cream h-[52px] shrink-0 rounded-full border-2 px-[22px] text-[15px] font-bold disabled:opacity-60"
         >
           {pending ? "Prüfe …" : "Einlösen"}
         </button>
@@ -93,7 +93,7 @@ export function DiscountForm({
         <p
           id={`${fieldId}-fehler`}
           role="alert"
-          className="text-berry flex items-center gap-1.5 text-[13px] font-semibold"
+          className="text-pv-wildberry flex items-center gap-1.5 text-[13px] font-bold"
         >
           <AlertIcon className="h-4 w-4" />
           {error}

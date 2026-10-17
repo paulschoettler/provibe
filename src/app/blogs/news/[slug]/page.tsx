@@ -67,7 +67,7 @@ export default async function BlogPostPage({ params }: Props) {
         />
         <Eyebrow className="mt-6">News</Eyebrow>
         <h1 className="pv-display mt-3 !text-[36px] lg:!text-[56px]">{post.title}</h1>
-        <p className="text-plum mt-3 text-[14px] font-medium">
+        <p className="text-pv-wildberry mt-3 text-[14px] font-medium">
           {post.publishedAt ? (
             <time dateTime={post.publishedAt}>{formatDateLongDe(post.publishedAt)}</time>
           ) : null}

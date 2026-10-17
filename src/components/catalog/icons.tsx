@@ -126,8 +126,8 @@ export function CloseLineIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
-/** Organische Fläche hinter Dosen (Figma "Blob"), Farbe über currentColor. */
-export function Blob({ className = "", opacity = 0.45 }: IconProps & { opacity?: number }) {
+/** Organische Fläche hinter Dosen (Figma "Blob"), Farbe über currentColor, deckend (CI: keine Transparenzen). */
+export function Blob({ className = "" }: IconProps) {
   return (
     <svg
       viewBox="0 0 229.6 224"
@@ -137,7 +137,6 @@ export function Blob({ className = "", opacity = 0.45 }: IconProps & { opacity?:
       preserveAspectRatio="none"
     >
       <path
-        opacity={opacity}
         fill="currentColor"
         d="M229.366 109.302C232.034 135.021 211.45 177.672 189.087 196.541C166.787 215.411 123.713 228.658 95.3141 222.455C66.9789 216.186 33.8153 187.43 18.8854 159.19C3.89186 130.95 -7.2262 79.4464 5.67075 52.9514C18.5677 26.3918 68.2495 1.90011 96.2035 0.0906945C124.158 -1.71872 151.159 23.9362 173.331 42.1595C195.567 60.3829 226.761 83.5822 229.366 109.302Z"
       />

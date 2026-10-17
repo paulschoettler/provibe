@@ -67,7 +67,7 @@ export function PublicCancelForm({ today }: { today: string }) {
       />
 
       <fieldset className="flex flex-col gap-2.5">
-        <legend className="mb-2 text-[14px] font-semibold">Art der Kündigung</legend>
+        <legend className="mb-2 text-[14px] font-bold">Art der Kündigung</legend>
         <label className="co-choice !min-h-[64px]">
           <input
             type="radio"
@@ -78,8 +78,10 @@ export function PublicCancelForm({ today }: { today: string }) {
             className="co-radio"
           />
           <span className="flex flex-col leading-[1.35]">
-            <span className="text-[16px] font-semibold">Ordentliche Kündigung</span>
-            <span className="text-plum text-[13px]">Zum nächsten Liefertermin, ohne Grund</span>
+            <span className="text-[16px] font-bold">Ordentliche Kündigung</span>
+            <span className="text-pv-wildberry text-[13px]">
+              Zum nächsten Liefertermin, ohne Grund
+            </span>
           </span>
         </label>
         <label className="co-choice !min-h-[64px]">
@@ -92,13 +94,13 @@ export function PublicCancelForm({ today }: { today: string }) {
             className="co-radio"
           />
           <span className="flex flex-col leading-[1.35]">
-            <span className="text-[16px] font-semibold">Außerordentliche Kündigung</span>
-            <span className="text-plum text-[13px]">
+            <span className="text-[16px] font-bold">Außerordentliche Kündigung</span>
+            <span className="text-pv-wildberry text-[13px]">
               Aus wichtigem Grund, mit Angabe des Grundes
             </span>
           </span>
         </label>
-        {e.kind ? <p className="text-berry text-[13px] font-semibold">{e.kind}</p> : null}
+        {e.kind ? <p className="text-pv-wildberry text-[13px] font-bold">{e.kind}</p> : null}
       </fieldset>
       <div className={kind === "extraordinary" ? "" : "pv-abo-js-hide"}>
         <Textarea
@@ -113,7 +115,7 @@ export function PublicCancelForm({ today }: { today: string }) {
       </div>
 
       <fieldset className="flex flex-col gap-2.5">
-        <legend className="mb-2 text-[14px] font-semibold">Wann soll das Abo enden?</legend>
+        <legend className="mb-2 text-[14px] font-bold">Wann soll das Abo enden?</legend>
         <label className="co-choice !min-h-[64px]">
           <input
             type="radio"
@@ -124,8 +126,8 @@ export function PublicCancelForm({ today }: { today: string }) {
             className="co-radio"
           />
           <span className="flex flex-col leading-[1.35]">
-            <span className="text-[16px] font-semibold">Zum nächstmöglichen Zeitpunkt</span>
-            <span className="text-plum text-[13px]">
+            <span className="text-[16px] font-bold">Zum nächstmöglichen Zeitpunkt</span>
+            <span className="text-pv-wildberry text-[13px]">
               Keine weitere Lieferung, keine weitere Abbuchung
             </span>
           </span>
@@ -140,8 +142,10 @@ export function PublicCancelForm({ today }: { today: string }) {
             className="co-radio"
           />
           <span className="flex flex-col leading-[1.35]">
-            <span className="text-[16px] font-semibold">Zu einem Wunschdatum</span>
-            <span className="text-plum text-[13px]">Du wählst das Datum im nächsten Feld</span>
+            <span className="text-[16px] font-bold">Zu einem Wunschdatum</span>
+            <span className="text-pv-wildberry text-[13px]">
+              Du wählst das Datum im nächsten Feld
+            </span>
           </span>
         </label>
       </fieldset>
@@ -160,7 +164,7 @@ export function PublicCancelForm({ today }: { today: string }) {
       <SubmitButton pendingLabel="Wird gekündigt …" className="w-full">
         Jetzt kündigen
       </SubmitButton>
-      <p className="text-plum -mt-2 text-[13px] leading-[1.45]">
+      <p className="text-pv-wildberry -mt-2 text-[13px] leading-[1.45]">
         Mit dem Klick ist deine Kündigung erklärt. Du siehst sofort eine Bestätigung mit Datum und
         Uhrzeit und bekommst sie zusätzlich per E-Mail.
       </p>

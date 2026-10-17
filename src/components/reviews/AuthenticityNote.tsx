@@ -18,9 +18,9 @@ export function AuthenticityNote({
 }) {
   return (
     <div
-      className={`bg-butter text-aubergine flex gap-2.5 rounded-[16px] px-3.5 py-3 text-[14px] leading-[1.45] font-medium lg:text-[15px] ${className}`}
+      className={`bg-pv-lime-raspberry text-pv-wildberry flex gap-2.5 rounded-[16px] px-3.5 py-3 text-[14px] leading-[1.45] font-medium lg:text-[15px] ${className}`}
     >
-      <ShieldIcon className="text-plum mt-px h-[22px] w-[22px] shrink-0" />
+      <ShieldIcon className="text-pv-wildberry mt-px h-[22px] w-[22px] shrink-0" />
       <p className="m-0">
         {AUTHENTICITY_TEXT}
         {details ? (

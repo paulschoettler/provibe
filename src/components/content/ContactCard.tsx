@@ -1,4 +1,4 @@
-import { InstagramIcon, TiktokIcon } from "@/components/layout/icons";
+import { InstagramIcon, TiktokIcon } from "@/components/brand/BrandIcon";
 import type { ShopSettings } from "@/lib/content/settings";
 import { InhaltIcon } from "./Decor";
 
@@ -12,10 +12,13 @@ export function ContactCard({ settings }: { settings: ShopSettings }) {
   const { contact, social } = settings;
   return (
     <aside
-      className="bg-pink-light flex flex-col gap-[14px] rounded-[10px] px-5 py-6"
+      className="bg-pv-cream flex flex-col gap-[14px] rounded-[10px] px-5 py-6"
       aria-labelledby="direkt-titel"
     >
-      <h2 id="direkt-titel" className="text-wine m-0 text-[22px] font-semibold lg:text-[26px]">
+      <h2
+        id="direkt-titel"
+        className="text-pv-wildberry m-0 text-[22px] font-medium lg:text-[26px]"
+      >
         Direkt erreichen
       </h2>
       <div className="pv-channel">
@@ -31,7 +34,7 @@ export function ContactCard({ settings }: { settings: ShopSettings }) {
       </div>
       <div className="pv-channel">
         <span className="pv-icon-circle" aria-hidden="true">
-          <InstagramIcon className="h-5 w-5" />
+          <InstagramIcon className="h-4 w-4" />
         </span>
         <span className="min-w-0">
           <span className="pv-channel-label">Instagram</span>
@@ -47,7 +50,7 @@ export function ContactCard({ settings }: { settings: ShopSettings }) {
       </div>
       <div className="pv-channel">
         <span className="pv-icon-circle" aria-hidden="true">
-          <TiktokIcon className="h-5 w-5" />
+          <TiktokIcon className="h-4 w-4" />
         </span>
         <span className="min-w-0">
           <span className="pv-channel-label">TikTok</span>

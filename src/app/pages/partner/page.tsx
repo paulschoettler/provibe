@@ -41,19 +41,19 @@ const PILLS = [
 const BENEFIT_STYLE = [
   {
     icon: "percent" as const,
-    bg: "#d9306e",
+    bg: "var(--pv-wildberry)",
     rot: 6,
     fallback: "Konditionen, Mengen und Abläufe besprechen wir direkt mit dir.",
   },
   {
     icon: "boxes" as const,
-    bg: "#f3eda4",
+    bg: "var(--pv-lime-raspberry)",
     rot: -5,
     fallback: "Ideal für Tests und Erstbestellungen.",
   },
   {
     icon: "bolt" as const,
-    bg: "#f7dceb",
+    bg: "var(--pv-peach)",
     rot: 4,
     fallback: "Wir beliefern unsere B2B-Partner direkt und unkompliziert.",
   },
@@ -193,7 +193,9 @@ export default async function PartnerPage() {
               >
                 <InhaltIcon name={b.icon} size={28} />
               </span>
-              <h3 className="text-wine m-0 text-[21px] leading-[1.2] font-semibold">{b.title}</h3>
+              <h3 className="text-pv-wildberry m-0 text-[21px] leading-[1.2] font-medium">
+                {b.title}
+              </h3>
               <p className="pv-body !text-[16px]">{b.text}</p>
             </li>
           ))}
@@ -222,7 +224,7 @@ export default async function PartnerPage() {
           </h2>
           <p className="pv-body !text-[16px]" dangerouslySetInnerHTML={{ __html: c.askHtml }} />
           <div className="pv-channel">
-            <span className="pv-icon-circle !bg-butter" aria-hidden="true">
+            <span className="pv-icon-circle !bg-pv-lime-raspberry" aria-hidden="true">
               <InhaltIcon name="mail" />
             </span>
             <span>
@@ -233,7 +235,7 @@ export default async function PartnerPage() {
             </span>
           </div>
           {c.networkText ? (
-            <p className="text-plum m-0 text-[15px] leading-[1.55]">{c.networkText}</p>
+            <p className="text-pv-wildberry m-0 text-[15px] leading-[1.55]">{c.networkText}</p>
           ) : null}
         </div>
         <div className="relative z-[1]">

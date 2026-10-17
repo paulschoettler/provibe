@@ -104,10 +104,10 @@ function LinkSent({
 }) {
   return (
     <div className="flex flex-col gap-[18px]" aria-live="polite">
-      <span className="bg-pink-light text-plum flex size-12 items-center justify-center rounded-full">
+      <span className="bg-pv-cream text-pv-wildberry flex size-12 items-center justify-center rounded-full">
         <MailIcon className="size-6" />
       </span>
-      <h2 className="text-[26px] leading-[1.15] font-semibold">{title}</h2>
+      <h2 className="text-[26px] leading-[1.15] font-medium">{title}</h2>
       <Notice tone="success" role="status" title="Link gesendet">
         {text ??
           (email
@@ -140,7 +140,7 @@ function MagicLinkForm({ next }: { next: string }) {
     return <LinkSent email={state.email ?? ""} resend={action} next={next} />;
   return (
     <>
-      <h2 className="text-[26px] leading-[1.15] font-semibold">Anmelden</h2>
+      <h2 className="text-[26px] leading-[1.15] font-medium">Anmelden</h2>
       <Tabs active="magic" next={next} />
       <p className="text-[15px] leading-[1.5]">
         Wir schicken dir einen Link per E-Mail. Ein Tipp darauf und du bist drin, ganz ohne
@@ -176,7 +176,7 @@ function PasswordForm({ next }: { next: string }) {
   const [state, action] = useActionState(loginWithPassword, INITIAL_FORM_STATE);
   return (
     <>
-      <h2 className="text-[26px] leading-[1.15] font-semibold">Anmelden</h2>
+      <h2 className="text-[26px] leading-[1.15] font-medium">Anmelden</h2>
       <Tabs active="passwort" next={next} />
       <form action={action} className="flex flex-col gap-[18px]" noValidate>
         <FormError state={state} />
@@ -237,7 +237,7 @@ function RegisterForm({ next }: { next: string }) {
   }
   return (
     <>
-      <h2 className="text-[26px] leading-[1.15] font-semibold">Konto anlegen</h2>
+      <h2 className="text-[26px] leading-[1.15] font-medium">Konto anlegen</h2>
       <p className="text-[15px] leading-[1.5]">
         Mit Passwort, wenn du magst. Ohne Passwort geht es per{" "}
         <Link href={tabHref("magic", next)} className={LINK_PLUM}>
@@ -303,7 +303,7 @@ function ResetForm({ next }: { next: string }) {
   }
   return (
     <>
-      <h2 className="text-[26px] leading-[1.15] font-semibold">Passwort vergessen?</h2>
+      <h2 className="text-[26px] leading-[1.15] font-medium">Passwort vergessen?</h2>
       <p className="text-[15px] leading-[1.5]">
         Kein Problem. Wir schicken dir einen Link, mit dem du dich anmeldest und ein neues Passwort
         setzt.

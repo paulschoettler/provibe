@@ -18,10 +18,10 @@ export function ActivationForm({ defaultEmail }: { defaultEmail?: string }) {
   if (state.status === "ok") {
     return (
       <div className={`${CARD} flex flex-col gap-[18px] p-5 sm:p-7`} aria-live="polite">
-        <span className="bg-pink-light text-plum flex size-12 items-center justify-center rounded-full">
+        <span className="bg-pv-cream text-pv-wildberry flex size-12 items-center justify-center rounded-full">
           <MailIcon className="size-6" />
         </span>
-        <h2 className="text-[26px] leading-[1.15] font-semibold">Check dein Postfach</h2>
+        <h2 className="text-[26px] leading-[1.15] font-medium">Check dein Postfach</h2>
         <Notice tone="success" role="status" title="Aktivierungslink unterwegs">
           {state.email
             ? `Falls wir ${state.email} kennen, bekommst du gleich eine Mail mit deinem Link.`
@@ -48,7 +48,7 @@ export function ActivationForm({ defaultEmail }: { defaultEmail?: string }) {
 
   return (
     <div className={`${CARD} flex flex-col gap-[18px] p-5 sm:p-7`}>
-      <h2 className="text-[26px] leading-[1.15] font-semibold">Konto aktivieren</h2>
+      <h2 className="text-[26px] leading-[1.15] font-medium">Konto aktivieren</h2>
       <p className="text-[15px] leading-[1.5]">
         Gib die E-Mail-Adresse ein, mit der du bisher bei uns bestellt hast. Wir schicken dir einen
         Link, mit dem du dich direkt anmeldest.

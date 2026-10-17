@@ -18,7 +18,7 @@ function Step({ n, children, id }: { n: number; children: React.ReactNode; id: s
   return (
     <h2
       id={id}
-      className="text-wine m-0 flex items-center gap-[10px] text-[20px] font-semibold lg:text-[22px]"
+      className="text-pv-wildberry m-0 flex items-center gap-[10px] text-[20px] font-medium lg:text-[22px]"
     >
       <span className="pv-step" aria-hidden="true">
         {n}
@@ -111,7 +111,7 @@ export function WithdrawalForm() {
                 <svg width="16" height="16" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path
                     d="M3.75 9.375L7.125 12.75L14.25 5.625"
-                    stroke="#D9306E"
+                    stroke="var(--pv-wildberry)"
                     strokeWidth="1.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"

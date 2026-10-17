@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Blob, Eyebrow, FruitSticker, WaveCut } from "@/components/content/Decor";
+import { FruitSticker } from "@/components/brand/FruitSticker";
+import { Blob, Eyebrow, WaveCut } from "@/components/content/Decor";
 import { FlavorTeaserCards } from "@/components/content/FlavorTeaserCards";
 import { SiteLink } from "@/components/layout/SiteLink";
 import { SiteShell } from "@/components/layout/SiteShell";
@@ -44,7 +45,7 @@ export default async function NotFound() {
           404
         </span>
         <FruitSticker
-          kind="brombeere"
+          kind="heidelbeere"
           rotate={-8}
           className="top-[24px] left-[4%] w-[52px] lg:top-[210px] lg:left-[18%] lg:w-[72px]"
         />
@@ -54,7 +55,7 @@ export default async function NotFound() {
           className="top-[18px] right-[5%] w-[50px] lg:top-[190px] lg:right-[19%] lg:w-[70px]"
         />
         <FruitSticker
-          kind="pfirsich"
+          kind="pfirsich-blatt-gross"
           rotate={4}
           className="top-[420px] right-[8%] hidden w-[78px] lg:top-[400px] lg:right-[12%] lg:block"
         />
@@ -91,7 +92,7 @@ export default async function NotFound() {
             <SiteLink href="/" className="pv-btn-primary">
               Zur Startseite
             </SiteLink>
-            <SiteLink href="/pages/shop" className="pv-btn-secondary !bg-cream">
+            <SiteLink href="/pages/shop" className="pv-btn-secondary !bg-pv-cream">
               Zum Shop
             </SiteLink>
           </div>

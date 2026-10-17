@@ -5,7 +5,7 @@ import Link from "next/link";
 export function GoodToKnow() {
   return (
     <aside className="pv-abo-know" aria-labelledby="gut-zu-wissen">
-      <h2 id="gut-zu-wissen" className="flex items-center gap-2 text-[20px] font-semibold">
+      <h2 id="gut-zu-wissen" className="flex items-center gap-2 text-[20px] font-medium">
         <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
           <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.8" />
           <path d="M12 11v5M12 8v.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -21,7 +21,7 @@ export function GoodToKnow() {
       </ul>
       <Link
         href={"/account/abo" as Route}
-        className="text-plum self-start font-semibold underline underline-offset-4"
+        className="text-pv-wildberry self-start font-bold underline underline-offset-4"
       >
         Zum Login
       </Link>

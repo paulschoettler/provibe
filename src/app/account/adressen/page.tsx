@@ -39,7 +39,7 @@ export default async function AddressesPage({
 
   return (
     <AccountShell active="adressen">
-      <h1 className="headline text-wine text-[40px] lg:text-[56px]">Deine Adressen</h1>
+      <h1 className="headline text-pv-wildberry text-[40px] lg:text-[56px]">Deine Adressen</h1>
       <p className="mt-2 text-[15px] leading-[1.5]">
         Gespeicherte Adressen kannst du im Checkout mit einem Tipp übernehmen.
       </p>
@@ -58,7 +58,7 @@ export default async function AddressesPage({
           {addresses.map((a) => (
             <li key={a.id} className={`${CARD_FLAT} flex flex-col gap-3 p-5`}>
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[16px] font-semibold">
+                <h2 className="text-[16px] font-medium">
                   {a.label ?? `${a.firstName} ${a.lastName}`}
                 </h2>
                 {a.isDefaultShipping ? <Badge tone="butter">Standard Lieferung</Badge> : null}
@@ -85,7 +85,7 @@ export default async function AddressesPage({
                   <input type="hidden" name="id" value={a.id} />
                   <button
                     type="submit"
-                    className="text-berry min-h-11 text-[14px] font-semibold underline decoration-[1.5px] underline-offset-4"
+                    className="text-pv-wildberry min-h-11 text-[14px] font-bold underline decoration-[1.5px] underline-offset-4"
                   >
                     Löschen<span className="sr-only">: {a.street}</span>
                   </button>

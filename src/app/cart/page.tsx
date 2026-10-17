@@ -44,7 +44,7 @@ export default async function CartPage({
       {params.fehler ? (
         <p
           role="alert"
-          className="bg-magenta/10 text-berry rounded-card mt-4 px-4 py-3 text-[15px]"
+          className="bg-pv-ui-error-bg text-pv-ui-error rounded-card mt-4 px-4 py-3 text-[15px]"
         >
           {params.fehler}
         </p>
@@ -59,14 +59,14 @@ export default async function CartPage({
         </div>
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px] lg:items-start">
-          <ul className="border-aubergine/10 border-t">
+          <ul className="border-pv-ui-hairline border-t">
             {cart.lines.map((line) => (
               <CartPageLine key={line.id} line={line} />
             ))}
           </ul>
 
-          <aside className="bg-cream-2 rounded-card space-y-4 p-5 lg:sticky lg:top-6">
-            <h2 className="text-[18px] font-semibold">Zusammenfassung</h2>
+          <aside className="bg-pv-cream rounded-card space-y-4 p-5 lg:sticky lg:top-6">
+            <h2 className="text-[18px] font-medium">Zusammenfassung</h2>
             <FreeShippingHint totals={totals} />
             <CartSummary totals={totals} />
             <Link href={ROUTE("/checkout")} className="btn-primary w-full">
@@ -75,7 +75,7 @@ export default async function CartPage({
             <Link href={ROUTE("/collections/all")} className="btn-secondary w-full">
               Weiter einkaufen
             </Link>
-            <p className="text-aubergine/60 text-[13px]">
+            <p className="text-pv-wildberry text-[13px]">
               Preise inklusive Mehrwertsteuer. Versandkosten und Lieferzeit siehst du oben, Pfand
               wird getrennt ausgewiesen.
             </p>
@@ -88,10 +88,10 @@ export default async function CartPage({
 
 function CartPageLine({ line }: { line: CartLineView }) {
   return (
-    <li className="border-aubergine/10 flex gap-4 border-b py-5">
+    <li className="border-pv-ui-hairline flex gap-4 border-b py-5">
       <Link
         href={ROUTE(line.productUrl)}
-        className="bg-cream-2 rounded-card shrink-0 overflow-hidden"
+        className="bg-pv-cream rounded-card shrink-0 overflow-hidden"
         aria-hidden={line.imageUrl ? undefined : true}
         tabIndex={line.imageUrl ? undefined : -1}
       >
@@ -111,26 +111,26 @@ function CartPageLine({ line }: { line: CartLineView }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
-            <Link href={ROUTE(line.productUrl)} className="text-[17px] font-semibold">
+            <Link href={ROUTE(line.productUrl)} className="text-[17px] font-bold">
               {line.productTitle}
             </Link>
-            <p className="text-aubergine/70 text-[15px]">{line.variantTitle}</p>
+            <p className="text-pv-wildberry text-[15px]">{line.variantTitle}</p>
             <SubscriptionLineNote subscription={line.subscription} quantity={line.quantity} />
-            <p className="text-aubergine/60 text-[13px]">
+            <p className="text-pv-wildberry text-[13px]">
               {`Einzelpreis ${formatEur(line.unitPriceCents)}${
                 line.unitDepositCents > 0 ? ` zzgl. ${formatEur(line.unitDepositCents)} Pfand` : ""
               }, Grundpreis: ${line.basePriceText}`}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[17px] font-semibold">{formatEur(line.lineGoodsCents)}</p>
+            <p className="text-[17px] font-bold">{formatEur(line.lineGoodsCents)}</p>
             <DepositNote lineDepositCents={line.lineDepositCents} />
           </div>
         </div>
 
         <form action={updateCartLineForm} className="mt-3 flex flex-wrap items-center gap-3">
           <input type="hidden" name="lineId" value={line.id} />
-          <div className="border-aubergine/15 flex items-center rounded-full border">
+          <div className="border-pv-ui-hairline flex items-center rounded-full border">
             <button
               type="submit"
               name="quantity"
@@ -140,7 +140,7 @@ function CartPageLine({ line }: { line: CartLineView }) {
             >
               −
             </button>
-            <span className="w-10 text-center text-[15px] font-semibold">{line.quantity}</span>
+            <span className="w-10 text-center text-[15px] font-bold">{line.quantity}</span>
             <button
               type="submit"
               name="quantity"
@@ -155,7 +155,7 @@ function CartPageLine({ line }: { line: CartLineView }) {
           <button
             type="submit"
             formAction={removeCartLineForm}
-            className="text-aubergine/70 text-[14px] underline underline-offset-4"
+            className="text-pv-wildberry text-[14px] underline underline-offset-4"
           >
             Entfernen
           </button>

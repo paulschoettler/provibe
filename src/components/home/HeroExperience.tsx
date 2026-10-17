@@ -218,6 +218,7 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
           "--flavor-via": palette.via,
           "--flavor-to": palette.to,
           "--flavor-accent": palette.accent,
+          "--flavor-ink": palette.ink,
         });
       }
     };

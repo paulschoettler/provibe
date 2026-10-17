@@ -7,12 +7,9 @@ type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 type TranslationRow = Database["public"]["Tables"]["product_translations"]["Row"];
 type VariantRow = Database["public"]["Tables"]["product_variants"]["Row"];
 
-export interface FlavorPalette {
-  from: string;
-  via: string;
-  to: string;
-  accent: string;
-}
+import { flavorPalette, type FlavorPalette } from "./palette";
+
+export type { FlavorPalette };
 
 /** Eine Sorte für Hero, Scroll-Sequenz und Sortenkarten. Alle Werte serverseitig berechnet. */
 export interface HomeFlavor {
@@ -87,12 +84,6 @@ const FLAVOR_SHORT: Record<string, string> = {
   "raspberry-lime": "Raspberry Lime",
   peach: "Peach",
 };
-const DEFAULT_PALETTE: FlavorPalette = {
-  from: "#F7DCEB",
-  via: "#E98AB0",
-  to: "#B5578C",
-  accent: "#702249",
-};
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -142,7 +133,7 @@ export async function getHomeData(locale = "de"): Promise<HomeData> {
     const pack = (variantsByProduct.get(product.id) ?? []).find((v) => v.unit_count === 9);
     if (!t || !pack) continue;
     const attrs = asRecord(product.attributes);
-    const palette = { ...DEFAULT_PALETTE, ...asRecord(attrs.palette) } as FlavorPalette;
+    const palette = flavorPalette(product.handle);
     const depositCents = product.deposit_cents_per_unit * pack.unit_count;
     const basePrice = calculateBasePrice({
       priceCents: pack.price_cents,

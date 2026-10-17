@@ -38,14 +38,14 @@ export function AlertIcon({ className = "" }: { className?: string }) {
     >
       <path
         d="M14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8Z"
-        stroke="#D9306E"
+        stroke="var(--pv-wildberry)"
         strokeWidth="1.46667"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M8 4.66667V8.66667M8 11V11.0067"
-        stroke="#D9306E"
+        stroke="var(--pv-wildberry)"
         strokeWidth="1.46667"
         strokeLinecap="round"
         strokeLinejoin="round"

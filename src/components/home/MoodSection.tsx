@@ -24,7 +24,7 @@ export function MoodSection() {
       </div>
 
       <div className="pvmood-panel">
-        <WaveDivider shape="soft" fill="var(--color-magenta)" position="top" />
+        <WaveDivider shape="soft" fill="var(--pv-wildberry)" position="top" />
         <div className="pvmood-copy reveal">
           <div className="pvmood-eyebrow">Powered by Protein</div>
           <h2 className="pvmood-title">Eiskalt. Erfrischend. 15 g Protein.</h2>

@@ -54,33 +54,30 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <SiteShell>
       <TrackSearch query={q} />
       <PageBand innerClassName="max-w-[800px]">
-        <Blob
-          className="pvc-band-deco top-[-60px] right-[-120px] h-[300px] w-[300px] lg:hidden"
-          opacity={0.5}
-        />
+        <Blob className="pvc-band-deco top-[-60px] right-[-120px] h-[300px] w-[300px] lg:hidden" />
         <div
           className="pointer-events-none absolute top-[-40px] right-[-260px] hidden h-[340px] w-[340px] lg:block"
           aria-hidden="true"
         >
-          <Blob className="text-pink absolute inset-0 h-full w-full" opacity={0.6} />
+          <Blob className="text-pv-peach absolute inset-0 h-full w-full" />
           <Image
             src="/images/cans/peach.webp"
             alt=""
             width={405}
             height={760}
             sizes="120px"
-            className="relative mx-auto mt-4 h-[200px] w-auto rotate-[-18deg] drop-shadow-[0_10px_14px_rgba(74,46,56,0.28)]"
+            className="relative mx-auto mt-4 h-[200px] w-auto rotate-[-18deg] drop-shadow-[0_10px_14px_var(--pv-ui-shadow-strong)]"
           />
         </div>
-        <h1 className="relative text-[44px] leading-none font-bold tracking-[-0.02em] lg:text-center lg:text-[72px]">
+        <h1 className="relative text-[44px] leading-none font-medium tracking-[-0.02em] lg:text-center lg:text-[72px]">
           Suche
         </h1>
         <form action="/search" method="get" role="search" className="relative mt-4 lg:mt-6">
-          <label htmlFor="suchbegriff" className="mb-2 block text-[15px] font-semibold">
+          <label htmlFor="suchbegriff" className="mb-2 block text-[15px] font-bold">
             Wonach suchst du?
           </label>
           <div className="pvc-search-field">
-            <SearchLineIcon className="text-aubergine h-5 w-5 shrink-0" />
+            <SearchLineIcon className="text-pv-wildberry h-5 w-5 shrink-0" />
             <input
               id="suchbegriff"
               name="q"
@@ -94,7 +91,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             {q ? (
               <SiteLink
                 href="/search"
-                className="text-aubergine grid h-11 w-11 shrink-0 place-items-center rounded-full"
+                className="text-pv-wildberry grid h-11 w-11 shrink-0 place-items-center rounded-full"
                 aria-label="Suchbegriff löschen"
               >
                 <CloseLineIcon className="h-5 w-5" />
@@ -111,7 +108,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <div className="mx-auto w-full max-w-[1200px] px-4 pt-2 pb-16 sm:px-6 lg:pb-24">
         {result && result.total > 0 ? (
           <>
-            <h2 className="text-[22px] font-semibold lg:text-[30px]" aria-live="polite">
+            <h2 className="text-[22px] font-medium lg:text-[30px]" aria-live="polite">
               {result.total} {result.total === 1 ? "Ergebnis" : "Ergebnisse"} für „{result.query}“
             </h2>
             <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,740px)_1fr] lg:gap-10">
@@ -121,7 +118,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                     <Eyebrow as="h3" id="treffer-produkte">
                       Produkte
                     </Eyebrow>
-                    <span className="text-plum text-[14px] font-semibold">
+                    <span className="text-pv-wildberry text-[14px] font-bold">
                       {result.products.length}
                     </span>
                   </div>
@@ -143,7 +140,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                     <Eyebrow as="h3" id="treffer-seiten">
                       Seiten
                     </Eyebrow>
-                    <span className="text-plum text-[14px] font-semibold">
+                    <span className="text-pv-wildberry text-[14px] font-bold">
                       {result.pages.length}
                     </span>
                   </div>
@@ -178,7 +175,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             </ul>
             <SiteLink
               href="/collections/all"
-              className="mt-6 inline-flex min-h-11 items-center gap-1.5 font-semibold underline underline-offset-4"
+              className="mt-6 inline-flex min-h-11 items-center gap-1.5 font-bold underline underline-offset-4"
             >
               Alle Produkte ansehen
               <ArrowRightIcon className="h-4 w-4" />
@@ -193,7 +190,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 function Suggestions({ className = "", label }: { className?: string; label?: string }) {
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      {label ? <p className="mr-1 w-full text-[15px] font-semibold sm:w-auto">{label}:</p> : null}
+      {label ? <p className="mr-1 w-full text-[15px] font-bold sm:w-auto">{label}:</p> : null}
       <ul
         className={`flex flex-wrap gap-2 ${label ? "" : "justify-center"}`}
         aria-label={label ?? "Suchvorschläge"}
@@ -212,20 +209,20 @@ function Suggestions({ className = "", label }: { className?: string; label?: st
 
 function PageHit({ hit }: { hit: SearchPageHit }) {
   return (
-    <li className="border-mauve/40 border-b">
+    <li className="border-pv-ui-hairline border-b">
       <SiteLink href={hit.url} className="group flex items-center gap-4 py-5">
-        <span className="bg-cream-2 text-aubergine grid h-11 w-11 shrink-0 place-items-center rounded-[14px]">
+        <span className="bg-pv-cream text-pv-wildberry grid h-11 w-11 shrink-0 place-items-center rounded-[14px]">
           <DocumentIcon className="h-5 w-5" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="group-hover:text-berry block text-[18px] font-semibold">
+          <span className="group-hover:text-pv-wildberry block text-[18px] font-bold">
             {hit.title}
           </span>
-          <span className="text-plum block text-[13px]">{hit.url}</span>
+          <span className="text-pv-wildberry block text-[13px]">{hit.url}</span>
           <span className="mt-1 block text-[15px] leading-[1.45]">
             {hit.snippet.map((part, i) =>
               part.mark ? (
-                <strong key={i} className="font-semibold">
+                <strong key={i} className="font-bold">
                   {part.text}
                 </strong>
               ) : (
@@ -234,7 +231,7 @@ function PageHit({ hit }: { hit: SearchPageHit }) {
             )}
           </span>
         </span>
-        <ArrowRightIcon className="text-aubergine h-5 w-5 shrink-0" />
+        <ArrowRightIcon className="text-pv-wildberry h-5 w-5 shrink-0" />
       </SiteLink>
     </li>
   );

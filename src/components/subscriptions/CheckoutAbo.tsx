@@ -44,12 +44,12 @@ export function SubscriptionTermsBlock({
   return (
     <section className="pv-abo-terms" aria-labelledby="dein-abo-titel">
       <div className="flex items-center justify-between gap-3">
-        <h2 id="dein-abo-titel" className="flex items-center gap-2 text-[20px] font-semibold">
-          <AboIcon className="text-magenta size-6" />
+        <h2 id="dein-abo-titel" className="flex items-center gap-2 text-[20px] font-medium">
+          <AboIcon className="text-pv-wildberry size-6" />
           {terms.length === 1 ? "Dein Abo" : "Deine Abos"}
         </h2>
         {rates.size === 1 ? (
-          <span className="bg-butter border-aubergine rounded-full border-[1.5px] px-2.5 py-0.5 text-[12px] font-semibold">
+          <span className="bg-pv-lime-raspberry border-pv-wildberry rounded-full border-[1.5px] px-2.5 py-0.5 text-[12px] font-bold">
             {percent([...rates][0])} Rabatt
           </span>
         ) : null}
@@ -57,7 +57,7 @@ export function SubscriptionTermsBlock({
       {terms.map((t) => (
         <dl key={t.variantId} className="pv-abo-terms__list">
           {terms.length > 1 ? (
-            <div className="col-span-2 pt-1 text-[15px] font-semibold">{t.productTitle}</div>
+            <div className="col-span-2 pt-1 text-[15px] font-bold">{t.productTitle}</div>
           ) : null}
           <dt>Lieferintervall</dt>
           <dd>alle {t.intervalWeeks} Wochen</dd>
@@ -84,7 +84,7 @@ export function SubscriptionTermsBlock({
           </dd>
         </dl>
       ))}
-      <p className="text-plum text-[13px] leading-[1.5]">
+      <p className="text-pv-wildberry text-[13px] leading-[1.5]">
         Preisänderungen kündigen wir dir mindestens 4 Wochen vorher per E-Mail an. Bis dahin kannst
         du kündigen.
       </p>
@@ -96,13 +96,13 @@ export function AccountRequiredBlock({ email, loggedIn }: { email: string; logge
   return (
     <section
       aria-labelledby="h-konto"
-      className="bg-cream-2 flex flex-col gap-2 rounded-[18px] px-4 py-3.5"
+      className="bg-pv-cream flex flex-col gap-2 rounded-[18px] px-4 py-3.5"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="h-konto" className="text-[15px] font-semibold">
+        <h2 id="h-konto" className="text-[15px] font-medium">
           Dein Kundenkonto
         </h2>
-        <span className="bg-butter border-aubergine rounded-full border-[1.5px] px-2.5 py-0.5 text-[12px] font-semibold">
+        <span className="bg-pv-lime-raspberry border-pv-wildberry rounded-full border-[1.5px] px-2.5 py-0.5 text-[12px] font-bold">
           Pflicht beim Abo
         </span>
       </div>
@@ -121,7 +121,7 @@ export function AccountRequiredBlock({ email, loggedIn }: { email: string; logge
             Du hast schon ein Konto?{" "}
             <Link
               href={"/account/login?next=/checkout/zahlung" as Route}
-              className="text-plum font-semibold underline underline-offset-2"
+              className="text-pv-wildberry font-bold underline underline-offset-2"
             >
               Anmelden
             </Link>

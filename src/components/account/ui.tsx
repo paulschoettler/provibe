@@ -10,21 +10,20 @@ import { AlertIcon, CheckIcon, InfoIcon } from "./icons";
 
 /** Outline-Button (Figma "Button/Sekundär"): Aubergine-Rahmen, transparent */
 export const BTN_OUTLINE =
-  "btn-pill border-[1.5px] border-aubergine bg-transparent text-aubergine hover:bg-aubergine/5";
+  "btn-pill border-[1.5px] border-pv-wildberry bg-transparent text-pv-wildberry hover:bg-pv-ui-hairline";
 /** Textlink in Plum, unterstrichen (Kontrast auf Creme) */
 export const LINK_PLUM =
-  "font-semibold text-plum underline decoration-[1.5px] underline-offset-4 hover:text-wine";
+  "font-bold text-pv-wildberry underline decoration-[1.5px] underline-offset-4 hover:text-pv-wildberry";
 /** Karte auf Creme (Figma: Cream-2, Radius 26, Schatten/Karte) */
-export const CARD = "rounded-card bg-cream-2 shadow-[0_12px_32px_-6px_rgba(74,46,56,0.12)]";
+export const CARD = "rounded-card bg-pv-cream shadow-[0_12px_32px_-6px_var(--pv-ui-shadow-color)]";
 /** Flache Karte ohne Schatten (Adressen, Zahlart) */
-export const CARD_FLAT = "rounded-[22px] bg-cream-2";
+export const CARD_FLAT = "rounded-[22px] bg-pv-cream";
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <p
-      className={`text-plum flex items-center gap-2 text-[13px] leading-[1.2] font-semibold tracking-[0.24em] uppercase ${className}`}
+      className={`text-pv-wildberry font-condensed flex items-center gap-2 text-[13px] leading-[1.2] font-bold tracking-[0.24em] uppercase ${className}`}
     >
-      <span className="bg-magenta size-2 rounded-full" aria-hidden="true" />
       {children}
     </p>
   );
@@ -33,9 +32,9 @@ export function Eyebrow({ children, className = "" }: { children: ReactNode; cla
 export type NoticeTone = "info" | "error" | "success";
 
 const NOTICE_STYLES: Record<NoticeTone, string> = {
-  info: "bg-butter border-aubergine text-aubergine",
-  error: "bg-pink-light border-magenta text-berry",
-  success: "bg-cream border-mauve/60 text-aubergine",
+  info: "bg-pv-lime-raspberry border-pv-wildberry text-pv-wildberry",
+  error: "bg-pv-cream border-pv-wildberry text-pv-wildberry",
+  success: "bg-pv-cream border-pv-ui-hairline text-pv-wildberry",
 };
 
 /** Hinweisbox (Info, Fehler, Erfolg). Fehler mit Magenta-Rahmen und Berry-Text (Frage H9). */
@@ -61,16 +60,16 @@ export function Notice({
       className={`flex items-start gap-3 rounded-[18px] border-[1.5px] p-4 ${NOTICE_STYLES[tone]} ${className}`}
     >
       {tone === "success" ? (
-        <span className="bg-magenta mt-px flex size-6 items-center justify-center rounded-full text-white">
+        <span className="bg-pv-wildberry text-pv-white mt-px flex size-6 items-center justify-center rounded-full">
           <CheckIcon className="size-4" />
         </span>
       ) : tone === "error" ? (
-        <AlertIcon className="text-magenta size-6" />
+        <AlertIcon className="text-pv-wildberry size-6" />
       ) : (
         <InfoIcon className="size-6" />
       )}
       <div className="min-w-0 flex-1">
-        {title ? <p className="text-[15px] leading-[1.4] font-semibold">{title}</p> : null}
+        {title ? <p className="text-[15px] leading-[1.4] font-bold">{title}</p> : null}
         {children ? <div className="mt-0.5 text-[14px] leading-[1.45]">{children}</div> : null}
       </div>
     </div>
@@ -78,16 +77,16 @@ export function Notice({
 }
 
 const BADGE_STYLES: Record<BadgeTone, string> = {
-  butter: "bg-butter border-aubergine text-aubergine",
-  success: "bg-[#dff1e3] border-[#2f6b3c] text-[#1f4d2a]",
-  neutral: "bg-cream border-mauve text-aubergine",
-  alert: "bg-pink-light border-magenta text-berry",
+  butter: "bg-pv-lime-raspberry border-pv-wildberry text-pv-wildberry",
+  success: "bg-pv-ui-success-bg border-pv-ui-success text-pv-ui-success",
+  neutral: "bg-pv-cream border-pv-wildberry text-pv-wildberry",
+  alert: "bg-pv-cream border-pv-wildberry text-pv-wildberry",
 };
 
 export function Badge({ tone, children }: { tone: BadgeTone; children: ReactNode }) {
   return (
     <span
-      className={`rounded-pill inline-flex items-center border-[1.5px] px-2.5 py-px text-[12px] leading-[1.5] font-semibold whitespace-nowrap ${BADGE_STYLES[tone]}`}
+      className={`rounded-pill inline-flex items-center border-[1.5px] px-2.5 py-px text-[12px] leading-[1.5] font-bold whitespace-nowrap ${BADGE_STYLES[tone]}`}
     >
       {children}
     </span>
@@ -135,9 +134,9 @@ export function Field({
   const describedBy = [errorId, hintId].filter(Boolean).join(" ") || undefined;
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={id} className="text-[14px] leading-[1.4] font-semibold">
+      <label htmlFor={id} className="text-[14px] leading-[1.4] font-bold">
         {label}
-        {required ? null : <span className="text-mauve font-normal"> (optional)</span>}
+        {required ? null : <span className="text-pv-wildberry font-normal"> (optional)</span>}
       </label>
       <input
         id={id}
@@ -155,8 +154,11 @@ export function Field({
         className={`pv-acc-input ${error ? "pv-acc-input--error" : ""}`}
       />
       {error ? (
-        <p id={errorId} className="text-berry flex items-center gap-1.5 text-[13px] font-semibold">
-          <AlertIcon className="text-magenta size-4" />
+        <p
+          id={errorId}
+          className="text-pv-wildberry flex items-center gap-1.5 text-[13px] font-bold"
+        >
+          <AlertIcon className="text-pv-wildberry size-4" />
           {error}
         </p>
       ) : null}
@@ -203,8 +205,11 @@ export function Checkbox({
         <span>{label}</span>
       </label>
       {error ? (
-        <p id={errorId} className="text-berry flex items-center gap-1.5 text-[13px] font-semibold">
-          <AlertIcon className="text-magenta size-4" />
+        <p
+          id={errorId}
+          className="text-pv-wildberry flex items-center gap-1.5 text-[13px] font-bold"
+        >
+          <AlertIcon className="text-pv-wildberry size-4" />
           {error}
         </p>
       ) : null}

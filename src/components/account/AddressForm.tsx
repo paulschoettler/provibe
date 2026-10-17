@@ -19,7 +19,7 @@ export function AddressForm({ address }: { address?: SavedAddress }) {
 
   return (
     <section className={`${CARD_FLAT} p-5 sm:p-6`} aria-labelledby="adresse-form-titel">
-      <h2 id="adresse-form-titel" className="text-[20px] leading-[1.2] font-semibold">
+      <h2 id="adresse-form-titel" className="text-[20px] leading-[1.2] font-medium">
         {address ? "Adresse bearbeiten" : "Neue Adresse"}
       </h2>
       <form action={action} className="mt-4 grid gap-4 sm:grid-cols-2" noValidate>
@@ -107,7 +107,7 @@ export function AddressForm({ address }: { address?: SavedAddress }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="ad-countryCode" className="text-[14px] leading-[1.4] font-semibold">
+          <label htmlFor="ad-countryCode" className="text-[14px] leading-[1.4] font-bold">
             Land
           </label>
           <select

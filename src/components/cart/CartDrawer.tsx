@@ -74,7 +74,7 @@ export function CartDrawer() {
         type="button"
         aria-label="Warenkorb schließen"
         onClick={close}
-        className={`bg-aubergine/40 absolute inset-0 h-full w-full cursor-default transition-opacity duration-300 ${shown ? "opacity-100" : "opacity-0"}`}
+        className={`bg-pv-ui-overlay absolute inset-0 h-full w-full cursor-default transition-opacity duration-300 ${shown ? "opacity-100" : "opacity-0"}`}
       />
       <div
         ref={panelRef}
@@ -82,9 +82,9 @@ export function CartDrawer() {
         aria-modal="true"
         aria-labelledby="cart-drawer-title"
         data-lenis-prevent
-        className={`bg-cream absolute inset-y-0 right-0 flex w-full flex-col shadow-[0_24px_50px_rgba(74,47,57,0.25)] transition-transform duration-300 ease-out sm:w-[420px] ${shown ? "translate-x-0" : "translate-x-full"}`}
+        className={`bg-pv-cream absolute inset-y-0 right-0 flex w-full flex-col shadow-[0_24px_50px_var(--pv-ui-shadow-strong)] transition-transform duration-300 ease-out sm:w-[420px] ${shown ? "translate-x-0" : "translate-x-full"}`}
       >
-        <header className="border-aubergine/10 flex items-center justify-between border-b px-4 py-3">
+        <header className="border-pv-ui-hairline flex items-center justify-between border-b px-4 py-3">
           <h2 id="cart-drawer-title" className="headline text-[22px]">
             Dein Warenkorb
           </h2>
@@ -93,7 +93,7 @@ export function CartDrawer() {
             type="button"
             onClick={close}
             aria-label="Warenkorb schließen"
-            className="text-aubergine flex h-11 w-11 items-center justify-center rounded-full"
+            className="text-pv-wildberry flex h-11 w-11 items-center justify-center rounded-full"
           >
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none">
               <path
@@ -107,7 +107,7 @@ export function CartDrawer() {
         </header>
 
         {error ? (
-          <p role="alert" className="bg-magenta/10 text-berry px-4 py-2 text-[14px]">
+          <p role="alert" className="bg-pv-ui-error-bg text-pv-ui-error px-4 py-2 text-[14px]">
             {error}
           </p>
         ) : null}
@@ -133,7 +133,7 @@ export function CartDrawer() {
               ))}
             </ul>
 
-            <div className="border-aubergine/10 space-y-3 border-t px-4 py-4">
+            <div className="border-pv-ui-hairline space-y-3 border-t px-4 py-4">
               <FreeShippingHint totals={totals} />
               <CartSummary totals={totals} />
               <div className="flex flex-col gap-2">
@@ -144,7 +144,7 @@ export function CartDrawer() {
                   Weiter einkaufen
                 </button>
               </div>
-              <p className="text-aubergine/60 text-center text-[13px]">
+              <p className="text-pv-wildberry text-center text-[13px]">
                 <Link href={ROUTE("/cart")} className="link-underline text-[13px]" onClick={close}>
                   Warenkorb als Seite öffnen
                 </Link>
@@ -169,10 +169,10 @@ function DrawerLine({
   onRemove: (lineId: string) => void;
 }) {
   return (
-    <li className="border-aubergine/10 flex gap-3 border-b py-4 last:border-b-0">
+    <li className="border-pv-ui-hairline flex gap-3 border-b py-4 last:border-b-0">
       <Link
         href={ROUTE(line.productUrl)}
-        className="bg-cream-2 rounded-card shrink-0 overflow-hidden"
+        className="bg-pv-cream rounded-card shrink-0 overflow-hidden"
       >
         {line.imageUrl ? (
           <Image
@@ -190,23 +190,20 @@ function DrawerLine({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <Link
-              href={ROUTE(line.productUrl)}
-              className="block truncate text-[16px] font-semibold"
-            >
+            <Link href={ROUTE(line.productUrl)} className="block truncate text-[16px] font-bold">
               {line.productTitle}
             </Link>
-            <p className="text-aubergine/70 text-[14px]">{line.variantTitle}</p>
+            <p className="text-pv-wildberry text-[14px]">{line.variantTitle}</p>
             <SubscriptionLineNote subscription={line.subscription} quantity={line.quantity} />
           </div>
-          <p className="shrink-0 text-[16px] font-semibold">{formatEur(line.lineGoodsCents)}</p>
+          <p className="shrink-0 text-[16px] font-bold">{formatEur(line.lineGoodsCents)}</p>
         </div>
 
         <DepositNote lineDepositCents={line.lineDepositCents} />
-        <p className="text-aubergine/60 text-[13px]">Grundpreis: {line.basePriceText}</p>
+        <p className="text-pv-wildberry text-[13px]">Grundpreis: {line.basePriceText}</p>
 
         <div className="mt-2 flex items-center justify-between gap-2">
-          <div className="border-aubergine/15 flex items-center rounded-full border">
+          <div className="border-pv-ui-hairline flex items-center rounded-full border">
             <button
               type="button"
               disabled={pending}
@@ -216,7 +213,7 @@ function DrawerLine({
             >
               −
             </button>
-            <span aria-live="polite" className="w-8 text-center text-[15px] font-semibold">
+            <span aria-live="polite" className="w-8 text-center text-[15px] font-bold">
               {line.quantity}
             </span>
             <button
@@ -233,7 +230,7 @@ function DrawerLine({
             type="button"
             disabled={pending}
             onClick={() => onRemove(line.id)}
-            className="text-aubergine/70 text-[14px] underline underline-offset-4 disabled:opacity-50"
+            className="text-pv-wildberry text-[14px] underline underline-offset-4 disabled:opacity-50"
           >
             Entfernen
           </button>

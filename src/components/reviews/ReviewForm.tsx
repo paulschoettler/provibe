@@ -128,8 +128,8 @@ export function ReviewForm({
         >
           {submitLabel}
         </SubmitButton>
-        <p className="text-aubergine m-0 flex gap-2 text-[13px] leading-[1.45]">
-          <LockIcon className="text-plum h-5 w-5 shrink-0" />
+        <p className="text-pv-wildberry m-0 flex gap-2 text-[13px] leading-[1.45]">
+          <LockIcon className="text-pv-wildberry h-5 w-5 shrink-0" />
           <span>
             Dein Name erscheint gekürzt, zum Beispiel „Lena M.“. Mehr in der{" "}
             <SiteLink

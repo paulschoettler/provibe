@@ -46,10 +46,10 @@ export function FlavorTeaserCards({
                 />
               </div>
               <div className="pv-flavor-card-body">
-                <H className="text-wine m-0 text-[24px] leading-[1.15] font-semibold">
+                <H className="text-pv-wildberry m-0 text-[24px] leading-[1.15] font-medium">
                   {f.shortName}
                 </H>
-                {f.notes ? <p className="text-plum m-0 text-[15px]">{f.notes}</p> : null}
+                {f.notes ? <p className="text-pv-wildberry m-0 text-[15px]">{f.notes}</p> : null}
                 <span className="pv-pill pv-pill--pink self-start !py-[5px] !text-[13px]">
                   15 g Protein
                 </span>
@@ -66,7 +66,7 @@ export function FlavorTeaserCards({
                 </p>
                 <SiteLink
                   href={f.productUrl}
-                  className="pv-textlink !min-h-[40px] !text-[15px] !font-semibold"
+                  className="pv-textlink !min-h-[40px] !text-[15px] !font-bold"
                 >
                   Zur Sorte<span className="sr-only"> {f.shortName}</span>
                   <InhaltIcon name="arrow" size={18} />

@@ -119,17 +119,17 @@ export function PaymentForm({
         {intro}
 
         <fieldset className="flex flex-col gap-3">
-          <legend className="mb-3 text-[20px] leading-[1.2] font-semibold">Zahlart</legend>
+          <legend className="mb-3 text-[20px] leading-[1.2] font-medium">Zahlart</legend>
 
           {mode === "live" ? (
-            <div className="rounded-[18px] border-[1.5px] border-[rgba(138,118,128,0.55)] bg-white p-4">
+            <div className="border-pv-ui-gray-300 bg-pv-white rounded-[18px] border-[1.5px] p-4">
               <StripePaymentElement
                 publishableKey={publishableKey}
                 clientSecret={clientSecret}
                 onReady={onStripeReady}
               />
               <noscript>
-                <p className="text-berry mt-2 text-[14px] font-semibold">
+                <p className="text-pv-wildberry mt-2 text-[14px] font-bold">
                   Zum sicheren Bezahlen brauchst du JavaScript. Bitte aktiviere es in deinem
                   Browser.
                 </p>
@@ -148,14 +148,14 @@ export function PaymentForm({
                   />
                   {m.id === "card" ? <CardIcon className="h-[22px] w-[22px]" /> : null}
                   <span className="flex min-w-0 flex-1 flex-col gap-[3px] leading-[1.4]">
-                    <span className="text-[16px] font-semibold">{m.title}</span>
+                    <span className="text-[16px] font-bold">{m.title}</span>
                     <span className="text-[14px]">{m.subtitle}</span>
                   </span>
                 </label>
                 {m.id === "card" ? (
                   <div className="co-paycard__panel px-[18px] pb-4">
-                    <div className="border-mauve flex flex-col gap-3 rounded-[14px] border-[1.5px] border-dashed bg-white p-3.5">
-                      <p className="text-plum text-[11px] font-semibold tracking-[0.12em] uppercase">
+                    <div className="border-pv-wildberry bg-pv-white flex flex-col gap-3 rounded-[14px] border-[1.5px] border-dashed p-3.5">
+                      <p className="text-pv-wildberry font-condensed text-[11px] font-bold tracking-[0.12em] uppercase">
                         Testmodus: Kartenzahlung wird simuliert
                       </p>
                       <Field
@@ -196,11 +196,11 @@ export function PaymentForm({
             ))
           )}
           {errors.paymentMethod ? (
-            <p className="text-berry text-[13px] font-semibold">{errors.paymentMethod}</p>
+            <p className="text-pv-wildberry text-[13px] font-bold">{errors.paymentMethod}</p>
           ) : null}
           {subscription ? (
             <>
-              <p className="bg-cream-2 rounded-[12px] px-3 py-2 text-[13px] leading-[1.45]">
+              <p className="bg-pv-cream rounded-[12px] px-3 py-2 text-[13px] leading-[1.45]">
                 Klarna geht beim Abo nicht, weil wir dein Zahlungsmittel für künftige Lieferungen
                 speichern.
               </p>
@@ -221,8 +221,8 @@ export function PaymentForm({
         <BackLink className="hidden lg:flex" />
       </div>
 
-      <aside className="lg:bg-cream-2 flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start lg:rounded-[22px] lg:p-5 lg:shadow-[0_24px_50px_rgba(74,47,57,0.14)]">
-        <div className="bg-cream-2 rounded-[22px] p-4 lg:bg-transparent lg:p-0">{summary}</div>
+      <aside className="lg:bg-pv-cream lg:shadow-card flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start lg:rounded-[22px] lg:p-5">
+        <div className="bg-pv-cream rounded-[22px] p-4 lg:bg-transparent lg:p-0">{summary}</div>
         {subscription?.termsBlock}
         <p className="text-[14px] leading-[1.5]">
           {subscription
@@ -230,7 +230,7 @@ export function PaymentForm({
             : "Mit deiner Bestellung akzeptierst du unsere "}
           <Link
             href={LEGAL_LINKS.agb as Route}
-            className="text-plum font-semibold underline underline-offset-2"
+            className="text-pv-wildberry font-bold underline underline-offset-2"
           >
             AGB
           </Link>
@@ -238,7 +238,7 @@ export function PaymentForm({
           findest du{" "}
           <Link
             href={LEGAL_LINKS.widerruf as Route}
-            className="text-plum font-semibold underline underline-offset-2"
+            className="text-pv-wildberry font-bold underline underline-offset-2"
           >
             hier
           </Link>
@@ -274,7 +274,7 @@ function BackLink({ className = "" }: { className?: string }) {
     <Link
       href={"/checkout" as Route}
       prefetch={false}
-      className={`text-plum h-11 items-center gap-1.5 text-[14px] font-semibold underline underline-offset-4 ${className}`}
+      className={`text-pv-wildberry h-11 items-center gap-1.5 text-[14px] font-bold underline underline-offset-4 ${className}`}
     >
       <ChevronLeftIcon className="h-4 w-4" />
       Zurück zur Adresse

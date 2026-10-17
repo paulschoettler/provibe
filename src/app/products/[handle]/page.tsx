@@ -161,11 +161,11 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                   ? (collection?.title ?? "Founder Bundles")
                   : "Merch"}
             </Eyebrow>
-            <h1 className="text-berry text-[52px] leading-[0.92] font-bold tracking-[-0.02em] break-words sm:text-[64px] lg:text-[80px]">
+            <h1 className="text-pv-wildberry text-[52px] leading-[0.92] font-medium tracking-[-0.02em] break-words sm:text-[64px] lg:text-[80px]">
               {heading}
             </h1>
             {(isDrink ? product.line2 : isBundle ? product.lead : product.line1) ? (
-              <p className="text-wine text-[20px] leading-[1.15] font-semibold lg:text-[24px]">
+              <p className="text-pv-wildberry text-[20px] leading-[1.15] font-medium lg:text-[24px]">
                 {isDrink ? product.line2 : isBundle ? product.lead : product.line1}
               </p>
             ) : null}
@@ -184,7 +184,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               {product.stickers.map((s, i) => (
                 <li key={s}>
                   <span
-                    className={`pvc-pill ${i === 0 ? "bg-butter" : i === 1 ? "bg-pink-light" : "bg-cream-2"}`}
+                    className={`pvc-pill ${i === 0 ? "bg-pv-lime-raspberry" : i === 1 ? "bg-pv-cream" : "bg-pv-cream"}`}
                   >
                     {s}
                   </span>
@@ -207,8 +207,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           ) : null}
 
           {isBundle && product.bundleComponents.length ? (
-            <div className="bg-cream-2 rounded-[22px] p-5">
-              <h2 className="text-[17px] font-semibold">Im Set</h2>
+            <div className="bg-pv-cream rounded-[22px] p-5">
+              <h2 className="text-[17px] font-medium">Im Set</h2>
               <ul className="mt-2 flex flex-col">
                 {product.bundleComponents.map((c) => (
                   <li
@@ -232,7 +232,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                       )}
                     </span>
                     <span>
-                      <strong className="font-semibold">{c.quantity} ×</strong> {c.label}
+                      <strong className="font-bold">{c.quantity} ×</strong> {c.label}
                     </span>
                   </li>
                 ))}
@@ -252,7 +252,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           />
 
           <ShippingNote product={product} shipping={shipping} deliveryTime={deliveryTime} />
-          <p className="text-plum text-[14px] leading-[1.45]">
+          <p className="text-pv-wildberry text-[14px] leading-[1.45]">
             Bezahlen mit Karte, Apple Pay, Google Pay, PayPal oder Klarna.
           </p>
 
@@ -290,7 +290,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
               </div>
               <SiteLink
                 href="/collections/all"
-                className="flex min-h-11 items-center gap-1.5 text-[15px] font-semibold underline underline-offset-4"
+                className="flex min-h-11 items-center gap-1.5 text-[15px] font-bold underline underline-offset-4"
               >
                 Alle Produkte ansehen
                 <ArrowRightIcon className="h-4 w-4" />
@@ -355,10 +355,10 @@ function ShippingNote({
   const free =
     shipping.freeAboveCents !== null ? formatEur(shipping.freeAboveCents).replace(",00", "") : null;
   return (
-    <div className="bg-cream-2 flex gap-3.5 rounded-[20px] p-[18px]">
-      <TruckIcon className="text-plum mt-0.5 h-[26px] w-[26px] shrink-0" />
+    <div className="bg-pv-cream flex gap-3.5 rounded-[20px] p-[18px]">
+      <TruckIcon className="text-pv-wildberry mt-0.5 h-[26px] w-[26px] shrink-0" />
       <div>
-        <p className="text-[16px] leading-[1.5] font-semibold">
+        <p className="text-[16px] leading-[1.5] font-bold">
           Versand {formatEur(shipping.priceCents)}
           {free ? `, ab ${free} versandkostenfrei` : ""}
           {product.type === "bundle" && overThreshold ? ". Dieses Set liegt drüber." : ""}

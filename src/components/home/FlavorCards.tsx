@@ -22,7 +22,7 @@ export function FlavorCards({ flavors }: { flavors: HomeFlavor[] }) {
   return (
     <section id="pvshop" className="pvshop-section">
       <RevealObserver />
-      <WaveDivider shape="swell" fill="#fbfaf3" position="top" />
+      <WaveDivider shape="swell" fill="var(--pv-cream)" position="top" />
 
       <div className="pvshop-head reveal">
         <div>

@@ -41,13 +41,13 @@ export default async function ReviewPage({ searchParams }: { searchParams: Searc
 
   return (
     <SiteShell>
-      <section className="bg-pink-light" aria-labelledby="bewerten-titel">
+      <section className="bg-pv-cream" aria-labelledby="bewerten-titel">
         <div className="pv-container flex flex-col gap-3.5 pt-9 pb-9 lg:flex-row lg:items-center lg:gap-12 lg:py-[72px]">
           <div className="flex flex-1 flex-col gap-3.5 lg:gap-[18px]">
             <Eyebrow>Bewerten</Eyebrow>
             <h1
               id="bewerten-titel"
-              className="text-wine m-0 text-[44px] leading-[0.96] font-bold tracking-[-0.02em] lg:text-[72px] lg:leading-[0.95]"
+              className="text-pv-wildberry m-0 text-[44px] leading-[0.96] font-medium tracking-[-0.02em] lg:text-[72px] lg:leading-[0.95]"
             >
               Wie war dein Vibe?
             </h1>
@@ -87,10 +87,7 @@ export default async function ReviewPage({ searchParams }: { searchParams: Searc
           {ctx.items.some((i) => i.existing) ? (
             <p className="m-0 text-[15px]">
               Fertig?{" "}
-              <SiteLink
-                href="/bewerten/danke"
-                className="font-semibold underline underline-offset-4"
-              >
+              <SiteLink href="/bewerten/danke" className="font-bold underline underline-offset-4">
                 Zur Bestätigung
               </SiteLink>
             </p>
@@ -99,7 +96,7 @@ export default async function ReviewPage({ searchParams }: { searchParams: Searc
         <aside className="flex min-w-0 flex-col gap-5" aria-label="So prüfen wir Bewertungen">
           <AuthenticityNote className="hidden lg:flex" />
           <HowWeCheck />
-          <p className="text-plum m-0 text-[14px] leading-[1.45]">
+          <p className="text-pv-wildberry m-0 text-[14px] leading-[1.45]">
             Fragen zu deiner Bestellung? Schreib uns an{" "}
             <a href="mailto:hello@provibe-drinks.de" className="underline underline-offset-2">
               hello@provibe-drinks.de
@@ -120,12 +117,12 @@ function HowWeCheck() {
   ];
   return (
     <section
-      className="border-aubergine/15 flex flex-col gap-3 rounded-[26px] border-[1.5px] px-[18px] py-[22px] lg:gap-3.5 lg:px-6 lg:py-[26px]"
+      className="border-pv-ui-hairline flex flex-col gap-3 rounded-[26px] border-[1.5px] px-[18px] py-[22px] lg:gap-3.5 lg:px-6 lg:py-[26px]"
       aria-labelledby="so-pruefen-wir"
     >
       <h2
         id="so-pruefen-wir"
-        className="text-wine m-0 text-[20px] leading-[1.2] font-semibold lg:text-[22px]"
+        className="text-pv-wildberry m-0 text-[20px] leading-[1.2] font-medium lg:text-[22px]"
       >
         So bleiben Bewertungen echt
       </h2>
@@ -133,7 +130,7 @@ function HowWeCheck() {
         {points.map((p) => (
           <li key={p} className="flex gap-2.5 text-[15px] leading-[1.45]">
             <span
-              className="bg-magenta mt-[7px] h-2 w-2 shrink-0 rounded-full"
+              className="bg-pv-wildberry mt-[7px] h-2 w-2 shrink-0 rounded-full"
               aria-hidden="true"
             />
             {p}
@@ -176,7 +173,7 @@ function NoLinkView({ status }: { status: Exclude<ReviewTokenResult["status"], "
     <SiteShell>
       <div className="pv-container pv-before-footer flex max-w-[720px] flex-col gap-4 pt-10 lg:pt-16">
         <Eyebrow>Bewerten</Eyebrow>
-        <h1 className="text-wine m-0 text-[34px] leading-[1.05] font-semibold tracking-[-0.01em] lg:text-[48px]">
+        <h1 className="text-pv-wildberry m-0 text-[34px] leading-[1.05] font-medium tracking-[-0.01em] lg:text-[48px]">
           {copy.title}
         </h1>
         <p className="m-0 text-[16px] leading-[1.5] lg:text-[17px]">{copy.text}</p>

@@ -4,6 +4,7 @@ import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { confirmPaymentAction, startSetupAction } from "@/lib/subscriptions/actions";
+import { BRAND_COLORS, BRAND_FONTS } from "@/lib/brand/tokens";
 
 /**
  * Live-Betrieb (APP_INTEGRATIONS=live): Zahlungsmittel per Stripe SetupIntent wechseln und eine
@@ -29,12 +30,13 @@ async function loadStripeJs(key: string): Promise<StripeLike | null> {
 const APPEARANCE = {
   theme: "flat",
   variables: {
-    colorPrimary: "#d9306e",
-    colorText: "#4a2f39",
-    colorBackground: "#ffffff",
-    colorDanger: "#702249",
+    // Stripe rendert im iframe ohne unsere CSS-Variablen: Werte aus tokens.json
+    colorPrimary: BRAND_COLORS.wildberry,
+    colorText: BRAND_COLORS.wildberry,
+    colorBackground: BRAND_COLORS.white,
+    colorDanger: BRAND_COLORS.wildberry,
     borderRadius: "14px",
-    fontFamily: "Jost, system-ui, sans-serif",
+    fontFamily: BRAND_FONTS.sans,
   },
 };
 
@@ -104,7 +106,7 @@ export function StripeSetupForm({
       {error ? (
         <p
           role="alert"
-          className="border-magenta text-berry rounded-[14px] border-[1.5px] bg-white px-3 py-2 text-[14px]"
+          className="border-pv-wildberry text-pv-wildberry bg-pv-white rounded-[14px] border-[1.5px] px-3 py-2 text-[14px]"
         >
           {error}
         </p>
@@ -119,7 +121,7 @@ export function StripeSetupForm({
         </button>
       )}
       <noscript>
-        <p className="text-berry text-[14px] font-semibold">
+        <p className="text-pv-wildberry text-[14px] font-bold">
           Zum Ändern des Zahlungsmittels brauchst du JavaScript.
         </p>
       </noscript>
@@ -173,7 +175,7 @@ export function ConfirmPaymentLive({
         {pending ? "Einen Moment …" : "Zahlung bestätigen"}
       </button>
       {error ? (
-        <p role="alert" className="text-berry text-[14px] font-semibold">
+        <p role="alert" className="text-pv-wildberry text-[14px] font-bold">
           {error}
         </p>
       ) : null}

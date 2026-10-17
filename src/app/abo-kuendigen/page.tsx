@@ -29,7 +29,7 @@ export default function AboKuendigenPage() {
       <div className="pv-container pv-before-footer relative grid gap-8 pt-8 pb-16 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-16 lg:pt-14">
         <div className="min-w-0">
           <Eyebrow>Vertrag kündigen</Eyebrow>
-          <h1 className="headline text-wine mt-3 text-[44px] leading-[1.05] lg:text-[64px]">
+          <h1 className="headline text-pv-wildberry mt-3 text-[44px] leading-[1.05] lg:text-[64px]">
             Abo kündigen
           </h1>
           <p className="mt-4 mb-6 text-[16px] leading-[1.55] lg:text-[17px]">

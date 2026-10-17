@@ -26,14 +26,14 @@ function InfoIcon() {
     >
       <path
         d="M19.25 11C19.25 15.5563 15.5563 19.25 11 19.25C6.44365 19.25 2.75 15.5563 2.75 11C2.75 6.44365 6.44365 2.75 11 2.75C15.5563 2.75 19.25 6.44365 19.25 11Z"
-        stroke="#7E2856"
+        stroke="var(--pv-wildberry)"
         strokeWidth="1.83333"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M11 10.0833V15.5833M11 6.875V6.88417"
-        stroke="#7E2856"
+        stroke="var(--pv-wildberry)"
         strokeWidth="1.83333"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -54,7 +54,7 @@ function CheckIcon() {
     >
       <path
         d="M4.58333 11.4583L8.70833 15.5833L17.4167 6.875"
-        stroke="#D9306E"
+        stroke="var(--pv-wildberry)"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeLinejoin="round"

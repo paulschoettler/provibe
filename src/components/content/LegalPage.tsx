@@ -60,7 +60,7 @@ function ChevronDown() {
     >
       <path
         d="M5 7.5L10 12.5L15 7.5"
-        stroke="#4A2F39"
+        stroke="var(--pv-wildberry)"
         strokeWidth="1.66667"
         strokeLinecap="round"
         strokeLinejoin="round"

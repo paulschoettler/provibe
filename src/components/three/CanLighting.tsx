@@ -1,5 +1,6 @@
 "use client";
 
+import { BRAND_COLORS } from "@/lib/brand/tokens";
 import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -52,7 +53,7 @@ export default function CanLighting() {
       {/* Führungslicht: vorn, leicht rechts und oben. */}
       <directionalLight position={[2.5, 3, 6]} intensity={0.95} />
       {/* Fülllicht von links, warm, damit die Schattenseite nicht absäuft. */}
-      <directionalLight position={[-5, 1.5, 3]} intensity={0.35} color="#fff3f6" />
+      <directionalLight position={[-5, 1.5, 3]} intensity={0.35} color={BRAND_COLORS.white} />
       {/* Kantenlicht von hinten oben für die helle Silhouette. */}
       <directionalLight position={[-2, 4, -5]} intensity={1.2} />
     </>

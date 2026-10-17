@@ -112,7 +112,7 @@ export default async function OrderDetailPage({ params }: Params) {
         Alle Bestellungen
       </Link>
 
-      <h1 className="headline text-wine mt-2 text-[40px] lg:text-[56px] xl:text-[64px]">
+      <h1 className="headline text-pv-wildberry mt-2 text-[40px] lg:text-[56px] xl:text-[64px]">
         Bestellung <span className="whitespace-nowrap">{order.number}</span>
       </h1>
       <div className="mt-3 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
@@ -141,8 +141,8 @@ export default async function OrderDetailPage({ params }: Params) {
           <StatusStepper steps={orderSteps(order)} className="lg:px-16" />
         )}
         {shipment || window ? (
-          <div className="border-aubergine/15 flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center">
-            <span className="bg-pink-light text-plum flex size-9 shrink-0 items-center justify-center rounded-full">
+          <div className="border-pv-ui-hairline flex flex-col gap-4 border-t pt-5 sm:flex-row sm:items-center">
+            <span className="bg-pv-cream text-pv-wildberry flex size-9 shrink-0 items-center justify-center rounded-full">
               <TruckIcon className="size-5" />
             </span>
             <div className="min-w-0 flex-1">
@@ -151,12 +151,12 @@ export default async function OrderDetailPage({ params }: Params) {
                   <p className="text-[13px] leading-[1.4]">
                     {shipment.carrier.toUpperCase()} Sendungsnummer
                   </p>
-                  <p className="text-[18px] leading-[1.3] font-semibold break-all">
+                  <p className="text-[18px] leading-[1.3] font-bold break-all">
                     {formatTrackingNumber(shipment.trackingNumber)}
                   </p>
                 </>
               ) : (
-                <p className="text-[15px] leading-[1.4] font-semibold">Noch nicht versendet</p>
+                <p className="text-[15px] leading-[1.4] font-bold">Noch nicht versendet</p>
               )}
               {window ? (
                 <p className="text-[13px] leading-[1.4]">Zustellung voraussichtlich {window}</p>
@@ -182,7 +182,7 @@ export default async function OrderDetailPage({ params }: Params) {
         {/* Artikel und Summen */}
         <section className={`${CARD_FLAT} p-5 sm:p-6`} aria-labelledby="artikel-titel">
           <div className="flex items-baseline justify-between">
-            <h2 id="artikel-titel" className="text-[20px] leading-[1.2] font-semibold">
+            <h2 id="artikel-titel" className="text-[20px] leading-[1.2] font-medium">
               Artikel
             </h2>
             <span className="text-[13px]">{itemCountText(order.itemCount)}</span>
@@ -192,7 +192,7 @@ export default async function OrderDetailPage({ params }: Params) {
               <OrderLineItem key={item.id} item={item} />
             ))}
           </ul>
-          <dl className="border-aubergine/15 mt-3 flex flex-col gap-3 border-t pt-4">
+          <dl className="border-pv-ui-hairline mt-3 flex flex-col gap-3 border-t pt-4">
             <SummaryRow label="Zwischensumme (ohne Pfand)" value={formatEur(order.subtotalCents)} />
             {order.discountCents > 0 ? (
               <SummaryRow
@@ -214,15 +214,15 @@ export default async function OrderDetailPage({ params }: Params) {
               }
             />
           </dl>
-          <dl className="border-aubergine/15 mt-4 border-t pt-4">
+          <dl className="border-pv-ui-hairline mt-4 border-t pt-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <dt className="text-[16px] font-semibold">Gesamt</dt>
+                <dt className="text-[16px] font-bold">Gesamt</dt>
                 <dd className="text-[12px] leading-[1.4]">
                   Zahlbetrag inkl. Pfand und MwSt. (darin {taxText})
                 </dd>
               </div>
-              <dd className="text-[28px] leading-none font-semibold whitespace-nowrap">
+              <dd className="text-[28px] leading-none font-bold whitespace-nowrap">
                 {formatEur(order.totalCents)}
               </dd>
             </div>
@@ -232,7 +232,7 @@ export default async function OrderDetailPage({ params }: Params) {
         {/* Adressen und Zahlart */}
         <div className="flex flex-col gap-4">
           <section className={`${CARD_FLAT} p-5`} aria-labelledby="liefer-titel">
-            <h2 id="liefer-titel" className="flex items-center gap-2 text-[16px] font-semibold">
+            <h2 id="liefer-titel" className="flex items-center gap-2 text-[16px] font-medium">
               <PinIcon className="size-5" />
               Lieferadresse
             </h2>
@@ -245,7 +245,7 @@ export default async function OrderDetailPage({ params }: Params) {
             </div>
           </section>
           <section className={`${CARD_FLAT} p-5`} aria-labelledby="rechnung-titel">
-            <h2 id="rechnung-titel" className="flex items-center gap-2 text-[16px] font-semibold">
+            <h2 id="rechnung-titel" className="flex items-center gap-2 text-[16px] font-medium">
               <DocIcon className="size-5" />
               Rechnungsadresse
             </h2>
@@ -262,7 +262,7 @@ export default async function OrderDetailPage({ params }: Params) {
           <section className={`${CARD_FLAT} p-5`} aria-labelledby="zahlart-titel">
             <h2
               id="zahlart-titel"
-              className="flex flex-wrap items-center gap-2 text-[16px] font-semibold"
+              className="flex flex-wrap items-center gap-2 text-[16px] font-medium"
             >
               <CardIcon className="size-5" />
               Zahlart

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Blob, Eyebrow, FruitSticker, ProteinSticker, WaveCut } from "@/components/content/Decor";
+import { FruitSticker } from "@/components/brand/FruitSticker";
+import { Blob, Eyebrow, ProteinSticker, WaveCut } from "@/components/content/Decor";
 import { JsonLd, absoluteUrl } from "@/components/content/JsonLd";
 import { Accordion } from "@/components/forms";
 import { SiteLink } from "@/components/layout/SiteLink";
@@ -97,7 +98,7 @@ const BLOCK_MEDIA = [
     blob: "bild-a" as const,
     sticker: (
       <FruitSticker
-        kind="pfirsich"
+        kind="pfirsich-blatt-gross"
         rotate={0}
         className="top-[-26px] right-[-14px] w-[84px] lg:w-[112px]"
       />
@@ -179,12 +180,12 @@ export default async function UberUnsPage() {
           className="top-[170px] left-[60%] w-[240px] lg:top-[-40px] lg:right-[-100px] lg:left-auto lg:w-[480px]"
         />
         <FruitSticker
-          kind="brombeere"
+          kind="heidelbeere"
           rotate={-10}
           className="top-[-6px] right-[6px] w-[64px] lg:top-[120px] lg:right-auto lg:left-[17%] lg:w-[92px]"
         />
         <FruitSticker
-          kind="pfirsich"
+          kind="pfirsich-blatt-gross"
           className="hidden lg:top-[380px] lg:left-[21%] lg:block lg:w-[108px]"
         />
         <div className="pv-container relative z-[1] flex flex-col gap-[14px]">
@@ -242,7 +243,7 @@ export default async function UberUnsPage() {
 
             {i === 1 ? (
               <section className="pv-story-quote" aria-label="Zitat der Gründerin">
-                <WaveDivider shape="soft" fill="#f3eda4" position="top" />
+                <WaveDivider shape="soft" fill="var(--pv-lime-raspberry)" position="top" />
                 <Blob
                   name="zitat"
                   className="top-[60px] right-[-30px] w-[160px] lg:top-[80px] lg:right-[-20px] lg:w-[300px]"
@@ -258,7 +259,7 @@ export default async function UberUnsPage() {
                     <footer>{firstName}, Gründerin von provibe</footer>
                   </blockquote>
                 </div>
-                <WaveDivider shape="soft" fill="#f3eda4" position="bottom" flip />
+                <WaveDivider shape="soft" fill="var(--pv-lime-raspberry)" position="bottom" flip />
               </section>
             ) : null}
           </div>

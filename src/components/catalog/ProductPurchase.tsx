@@ -98,11 +98,9 @@ export function ProductPurchase({
 
       {variants.length > 1 ? (
         <fieldset>
-          <legend className="float-left mb-2.5 text-[16px] leading-6 font-semibold">
-            {legend}
-          </legend>
+          <legend className="float-left mb-2.5 text-[16px] leading-6 font-bold">{legend}</legend>
           <p
-            className="text-plum float-right mb-2.5 text-[14px] leading-6 font-medium"
+            className="text-pv-wildberry float-right mb-2.5 text-[14px] leading-6 font-medium"
             aria-live="polite"
           >
             Gewählt: {isSize ? selected.optionValue : selected.title}
@@ -141,7 +139,7 @@ export function ProductPurchase({
                       <span className="pvc-pack-check" aria-hidden="true">
                         <CheckIcon className="h-3.5 w-3.5" />
                       </span>
-                      <span className="text-[15px] font-semibold">{v.title}</span>
+                      <span className="text-[15px] font-bold">{v.title}</span>
                       <span className="text-[17px] font-bold">{formatEur(v.goodsPriceCents)}</span>
                       {isDrink ? (
                         <>
@@ -150,7 +148,7 @@ export function ProductPurchase({
                               zzgl. {formatEur(v.depositCents)} Pfand
                             </span>
                           ) : null}
-                          <span className="text-plum text-[12px]">
+                          <span className="text-pv-wildberry text-[12px]">
                             {formatEur(v.perUnitCents)} je Dose
                           </span>
                           {v.basePriceText ? (
@@ -159,7 +157,7 @@ export function ProductPurchase({
                         </>
                       ) : null}
                       {!v.available ? (
-                        <span className="text-berry text-[12px]">ausverkauft</span>
+                        <span className="text-pv-wildberry text-[12px]">ausverkauft</span>
                       ) : null}
                     </label>
                   )}
@@ -209,7 +207,7 @@ export function ProductPurchase({
             {formatEur(selected.goodsPriceCents)}
           </span>
           {isDrink ? (
-            <span className="text-plum pb-0.5 text-[17px] font-medium">
+            <span className="text-pv-wildberry pb-0.5 text-[17px] font-medium">
               für {selected.unitCount} Dosen
             </span>
           ) : null}
@@ -231,7 +229,7 @@ export function ProductPurchase({
         {type === "bundle" &&
         selected.componentsSumGoodsCents &&
         selected.componentsSumGoodsCents > selected.goodsPriceCents ? (
-          <p className="text-plum text-[17px] font-medium">
+          <p className="text-pv-wildberry text-[17px] font-medium">
             Einzeln: {formatEur(selected.componentsSumGoodsCents)}
           </p>
         ) : null}
@@ -252,8 +250,8 @@ export function ProductPurchase({
           </SiteLink>
         </p>
         {type === "bundle" && deliveryTimeText ? (
-          <p className="mt-1 flex items-center gap-2 text-[15px] font-semibold">
-            <ClockIcon className="text-plum h-5 w-5" />
+          <p className="mt-1 flex items-center gap-2 text-[15px] font-bold">
+            <ClockIcon className="text-pv-wildberry h-5 w-5" />
             Lieferzeit {deliveryTimeText}
           </p>
         ) : null}
@@ -261,7 +259,7 @@ export function ProductPurchase({
 
       {/* Menge und Warenkorb */}
       <div className="flex flex-col gap-2">
-        <label htmlFor={`${uid}-menge`} className="text-[16px] font-semibold">
+        <label htmlFor={`${uid}-menge`} className="text-[16px] font-bold">
           Menge
         </label>
         <div className="flex items-center gap-3">
@@ -316,8 +314,8 @@ export function ProductPurchase({
             role={message.ok ? "status" : "alert"}
             className={
               message.ok
-                ? "text-plum text-[14px] font-semibold"
-                : "border-magenta text-berry rounded-[14px] border-[1.5px] bg-white px-3 py-2 text-[14px]"
+                ? "text-pv-wildberry text-[14px] font-bold"
+                : "border-pv-wildberry text-pv-wildberry bg-pv-white rounded-[14px] border-[1.5px] px-3 py-2 text-[14px]"
             }
           >
             {message.text}

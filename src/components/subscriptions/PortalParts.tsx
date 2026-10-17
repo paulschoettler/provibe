@@ -14,26 +14,26 @@ import { SUBSCRIPTION_STATUS_LABEL, type SubscriptionStatus } from "@/lib/subscr
  */
 
 export const ABO_BG_BY_HANDLE: Record<string, string> = {
-  wildberry: "bg-pink-light",
-  "raspberry-lime": "bg-pink-light",
-  peach: "bg-peach",
+  wildberry: "bg-pv-cream",
+  "raspberry-lime": "bg-pv-cream",
+  peach: "bg-pv-peach",
 };
 
 export function StatusBadge({ status, label }: { status: SubscriptionStatus; label?: string }) {
   const tone =
     status === "active"
-      ? "border-magenta bg-cream text-berry"
+      ? "border-pv-wildberry bg-pv-cream text-pv-wildberry"
       : status === "past_due"
-        ? "border-magenta bg-magenta text-white"
+        ? "border-pv-wildberry bg-pv-wildberry text-pv-white"
         : status === "paused"
-          ? "border-mauve bg-cream text-aubergine"
-          : "border-mauve bg-cream-2 text-aubergine";
+          ? "border-pv-wildberry bg-pv-cream text-pv-wildberry"
+          : "border-pv-wildberry bg-pv-cream text-pv-wildberry";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-px text-[12px] leading-[1.5] font-semibold whitespace-nowrap ${tone}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-px text-[12px] leading-[1.5] font-bold whitespace-nowrap ${tone}`}
     >
       <span
-        className={`size-1.5 rounded-full ${status === "past_due" ? "bg-white" : status === "active" ? "bg-magenta" : "bg-mauve"}`}
+        className={`size-1.5 rounded-full ${status === "past_due" ? "bg-pv-white" : status === "active" ? "bg-pv-wildberry" : "bg-pv-ui-gray-500"}`}
         aria-hidden="true"
       />
       {label ?? SUBSCRIPTION_STATUS_LABEL[status]}
@@ -56,7 +56,7 @@ export function CanImage({
     size === "sm" ? "size-16 rounded-[14px]" : "size-[84px] rounded-[18px] lg:size-[106px]";
   return (
     <div
-      className={`${ABO_BG_BY_HANDLE[handle] ?? "bg-pink-light"} flex shrink-0 items-center justify-center overflow-hidden ${box}`}
+      className={`${ABO_BG_BY_HANDLE[handle] ?? "bg-pv-cream"} flex shrink-0 items-center justify-center overflow-hidden ${box}`}
     >
       {src ? (
         <Image
@@ -153,29 +153,29 @@ export function SubscriptionListCard({ card }: { card: SubscriptionCardView }) {
     >
       <CanImage src={card.imageUrl} alt={card.productTitle} handle={card.productHandle} />
       <div className="min-w-0">
-        <h2 className="flex flex-wrap items-center gap-2 text-[20px] leading-[1.2] font-semibold lg:text-[22px]">
+        <h2 className="flex flex-wrap items-center gap-2 text-[20px] leading-[1.2] font-medium lg:text-[22px]">
           <Link href={detail} className="hover:underline">
             {card.productTitle}
           </Link>
           <StatusBadge status={card.status} />
         </h2>
         <p className="mt-1 text-[14px]">{packLabel(card)}</p>
-        <p className="text-mauve text-[12px]">{card.number}</p>
+        <p className="text-pv-wildberry text-[12px]">{card.number}</p>
       </div>
       <div className="col-span-2 flex justify-between gap-4 lg:col-span-1 lg:block">
-        <p className="text-plum text-[13px]">{line.label}</p>
-        <p className={`text-[17px] font-semibold ${line.alert ? "text-berry" : ""}`}>
+        <p className="text-pv-wildberry text-[13px]">{line.label}</p>
+        <p className={`text-[17px] font-bold ${line.alert ? "text-pv-wildberry" : ""}`}>
           {line.value}
           {card.skipNext && card.status === "active" ? (
-            <span className="text-plum block text-[12px] font-normal">
+            <span className="text-pv-wildberry block text-[12px] font-normal">
               eine Lieferung übersprungen
             </span>
           ) : null}
         </p>
       </div>
       <div className="col-span-2 flex items-baseline justify-between gap-4 lg:col-span-1 lg:block">
-        <p className="text-[17px] font-semibold">{formatEur(card.totalCents)}</p>
-        <p className="text-plum text-right text-[12px] leading-[1.35] lg:text-left">
+        <p className="text-[17px] font-bold">{formatEur(card.totalCents)}</p>
+        <p className="text-pv-wildberry text-right text-[12px] leading-[1.35] lg:text-left">
           {priceNote(card)}
         </p>
       </div>
@@ -233,12 +233,12 @@ export function SectionCard({
       aria-labelledby={headingId}
       className={
         tone === "outline"
-          ? "rounded-card border-aubergine/80 flex flex-col gap-3 border-[1.5px] p-5"
+          ? "rounded-card border-pv-wildberry flex flex-col gap-3 border-[1.5px] p-5"
           : `${CARD} flex flex-col gap-3 p-5`
       }
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id={headingId} className="text-[20px] leading-[1.2] font-semibold">
+        <h2 id={headingId} className="text-[20px] leading-[1.2] font-medium">
           {title}
         </h2>
         {action}

@@ -50,7 +50,7 @@ export function Accordion({
               >
                 <path
                   d="M9 3.75V14.25M3.75 9H14.25"
-                  stroke="#7E2856"
+                  stroke="var(--pv-wildberry)"
                   strokeWidth="1.8"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -63,7 +63,12 @@ export function Accordion({
                 viewBox="0 0 18 18"
                 fill="none"
               >
-                <path d="M3.75 9H14.25" stroke="#7E2856" strokeWidth="1.8" strokeLinecap="round" />
+                <path
+                  d="M3.75 9H14.25"
+                  stroke="var(--pv-wildberry)"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
               </svg>
             </span>
           </summary>

@@ -21,17 +21,11 @@ import { ArrowRightIcon, Blob, CartLineIcon, CupIcon, ShirtIcon } from "./icons"
  */
 export type ProductCardLayout = "grid" | "list" | "compact";
 
-/** Blob-Farbe je Sorte (Figma: Pink hinter Wildberry und Raspberry Lime, Peach hinter Peach). */
+/** Blob-Farbe je Sorte: die Sortenfarbe aus dem CI-Guide (Wildberry, Lime-Raspberry, Peach). */
 const BLOB_COLOR: Record<string, string> = {
-  wildberry: "#E98AB0",
-  "raspberry-lime": "#E98AB0",
-  peach: "#F7CA99",
-};
-/** Fläche hinter der Dose in der kompakten Karte */
-const COMPACT_BG: Record<string, string> = {
-  wildberry: "var(--color-pink-light)",
-  "raspberry-lime": "var(--color-pink-light)",
-  peach: "var(--color-butter-2)",
+  wildberry: "var(--pv-wildberry)",
+  "raspberry-lime": "var(--pv-lime-raspberry)",
+  peach: "var(--pv-peach)",
 };
 
 export function ProductCard({
@@ -58,8 +52,7 @@ export function ProductCard({
       className={`pvc-card pvc-card--${layout} pvc-card--${type}`}
       style={
         {
-          "--pvc-blob": BLOB_COLOR[product.handle] ?? product.palette.via,
-          "--pvc-compact-bg": COMPACT_BG[product.handle] ?? "var(--color-pink-light)",
+          "--pvc-blob": BLOB_COLOR[product.handle] ?? "var(--pv-wildberry)",
         } as React.CSSProperties
       }
     >

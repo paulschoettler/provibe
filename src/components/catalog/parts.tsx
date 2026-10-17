@@ -22,7 +22,6 @@ export function Eyebrow({
 }) {
   return (
     <Tag id={id} className={`pvc-eyebrow ${className}`}>
-      <span className="pvc-eyebrow-dot" aria-hidden="true" />
       {children}
     </Tag>
   );
@@ -36,14 +35,14 @@ export interface Crumb {
 export function Breadcrumbs({ items, className = "" }: { items: Crumb[]; className?: string }) {
   return (
     <nav aria-label="Brotkrumen" className={className}>
-      <ol className="text-plum flex flex-wrap items-center gap-x-2 text-[14px] leading-[1.45] font-medium">
+      <ol className="text-pv-wildberry flex flex-wrap items-center gap-x-2 text-[14px] leading-[1.45] font-medium">
         {items.map((item, i) => (
           <Fragment key={`${item.label}-${i}`}>
             <li>
               {item.href && i < items.length - 1 ? (
                 <SiteLink
                   href={item.href}
-                  className="hover:text-magenta underline-offset-4 hover:underline"
+                  className="hover:text-pv-wildberry underline-offset-4 hover:underline"
                 >
                   {item.label}
                 </SiteLink>
@@ -52,7 +51,7 @@ export function Breadcrumbs({ items, className = "" }: { items: Crumb[]; classNa
               )}
             </li>
             {i < items.length - 1 ? (
-              <li aria-hidden="true" className="text-plum/70">
+              <li aria-hidden="true" className="text-pv-wildberry">
                 ›
               </li>
             ) : null}
@@ -80,12 +79,7 @@ export function PageBand({
       >
         {children}
       </div>
-      <WaveDivider
-        shape="soft"
-        fill="var(--color-cream)"
-        position="top"
-        className="pvc-wave-inside"
-      />
+      <WaveDivider shape="soft" fill="var(--pv-cream)" position="top" className="pvc-wave-inside" />
     </section>
   );
 }
@@ -98,7 +92,7 @@ export function PriceFootnote({
   className?: string;
 }) {
   return (
-    <p className={`text-aubergine/80 text-[13px] leading-[1.45] ${className}`}>
+    <p className={`text-pv-wildberry text-[13px] leading-[1.45] ${className}`}>
       Alle Preise inkl. MwSt., zzgl.{" "}
       <SiteLink href="/pages/versand" className="underline underline-offset-2">
         Versandkosten

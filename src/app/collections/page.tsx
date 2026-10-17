@@ -55,20 +55,20 @@ export default async function CollectionsPage() {
         <h2 id="alle-kollektionen" className="pvc-h2 mt-3 mb-4">
           Direkt zur Liste
         </h2>
-        <ul className="border-mauve/40 border-t">
+        <ul className="border-pv-ui-hairline border-t">
           {collections.map((c) => (
-            <li key={c.id} className="border-mauve/40 border-b">
+            <li key={c.id} className="border-pv-ui-hairline border-b">
               <SiteLink
                 href={c.url}
-                className="hover:text-berry flex min-h-[60px] items-center justify-between gap-4 text-[18px] font-semibold"
+                className="hover:text-pv-wildberry flex min-h-[60px] items-center justify-between gap-4 text-[18px] font-bold"
               >
                 <span>
                   {c.title}
-                  <span className="text-plum ml-2 text-[14px] font-medium">
+                  <span className="text-pv-wildberry ml-2 text-[14px] font-medium">
                     {c.productCount} {c.productCount === 1 ? "Produkt" : "Produkte"}
                   </span>
                 </span>
-                <ArrowRightIcon className="text-plum h-5 w-5" />
+                <ArrowRightIcon className="text-pv-wildberry h-5 w-5" />
               </SiteLink>
             </li>
           ))}

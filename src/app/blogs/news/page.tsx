@@ -88,12 +88,12 @@ export default async function BlogIndexPage() {
                       {post.publishedAt ? (
                         <time
                           dateTime={post.publishedAt}
-                          className="text-plum text-[13px] font-medium"
+                          className="text-pv-wildberry text-[13px] font-medium"
                         >
                           {formatDateLongDe(post.publishedAt)}
                         </time>
                       ) : null}
-                      <h2 className="text-wine m-0 text-[21px] leading-[1.25] font-semibold">
+                      <h2 className="text-pv-wildberry m-0 text-[21px] leading-[1.25] font-medium">
                         <SiteLink href={`/blogs/news/${post.handle}`} className="hover:underline">
                           {post.title}
                         </SiteLink>

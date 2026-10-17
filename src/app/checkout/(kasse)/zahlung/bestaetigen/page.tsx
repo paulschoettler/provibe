@@ -33,9 +33,9 @@ export default async function ThreeDsPage({
 
   return (
     <main className="mx-auto flex max-w-[520px] flex-col gap-6 px-4 py-12 lg:py-20">
-      <div className="bg-cream-2 border-aubergine flex flex-col gap-4 rounded-[26px] border-2 p-6">
+      <div className="bg-pv-cream border-pv-wildberry flex flex-col gap-4 rounded-[26px] border-2 p-6">
         <p className="co-eyebrow">Testmodus · 3-D-Secure</p>
-        <h1 className="text-wine text-[32px] leading-[1.08] font-semibold">
+        <h1 className="text-pv-wildberry text-[32px] leading-[1.08] font-medium">
           Zahlung bei deiner Bank bestätigen
         </h1>
         <p className="text-[15px] leading-[1.5]">

@@ -77,16 +77,16 @@ export default async function PaymentPage({
       <CheckoutTitle title="Wie willst du zahlen?" eyebrow={isAbo ? "Kasse · Abo" : "Kasse"} />
       <section
         aria-labelledby="h-lieferung"
-        className="bg-cream-2 flex flex-col gap-1 rounded-[18px] px-4 py-3.5"
+        className="bg-pv-cream flex flex-col gap-1 rounded-[18px] px-4 py-3.5"
       >
         <div className="flex items-center justify-between">
-          <h2 id="h-lieferung" className="text-[15px] font-semibold">
+          <h2 id="h-lieferung" className="text-[15px] font-medium">
             Lieferung an
           </h2>
           <Link
             href={"/checkout" as Route}
             prefetch={false}
-            className="text-plum flex h-8 items-center text-[14px] font-semibold underline underline-offset-4"
+            className="text-pv-wildberry flex h-8 items-center text-[14px] font-bold underline underline-offset-4"
           >
             Ändern<span className="sr-only"> (Adresse und Versand)</span>
           </Link>

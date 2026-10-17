@@ -30,7 +30,7 @@ export function ReviewItemCard({
     <section
       id={`produkt-${item.productId}`}
       aria-labelledby={headingId}
-      className="bg-cream-2 flex scroll-mt-28 flex-col gap-5 rounded-[26px] px-[18px] pt-[22px] pb-6 lg:gap-[22px] lg:px-9 lg:pt-8 lg:pb-9"
+      className="bg-pv-cream flex scroll-mt-28 flex-col gap-5 rounded-[26px] px-[18px] pt-[22px] pb-6 lg:gap-[22px] lg:px-9 lg:pt-8 lg:pb-9"
     >
       <div className="flex items-center gap-3.5 lg:gap-[18px]">
         <span
@@ -52,15 +52,17 @@ export function ReviewItemCard({
         <div className="flex min-w-0 flex-col gap-0.5 lg:gap-1">
           <h2
             id={headingId}
-            className="text-wine m-0 text-[22px] leading-[1.15] font-semibold lg:text-[28px]"
+            className="text-pv-wildberry m-0 text-[22px] leading-[1.15] font-medium lg:text-[28px]"
           >
             {item.title}
           </h2>
           {item.meta ? (
-            <p className="text-plum m-0 text-[14px] leading-[1.4] lg:text-[15px]">{item.meta}</p>
+            <p className="text-pv-wildberry m-0 text-[14px] leading-[1.4] lg:text-[15px]">
+              {item.meta}
+            </p>
           ) : null}
           {existing ? (
-            <span className="bg-butter text-aubergine mt-1 self-start rounded-full px-2.5 py-1 text-[13px] leading-none font-semibold">
+            <span className="bg-pv-lime-raspberry text-pv-wildberry mt-1 self-start rounded-full px-2.5 py-1 text-[13px] leading-none font-bold">
               {STATUS_LABEL[existing.status]}
             </span>
           ) : null}
@@ -81,10 +83,10 @@ export function ReviewItemCard({
               <p>Du kannst sie überarbeiten, dann prüfen wir sie noch einmal.</p>
             </Notice>
           ) : null}
-          <figure className="bg-cream m-0 flex flex-col gap-2 rounded-[16px] px-4 py-3.5 lg:px-5 lg:py-4">
+          <figure className="bg-pv-cream m-0 flex flex-col gap-2 rounded-[16px] px-4 py-3.5 lg:px-5 lg:py-4">
             <StarRating value={existing.rating} size={18} />
             {existing.title ? (
-              <p className="text-wine m-0 text-[16px] font-semibold lg:text-[17px]">
+              <p className="text-pv-wildberry m-0 text-[16px] font-bold lg:text-[17px]">
                 {existing.title}
               </p>
             ) : null}

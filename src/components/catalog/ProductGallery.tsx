@@ -96,10 +96,10 @@ export function ProductGallery({
             {badges.map((b) => (
               <span
                 key={b.label}
-                className={`rounded-pill px-4 py-1.5 text-[14px] font-semibold ${
+                className={`rounded-pill px-4 py-1.5 text-[14px] font-bold ${
                   b.tone === "berry"
-                    ? "bg-berry text-white"
-                    : "bg-butter text-aubergine border-aubergine border-2"
+                    ? "bg-pv-wildberry text-pv-white"
+                    : "bg-pv-lime-raspberry text-pv-wildberry border-pv-wildberry border-2"
                 }`}
               >
                 {b.label}
@@ -196,9 +196,9 @@ function SlideContent({
   }
   if (slide.kind === "placeholder") {
     return (
-      <span className="text-aubergine relative z-[1] flex flex-col items-center gap-2 text-center">
-        <span className="text-[22px] font-semibold">{placeholderTitle}</span>
-        <span className="border-mauve rounded-pill border px-3 py-1 text-[12px] font-medium">
+      <span className="text-pv-wildberry relative z-[1] flex flex-col items-center gap-2 text-center">
+        <span className="text-[22px] font-medium">{placeholderTitle}</span>
+        <span className="border-pv-wildberry rounded-pill border px-3 py-1 text-[12px] font-medium">
           Foto folgt
         </span>
       </span>
@@ -206,8 +206,8 @@ function SlideContent({
   }
   return (
     <>
-      <Blob className="pvc-slide-blob top-[35%] left-[-20%] h-[65%] w-[72%]" opacity={0.28} />
-      <Blob className="pvc-slide-blob top-[-14%] right-[-14%] h-[46%] w-[52%]" opacity={0.28} />
+      <Blob className="pvc-slide-blob top-[35%] left-[-20%] h-[65%] w-[72%]" />
+      <Blob className="pvc-slide-blob top-[-14%] right-[-14%] h-[46%] w-[52%]" />
       {slide.kind === "trio" ? (
         <CanTrio
           className="relative z-[1] [--trio-h:min(62vw,330px)]"

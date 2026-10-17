@@ -36,7 +36,7 @@ export function OrderThumbs({ thumbs }: { thumbs: OrderSummary["thumbs"] }) {
       {thumbs.map((t, i) => (
         <li
           key={`${t.src}-${i}`}
-          className="bg-pink-light relative size-[52px] overflow-hidden rounded-[12px]"
+          className="bg-pv-cream relative size-[52px] overflow-hidden rounded-[12px]"
         >
           <Image src={t.src} alt={t.alt} fill sizes="52px" className="object-contain p-1" />
         </li>
@@ -63,7 +63,7 @@ export function LastOrderCard({
         <div className="flex flex-col gap-1">
           <p className="text-[13px] leading-[1.4]">Letzte Bestellung</p>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 id={`bestellung-${order.id}`} className="text-[24px] leading-[1.15] font-semibold">
+            <h3 id={`bestellung-${order.id}`} className="text-[24px] leading-[1.15] font-medium">
               {order.number}
             </h3>
             <Badge tone={badge.tone}>{badge.label}</Badge>
@@ -78,7 +78,7 @@ export function LastOrderCard({
 
       {closed ? null : <StatusStepper steps={orderSteps(order)} className="sm:px-6" />}
 
-      <p className="bg-cream flex items-start gap-2.5 rounded-[14px] px-4 py-3 text-[14px] leading-[1.45]">
+      <p className="bg-pv-cream flex items-start gap-2.5 rounded-[14px] px-4 py-3 text-[14px] leading-[1.45]">
         <TruckIcon className="mt-px size-5" />
         <span>{statusSentence(order)}</span>
       </p>
@@ -115,11 +115,11 @@ export function OrderRow({ order }: { order: OrderSummary }) {
     <li>
       <Link
         href={orderHref(order.number)}
-        className={`${CARD} hover:bg-cream-3 flex items-center gap-4 p-4 transition-colors sm:p-5`}
+        className={`${CARD} hover:bg-pv-ui-hairline flex items-center gap-4 p-4 transition-colors sm:p-5`}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[18px] leading-[1.2] font-semibold">{order.number}</span>
+            <span className="text-[18px] leading-[1.2] font-bold">{order.number}</span>
             <Badge tone={badge.tone}>{badge.label}</Badge>
           </div>
           <span className="text-[14px] leading-[1.4]">
@@ -130,7 +130,7 @@ export function OrderRow({ order }: { order: OrderSummary }) {
         <div className="hidden sm:block">
           <OrderThumbs thumbs={order.thumbs} />
         </div>
-        <ChevronRightIcon className="text-plum size-5" />
+        <ChevronRightIcon className="text-pv-wildberry size-5" />
         <span className="sr-only">Details zur Bestellung {order.number}</span>
       </Link>
     </li>
@@ -143,7 +143,7 @@ export function OrderLineItem({ item }: { item: OrderItemView }) {
     item.depositTotalCents > 0 ? ` · zzgl. ${formatEur(item.depositTotalCents)} Pfand` : "";
   return (
     <li className="flex items-start gap-3 py-2">
-      <div className="bg-pink-light relative size-[52px] shrink-0 overflow-hidden rounded-[12px]">
+      <div className="bg-pv-cream relative size-[52px] shrink-0 overflow-hidden rounded-[12px]">
         {item.image ? (
           <Image
             src={item.image}
@@ -155,7 +155,7 @@ export function OrderLineItem({ item }: { item: OrderItemView }) {
         ) : null}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="text-[15px] leading-[1.35] font-semibold">{item.title}</p>
+        <p className="text-[15px] leading-[1.35] font-bold">{item.title}</p>
         {item.variantTitle ? (
           <p className="text-[13px] leading-[1.4]">{item.variantTitle}</p>
         ) : null}
@@ -165,7 +165,7 @@ export function OrderLineItem({ item }: { item: OrderItemView }) {
         </p>
       </div>
       <div className="flex flex-col items-end gap-0.5 text-right">
-        <p className="text-[15px] leading-[1.35] font-semibold whitespace-nowrap">
+        <p className="text-[15px] leading-[1.35] font-bold whitespace-nowrap">
           {formatEur(item.goodsTotalCents)}
         </p>
         {item.basePriceText ? (
@@ -188,7 +188,7 @@ export function SummaryRow({
 }) {
   return (
     <div
-      className={`flex items-center justify-between gap-4 ${strong ? "text-[16px] font-semibold" : "text-[15px]"}`}
+      className={`flex items-center justify-between gap-4 ${strong ? "text-[16px] font-bold" : "text-[15px]"}`}
     >
       <dt>{label}</dt>
       <dd className="text-right whitespace-nowrap">{value}</dd>

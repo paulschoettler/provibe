@@ -53,18 +53,20 @@ export default async function ShopPage() {
 
       {/* Hero-Band */}
       <section className="pvc-hero" aria-labelledby="shop-titel">
-        <Blob className="pvc-hero-blob top-[-12%] right-[-8%] h-[70%] w-[60%]" opacity={0.18} />
-        <Blob className="pvc-hero-blob bottom-[8%] left-[-18%] h-[60%] w-[55%]" opacity={0.14} />
+        <Blob className="pvc-hero-blob top-[-12%] right-[-8%] h-[70%] w-[60%]" />
+        <Blob className="pvc-hero-blob bottom-[8%] left-[-18%] h-[60%] w-[55%]" />
         <div className="relative z-[1] mx-auto grid w-full max-w-[1200px] items-center gap-6 px-4 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:gap-10">
           <div className="text-center lg:text-left">
-            <Eyebrow className="text-wine justify-center lg:justify-start">get the vibe</Eyebrow>
+            <Eyebrow className="text-pv-wildberry justify-center lg:justify-start">
+              get the vibe
+            </Eyebrow>
             <h1
               id="shop-titel"
-              className="text-wine mt-3 text-[46px] leading-[0.95] font-bold tracking-[-0.03em] sm:text-[64px] lg:text-[92px]"
+              className="text-pv-wildberry mt-3 text-[46px] leading-[0.95] font-medium tracking-[-0.03em] sm:text-[64px] lg:text-[92px]"
             >
               Such dir deinen Vibe.
             </h1>
-            <p className="text-wine mx-auto mt-4 max-w-[30ch] text-[17px] leading-[1.5] font-medium lg:mx-0 lg:text-[22px]">
+            <p className="text-pv-wildberry mx-auto mt-4 max-w-[30ch] text-[17px] leading-[1.5] font-medium lg:mx-0 lg:text-[22px]">
               Probier provibe: erfrischender Eistee mit 15 g Protein.
             </p>
             <div className="mt-7 hidden lg:block">
@@ -105,7 +107,7 @@ export default async function ShopPage() {
         </div>
         <WaveDivider
           shape="swell"
-          fill="var(--color-cream)"
+          fill="var(--pv-cream)"
           position="top"
           className="pvc-wave-inside"
         />
@@ -132,10 +134,10 @@ export default async function ShopPage() {
           id="alle-produkte"
           aside={
             <p className="flex items-center gap-6 text-[14px]">
-              <span className="text-plum">{products.length} Produkte</span>
+              <span className="text-pv-wildberry">{products.length} Produkte</span>
               <SiteLink
                 href="/collections/all"
-                className="text-aubergine flex min-h-11 items-center gap-1.5 font-semibold underline underline-offset-4"
+                className="text-pv-wildberry flex min-h-11 items-center gap-1.5 font-bold underline underline-offset-4"
               >
                 Zur Kollektion
                 <ArrowRightIcon className="h-4 w-4" />

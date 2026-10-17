@@ -30,7 +30,7 @@ export default async function AboOverviewPage() {
   return (
     <AccountShell active="abo">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <h1 className="headline text-wine text-[40px] lg:text-[64px]">Dein Abo</h1>
+        <h1 className="headline text-pv-wildberry text-[40px] lg:text-[64px]">Dein Abo</h1>
         <p className="pv-acc-hello-sticker">Jederzeit flexibel.</p>
       </div>
       <p className="mt-4 max-w-[640px] text-[16px] leading-[1.5] lg:text-[17px]">
@@ -60,7 +60,7 @@ export default async function AboOverviewPage() {
 
       {cancelled.length > 0 ? (
         <section className="mt-10" aria-labelledby="beendete-abos">
-          <h2 id="beendete-abos" className="text-[20px] font-semibold">
+          <h2 id="beendete-abos" className="text-[20px] font-medium">
             Beendete Abos
           </h2>
           <ul className="mt-4 flex flex-col gap-4">

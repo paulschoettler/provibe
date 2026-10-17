@@ -45,7 +45,7 @@ export function SentPage({
           <Eyebrow className="mt-2">{eyebrow}</Eyebrow>
           <h1
             id="gesendet-titel"
-            className="pv-h2 max-w-[640px] !text-[34px] !font-bold lg:!text-[56px]"
+            className="pv-h2 max-w-[640px] !text-[34px] !font-medium lg:!text-[56px]"
           >
             {title}
           </h1>
@@ -59,7 +59,7 @@ export function SentPage({
             className="pv-card-soft w-full !rounded-[10px] px-5 py-5"
             aria-labelledby="angaben-titel"
           >
-            <h2 id="angaben-titel" className="text-wine m-0 mb-2 text-[20px] font-semibold">
+            <h2 id="angaben-titel" className="text-pv-wildberry m-0 mb-2 text-[20px] font-medium">
               {summaryTitle}
             </h2>
             <dl className="m-0">
@@ -81,7 +81,9 @@ export function SentPage({
             Zur Startseite
           </SiteLink>
         </div>
-        {footnote ? <p className="text-plum m-0 text-center text-[15px]">{footnote}</p> : null}
+        {footnote ? (
+          <p className="text-pv-wildberry m-0 text-center text-[15px]">{footnote}</p>
+        ) : null}
       </div>
     </SiteShell>
   );

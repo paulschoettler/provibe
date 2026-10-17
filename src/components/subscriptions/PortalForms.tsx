@@ -33,7 +33,7 @@ function FormError({ state }: { state: AboFormState }) {
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} className="text-berry text-[13px] font-semibold">
+    <p id={id} className="text-pv-wildberry text-[13px] font-bold">
       {message}
     </p>
   );
@@ -94,13 +94,13 @@ export function PlanForm({
       <FormError state={state} />
 
       <section
-        className="rounded-card bg-cream-2 flex flex-col gap-3 p-5 shadow-[0_12px_32px_-6px_rgba(74,46,56,0.12)]"
+        className="rounded-card bg-pv-cream flex flex-col gap-3 p-5 shadow-[0_12px_32px_-6px_var(--pv-ui-shadow-color)]"
         aria-labelledby="sorte-titel"
       >
-        <h2 id="sorte-titel" className="text-[20px] font-semibold">
+        <h2 id="sorte-titel" className="text-[20px] font-medium">
           Sorte
         </h2>
-        <p className="text-plum text-[13px]">
+        <p className="text-pv-wildberry text-[13px]">
           Ein Wechsel gilt ab der nächsten Lieferung, der Preis bleibt gleich.
         </p>
         <fieldset>
@@ -154,7 +154,7 @@ export function PlanForm({
                       ))}
                     </span>
                   )}
-                  <span className="text-[13px] font-semibold">{f.title}</span>
+                  <span className="text-[13px] font-bold">{f.title}</span>
                 </label>
               </div>
             ))}
@@ -163,14 +163,14 @@ export function PlanForm({
       </section>
 
       <section
-        className="rounded-card bg-cream-2 flex flex-col gap-3 p-5 shadow-[0_12px_32px_-6px_rgba(74,46,56,0.12)]"
+        className="rounded-card bg-pv-cream flex flex-col gap-3 p-5 shadow-[0_12px_32px_-6px_var(--pv-ui-shadow-color)]"
         aria-labelledby="menge-titel"
       >
-        <h2 id="menge-titel" className="text-[20px] font-semibold">
+        <h2 id="menge-titel" className="text-[20px] font-medium">
           Menge und Intervall
         </h2>
         <fieldset>
-          <legend className="mb-2.5 text-[15px] font-semibold">Packgröße je Lieferung</legend>
+          <legend className="mb-2.5 text-[15px] font-bold">Packgröße je Lieferung</legend>
           <div className="grid grid-cols-3 gap-2.5">
             {packs.map((p) => (
               <div key={p.variantId} className="relative">
@@ -195,22 +195,24 @@ export function PlanForm({
                       />
                     </svg>
                   </span>
-                  <span className="text-[14px] font-semibold">{p.title}</span>
+                  <span className="text-[14px] font-bold">{p.title}</span>
                   <span className="text-[16px] font-bold">{formatEur(p.goodsCents)}</span>
                   <span className="text-[11px]">zzgl. {formatEur(p.depositCents)} Pfand</span>
-                  <span className="text-plum text-[11px]">{formatEur(p.perCanCents)} je Dose</span>
+                  <span className="text-pv-wildberry text-[11px]">
+                    {formatEur(p.perCanCents)} je Dose
+                  </span>
                   <span className="text-[11px]">{p.basePriceText}</span>
                 </label>
               </div>
             ))}
           </div>
-          <p className="text-plum mt-2 text-[12px]">
+          <p className="text-pv-wildberry mt-2 text-[12px]">
             Abo-Preise je Lieferung mit {percent} % Rabatt auf den Warenwert, Pfand getrennt,
             Versand ab der Grenze kostenlos.
           </p>
         </fieldset>
         <fieldset>
-          <legend className="mb-2 text-[15px] font-semibold">Liefern alle</legend>
+          <legend className="mb-2 text-[15px] font-bold">Liefern alle</legend>
           <div className="grid grid-cols-4 gap-2">
             {intervals.map((w) => (
               <div key={w}>
@@ -284,8 +286,8 @@ export function PauseForm({
               className="co-radio"
             />
             <span className="flex flex-col leading-[1.35]">
-              <span className="text-[16px] font-semibold">{s.weeks} Wochen</span>
-              <span className="text-plum text-[13px]">Nächste Lieferung am {s.label}</span>
+              <span className="text-[16px] font-bold">{s.weeks} Wochen</span>
+              <span className="text-pv-wildberry text-[13px]">Nächste Lieferung am {s.label}</span>
             </span>
           </label>
         ))}
@@ -299,13 +301,15 @@ export function PauseForm({
             className="co-radio"
           />
           <span className="flex flex-col leading-[1.35]">
-            <span className="text-[16px] font-semibold">Bis zu einem Datum</span>
-            <span className="text-plum text-[13px]">Du wählst den Tag der nächsten Lieferung</span>
+            <span className="text-[16px] font-bold">Bis zu einem Datum</span>
+            <span className="text-pv-wildberry text-[13px]">
+              Du wählst den Tag der nächsten Lieferung
+            </span>
           </span>
         </label>
       </fieldset>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="pause-bis" className="text-[14px] font-semibold">
+        <label htmlFor="pause-bis" className="text-[14px] font-bold">
           Pausieren bis
         </label>
         <input
@@ -329,11 +333,11 @@ export function PauseForm({
         <FieldError id="pause-bis-fehler" message={state.fieldErrors?.until} />
       </div>
       <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <p className="text-plum text-[13px] sm:mr-auto">Pause jederzeit beendbar.</p>
+        <p className="text-pv-wildberry text-[13px] sm:mr-auto">Pause jederzeit beendbar.</p>
         <Link
           href={closeHref as Route}
           scroll={false}
-          className="btn-pill border-aubergine text-aubergine border-[1.5px]"
+          className="btn-pill border-pv-wildberry text-pv-wildberry border-[1.5px]"
         >
           Abbrechen
         </Link>
@@ -364,13 +368,13 @@ export function CancelForm({
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="id" value={subscriptionId} />
-      <div className="bg-cream-2 rounded-[18px] p-4">
-        <p className="text-[15px] font-semibold">{summary}</p>
+      <div className="bg-pv-cream rounded-[18px] p-4">
+        <p className="text-[15px] font-bold">{summary}</p>
         <p className="mt-1 text-[14px] leading-[1.5]">{detail}</p>
       </div>
       <FormError state={state} />
       <fieldset>
-        <legend className="mb-2.5 text-[15px] font-semibold">
+        <legend className="mb-2.5 text-[15px] font-bold">
           Magst du uns sagen, warum? (optional)
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -391,7 +395,7 @@ export function CancelForm({
         </div>
       </fieldset>
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="kuendigen-notiz" className="text-[14px] font-semibold">
+        <label htmlFor="kuendigen-notiz" className="text-[14px] font-bold">
           Noch etwas für uns? (optional)
         </label>
         <textarea
@@ -410,18 +414,18 @@ export function CancelForm({
           <Link
             href={pauseHref as Route}
             scroll={false}
-            className="text-plum font-semibold underline underline-offset-2"
+            className="text-pv-wildberry font-bold underline underline-offset-2"
           >
             Abo pausieren
           </Link>
         </p>
       ) : null}
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
-        <p className="text-plum text-[13px] sm:mr-auto">Bestätigung kommt per E-Mail.</p>
+        <p className="text-pv-wildberry text-[13px] sm:mr-auto">Bestätigung kommt per E-Mail.</p>
         <Link
           href={closeHref as Route}
           scroll={false}
-          className="btn-pill border-aubergine text-aubergine border-[1.5px]"
+          className="btn-pill border-pv-wildberry text-pv-wildberry border-[1.5px]"
           data-autofocus
         >
           Abo behalten
@@ -456,9 +460,9 @@ export function AddressForm({
     className = "",
   ) => (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={`adr-${name}`} className="text-[14px] font-semibold">
+      <label htmlFor={`adr-${name}`} className="text-[14px] font-bold">
         {label}
-        {optional ? <span className="text-mauve font-normal"> (optional)</span> : null}
+        {optional ? <span className="text-pv-wildberry font-normal"> (optional)</span> : null}
       </label>
       <input
         id={`adr-${name}`}
@@ -493,7 +497,7 @@ export function AddressForm({
         <Link
           href={closeHref as Route}
           scroll={false}
-          className="btn-pill border-aubergine text-aubergine border-[1.5px]"
+          className="btn-pill border-pv-wildberry text-pv-wildberry border-[1.5px]"
         >
           Abbrechen
         </Link>
@@ -540,15 +544,15 @@ export function MockPaymentMethodForm({
               className="co-radio"
             />
             <span className="flex flex-col leading-[1.35]">
-              <span className="text-[16px] font-semibold">{m.title}</span>
+              <span className="text-[16px] font-bold">{m.title}</span>
               <span className="text-[13px]">{m.text}</span>
             </span>
           </label>
         ))}
       </fieldset>
       {method === "card" ? (
-        <div className="border-mauve flex flex-col gap-3 rounded-[14px] border-[1.5px] border-dashed bg-white p-3.5">
-          <p className="text-plum text-[11px] font-semibold tracking-[0.12em] uppercase">
+        <div className="border-pv-wildberry bg-pv-white flex flex-col gap-3 rounded-[14px] border-[1.5px] border-dashed p-3.5">
+          <p className="text-pv-wildberry font-condensed text-[11px] font-bold tracking-[0.12em] uppercase">
             Testmodus: Karte wird simuliert
           </p>
           {[
@@ -561,7 +565,7 @@ export function MockPaymentMethodForm({
             },
           ].map((f) => (
             <div key={f.name} className="flex flex-col gap-1.5">
-              <label htmlFor={`pm-${f.name}`} className="text-[14px] font-semibold">
+              <label htmlFor={`pm-${f.name}`} className="text-[14px] font-bold">
                 {f.label}
               </label>
               <input
@@ -583,7 +587,7 @@ export function MockPaymentMethodForm({
           ))}
           <div className="flex gap-3">
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <label htmlFor="pm-cardExpiry" className="text-[14px] font-semibold">
+              <label htmlFor="pm-cardExpiry" className="text-[14px] font-bold">
                 Ablaufdatum
               </label>
               <input
@@ -599,7 +603,7 @@ export function MockPaymentMethodForm({
               <FieldError id="pm-cardExpiry-fehler" message={errors.cardExpiry} />
             </div>
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-              <label htmlFor="pm-cardCvc" className="text-[14px] font-semibold">
+              <label htmlFor="pm-cardCvc" className="text-[14px] font-bold">
                 CVC
               </label>
               <input
@@ -627,7 +631,7 @@ export function MockPaymentMethodForm({
         <Link
           href={closeHref as Route}
           scroll={false}
-          className="btn-pill border-aubergine text-aubergine border-[1.5px]"
+          className="btn-pill border-pv-wildberry text-pv-wildberry border-[1.5px]"
         >
           Abbrechen
         </Link>

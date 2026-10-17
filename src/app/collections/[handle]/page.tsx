@@ -124,7 +124,7 @@ export default async function CollectionPage({
             {filter !== "alle" ? (
               <SiteLink
                 href={collection.url}
-                className="order-last mt-5 inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
+                className="order-last mt-5 inline-flex min-h-11 items-center font-bold underline underline-offset-4"
               >
                 Filter zurücksetzen
               </SiteLink>

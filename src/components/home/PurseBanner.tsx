@@ -14,7 +14,7 @@ export function PurseBanner() {
   return (
     <section id="pvbanner" className="pvbanner-section">
       <RevealObserver />
-      <WaveDivider shape="swell" fill="var(--color-butter)" position="top" flip />
+      <WaveDivider shape="swell" fill="var(--pv-lime-raspberry)" position="top" flip />
 
       <div className="pvbanner-media reveal">
         <Image
@@ -40,7 +40,7 @@ export function PurseBanner() {
         </SiteLink>
       </div>
 
-      <WaveDivider shape="soft" fill="var(--color-butter)" position="bottom" />
+      <WaveDivider shape="soft" fill="var(--pv-lime-raspberry)" position="bottom" />
     </section>
   );
 }

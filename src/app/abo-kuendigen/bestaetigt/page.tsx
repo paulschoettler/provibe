@@ -46,12 +46,12 @@ export default async function KuendigungBestaetigtPage() {
       <div className="pv-container pv-before-footer relative grid gap-8 pt-8 pb-16 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-16 lg:pt-14">
         <div className="min-w-0">
           <Eyebrow>Vertrag kündigen</Eyebrow>
-          <h1 className="headline text-wine mt-3 text-[44px] leading-[1.05] lg:text-[64px]">
+          <h1 className="headline text-pv-wildberry mt-3 text-[44px] leading-[1.05] lg:text-[64px]">
             Erledigt
           </h1>
           <section className="pv-abo-done mt-6" aria-labelledby="kuendigung-titel" role="status">
             <span
-              className="bg-magenta flex size-14 items-center justify-center rounded-full text-white lg:size-16"
+              className="bg-pv-wildberry text-pv-white flex size-14 items-center justify-center rounded-full lg:size-16"
               aria-hidden="true"
             >
               <svg viewBox="0 0 24 24" className="size-7">
@@ -67,16 +67,16 @@ export default async function KuendigungBestaetigtPage() {
             </span>
             <h2
               id="kuendigung-titel"
-              className="text-[24px] leading-[1.2] font-semibold lg:text-[28px]"
+              className="text-[24px] leading-[1.2] font-medium lg:text-[28px]"
             >
               Deine Kündigung ist bei uns eingegangen.
             </h2>
             {rows.length > 0 ? (
-              <dl className="flex flex-col gap-3 rounded-[18px] bg-white p-4">
+              <dl className="bg-pv-white flex flex-col gap-3 rounded-[18px] p-4">
                 {rows.map(([k, v]) => (
                   <div key={k}>
-                    <dt className="text-plum text-[13px]">{k}</dt>
-                    <dd className="text-[16px] font-semibold break-words">{v}</dd>
+                    <dt className="text-pv-wildberry text-[13px]">{k}</dt>
+                    <dd className="text-[16px] font-bold break-words">{v}</dd>
                   </div>
                 ))}
               </dl>
@@ -92,7 +92,7 @@ export default async function KuendigungBestaetigtPage() {
               </Link>
               <Link
                 href={"/collections/all" as Route}
-                className="text-plum font-semibold underline underline-offset-4"
+                className="text-pv-wildberry font-bold underline underline-offset-4"
               >
                 Doch wieder Lust? Neues Abo
               </Link>

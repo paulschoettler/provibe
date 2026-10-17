@@ -31,8 +31,8 @@ export function Field({
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       <label htmlFor={fieldId} className="flex items-center gap-1.5 leading-[1.4]">
-        <span className="text-[14px] font-semibold">{label}</span>
-        {optional ? <span className="text-plum text-[13px]">optional</span> : null}
+        <span className="text-[14px] font-bold">{label}</span>
+        {optional ? <span className="text-pv-wildberry text-[13px]">optional</span> : null}
       </label>
       {readOnlyDisplay !== undefined ? (
         <input
@@ -54,7 +54,10 @@ export function Field({
         />
       )}
       {error ? (
-        <p id={errorId} className="text-berry flex items-center gap-1.5 text-[13px] font-semibold">
+        <p
+          id={errorId}
+          className="text-pv-wildberry flex items-center gap-1.5 text-[13px] font-bold"
+        >
           <AlertIcon className="h-4 w-4" />
           {error}
         </p>

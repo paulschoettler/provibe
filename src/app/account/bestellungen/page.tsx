@@ -22,7 +22,7 @@ export default async function OrdersPage() {
 
   return (
     <AccountShell active="bestellungen">
-      <h1 className="headline text-wine text-[40px] lg:text-[56px]">Deine Bestellungen</h1>
+      <h1 className="headline text-pv-wildberry text-[40px] lg:text-[56px]">Deine Bestellungen</h1>
       <p className="mt-2 text-[15px] leading-[1.5]">
         {orders.length === 0
           ? "Du hast noch nichts bestellt."

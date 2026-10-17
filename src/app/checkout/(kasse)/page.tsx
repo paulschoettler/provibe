@@ -139,9 +139,9 @@ export default async function CheckoutPage({
           </div>
 
           <aside className="hidden lg:block">
-            <div className="bg-cream-2 sticky top-6 rounded-[22px] p-6 shadow-[0_24px_50px_rgba(74,47,57,0.14)]">
+            <div className="bg-pv-cream shadow-card sticky top-6 rounded-[22px] p-6">
               <OrderSummary snapshot={snapshot} title="Deine Bestellung">
-                <hr className="border-aubergine/20" />
+                <hr className="border-pv-ui-hairline" />
                 <DiscountForm idPrefix="desktop" appliedCode={appliedCode} rejection={rejection} />
                 <PaymentBadges />
               </OrderSummary>
