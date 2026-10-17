@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { buttonClasses, iconButtonClasses } from "@/components/admin/ui/Button";
 import { cx } from "@/components/admin/ui/cx";
 import { Icon } from "@/components/admin/ui/Icon";
 import { MobileNav } from "./MobileNav";
-import { titleFor, type NavLink } from "./nav-shared";
+import type { NavLink } from "./nav-shared";
 import type { ShellUser } from "./Sidebar";
 
 /**
@@ -34,8 +33,6 @@ export function Topbar({
   aboAlerts?: number;
   quickActions: QuickAction[];
 }) {
-  const pathname = usePathname() ?? "/admin";
-  const title = titleFor(pathname, items);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -72,9 +69,9 @@ export function Topbar({
   return (
     <header className="border-admin-rahmen bg-admin-karte sticky top-0 z-40 flex h-14 items-center gap-1 border-b px-1 lg:gap-4 lg:px-6">
       <MobileNav items={items} user={user} />
-      <p className="text-admin-ueberschrift min-w-0 flex-1 truncate text-[18px] leading-[1.4] font-medium lg:flex-none lg:grow lg:basis-0 lg:text-[24px]">
-        {title}
-      </p>
+      {/* Kein Seitentitel in der Kopfzeile: jede Seite trägt ihn selbst im PageHeader
+          (Feedback 17.10.2026). Der Platzhalter hält die Suche in der Mitte. */}
+      <div aria-hidden="true" className="min-w-0 flex-1 lg:flex-none lg:grow lg:basis-0" />
       <form
         action="/admin/suche"
         method="get"

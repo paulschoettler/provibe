@@ -8,6 +8,47 @@ export interface NavLink {
   icon: IconName;
   exact?: boolean;
   count?: number;
+  /** Bereich in der Seitenleiste (Schlüssel aus NAV_GROUPS); ohne Gruppe steht der Punkt einzeln */
+  group?: NavGroupId;
+}
+
+/** Auf- und zuklappbare Bereiche der Seitenleiste, Reihenfolge wie in nav.ts */
+export const NAV_GROUPS = {
+  verkauf: { label: "Verkauf", icon: "bestellungen" },
+  katalog: { label: "Katalog", icon: "produkte" },
+  kunden: { label: "Kunden", icon: "kunden" },
+  marketing: { label: "Marketing", icon: "newsletter" },
+  system: { label: "System", icon: "einstellungen" },
+} as const satisfies Record<string, { label: string; icon: IconName }>;
+
+export type NavGroupId = keyof typeof NAV_GROUPS;
+
+export type NavSection =
+  | { kind: "item"; item: NavLink }
+  | { kind: "group"; id: NavGroupId; label: string; icon: IconName; items: NavLink[] };
+
+/** Flache Liste in Abschnitte falten: Einzelpunkte bleiben, Gruppen sammeln ihre Punkte in Reihenfolge. */
+export function sectionsOf(items: NavLink[]): NavSection[] {
+  const sections: NavSection[] = [];
+  for (const item of items) {
+    if (!item.group) {
+      sections.push({ kind: "item", item });
+      continue;
+    }
+    const last = sections.findLast((s) => s.kind === "group" && s.id === item.group);
+    if (last && last.kind === "group") last.items.push(item);
+    else {
+      const def = NAV_GROUPS[item.group];
+      sections.push({
+        kind: "group",
+        id: item.group,
+        label: def.label,
+        icon: def.icon,
+        items: [item],
+      });
+    }
+  }
+  return sections;
 }
 
 /** Weitere Seitentitel für die Kopfzeile, die nicht in der Navigation stehen */
