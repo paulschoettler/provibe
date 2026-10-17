@@ -4506,6 +4506,10 @@ a.pv-channel-value {
   width: 100%;
   min-width: 0;
   align-content: start;
+  /* Gleich hohe Karten im Raster: die Zelle (li) streckt die Karte, die Zeile "lines" nimmt
+     die restliche Höhe auf, Preis, Hinweis und Button stehen damit in allen Karten unten
+     auf gleicher Höhe (Feedback 17.10.2026). */
+  align-self: stretch;
   background: var(--pv-cream);
   color: var(--pv-wildberry);
   isolation: isolate;
@@ -4578,6 +4582,7 @@ a.pv-channel-value {
 }
 .pvc-lines {
   grid-area: lines;
+  align-self: end;
   min-width: 0;
   line-height: 1.35;
 }
@@ -4663,6 +4668,7 @@ a.pv-channel-value {
 .pvc-card--grid {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas: "badge" "title" "media" "lines" "price" "fine" "action";
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto auto;
   row-gap: 8px;
   border-radius: 22px;
   padding: 14px;
@@ -4673,13 +4679,13 @@ a.pv-channel-value {
   letter-spacing: 0.02em;
 }
 .pvc-card--grid .pvc-title {
+  min-height: 2.1em;
   font-size: 20px;
 }
 .pvc-card--grid .pvc-media {
   height: 168px;
 }
 .pvc-card--grid:is(.pvc-card--bundle, .pvc-card--merch) .pvc-media {
-  height: 107px;
   border-radius: 16px;
 }
 .pvc-card--grid .pvc-can {
@@ -4705,6 +4711,10 @@ a.pv-channel-value {
 .pvc-card--grid .pvc-placeholder-name {
   font-size: 13px;
 }
+.pvc-card--grid .pvc-lines {
+  /* drei Zeilen à 13 px × 1,35: alle Karten einer Seite gleich hoch */
+  min-height: 52.7px;
+}
 .pvc-card--grid .pvc-line1 {
   font-size: 13px;
 }
@@ -4719,6 +4729,8 @@ a.pv-channel-value {
   font-size: 12px;
 }
 .pvc-card--grid .pvc-fine {
+  /* drei Hinweiszeilen (je Dose, Pfand, Grundpreis) à 12 px × 1,4 */
+  min-height: 50.4px;
   font-size: 12px;
 }
 .pvc-card--grid .pvc-btn {
@@ -4830,13 +4842,11 @@ a.pv-channel-value {
   :is(.pvc-card--grid, .pvc-card--list) {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "title title" "media media" "lines price" "fine fine" "action action";
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     column-gap: 16px;
     row-gap: 14px;
     border-radius: 26px;
     padding: 30px 30px 26px;
-  }
-  :is(.pvc-card--grid, .pvc-card--list):is(.pvc-card--bundle, .pvc-card--merch) {
-    grid-template-areas: "media media" "title title" "lines price" "fine fine" "action action";
   }
   :is(.pvc-card--grid, .pvc-card--list) .pvc-badge {
     position: absolute;
@@ -4851,14 +4861,10 @@ a.pv-channel-value {
     min-height: 2.1em;
     font-size: 34px;
   }
+  /* Bundle-Titel kleiner, aber gleich hoch wie die Sortentitel (zwei Zeilen à 34 px) */
   :is(.pvc-card--grid, .pvc-card--list):is(.pvc-card--bundle) .pvc-title {
-    min-height: 0;
-    max-width: none;
+    min-height: 71.4px;
     font-size: 26px;
-  }
-  :is(.pvc-card--grid, .pvc-card--list):is(.pvc-card--merch) .pvc-title {
-    min-height: 0;
-    max-width: none;
   }
   :is(.pvc-card--grid, .pvc-card--list) .pvc-media {
     width: auto;
@@ -4867,7 +4873,6 @@ a.pv-channel-value {
     background: none;
   }
   :is(.pvc-card--grid, .pvc-card--list):is(.pvc-card--bundle, .pvc-card--merch) .pvc-media {
-    height: 243px;
     border-radius: 20px;
   }
   :is(.pvc-card--grid, .pvc-card--list):is(.pvc-card--merch) .pvc-media {
@@ -4891,6 +4896,10 @@ a.pv-channel-value {
     display: block;
     font-size: 18px;
   }
+  :is(.pvc-card--grid, .pvc-card--list) .pvc-lines {
+    /* drei Zeilen à 15 px × 1,35 (Sorte, Füllmenge, Geschmacksnoten) */
+    min-height: 60.75px;
+  }
   :is(.pvc-card--grid, .pvc-card--list) .pvc-line1 {
     font-size: 15px;
   }
@@ -4910,6 +4919,8 @@ a.pv-channel-value {
     font-size: 13px;
   }
   :is(.pvc-card--grid, .pvc-card--list) .pvc-fine {
+    /* zwei Zeilen à 13 px × 1,4, damit Merch und Sorten gleich hoch enden */
+    min-height: 36.4px;
     font-size: 13px;
   }
   :is(.pvc-card--grid, .pvc-card--list) .pvc-fine .pvc-nowrap {
