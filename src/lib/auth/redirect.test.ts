@@ -26,6 +26,17 @@ describe("safeNextPath", () => {
     expect(safeNextPath(42)).toBe("/account");
   });
 
+  it("packt das Ziel aus einer Callback-Adresse aus (Supabase-Vorlagen mit next={{ .RedirectTo }})", () => {
+    expect(
+      safeNextPath("https://www.provibe-drinks.de/auth/callback?next=%2Fcheckout%3Fschritt%3D2"),
+    ).toBe("/checkout?schritt=2");
+    expect(safeNextPath("https://evil.example/auth/callback?next=https%3A%2F%2Fevil.example")).toBe(
+      "/account",
+    );
+    expect(safeNextPath("https://www.provibe-drinks.de/auth/callback?x=1")).toBe("/account");
+    expect(safeNextPath("https://www.provibe-drinks.de/account")).toBe("/account");
+  });
+
   it("nutzt den Fallback", () => {
     expect(safeNextPath("//x", "/")).toBe("/");
   });
