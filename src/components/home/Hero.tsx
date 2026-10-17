@@ -157,7 +157,9 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
         {/* Zutatenpanel: alle Sorten im HTML, eingeblendet ab --seq 0,4 */}
         {/* Fläche und Scrollbereich sind getrennt: Ein scrollender Block mit
             deckendem Hintergrund verdeckt in Chromium Teile der 3D-Canvas
-            (Verdeckungsprüfung des Compositors), ein durchsichtiger nicht. */}
+            (Verdeckungsprüfung des Compositors), ein durchsichtiger nicht.
+            Auf dem Telefon scrollt nichts: Dose, Panel und Dock passen
+            gemeinsam ins Bild (hero-geometry.ts, data-layout auf #pv-hero). */}
         <div className="pv-facts">
           <div className="pv-facts__scroll">
             {flavors.map((flavor, index) => {

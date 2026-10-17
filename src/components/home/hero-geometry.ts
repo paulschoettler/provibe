@@ -51,10 +51,54 @@ const NEIGHBOR_ANGLE = (2 * Math.PI) / 3;
  */
 const NEIGHBOR_SCALE_SIDE = 0.86;
 const NEIGHBOR_SCALE_STACKED = 0.74;
-/** Höhe der gezoomten Dose im gestapelten Layout als Anteil der Bildhöhe. */
+/** Höhe der gezoomten Dose im gestapelten Layout als Anteil der Bildhöhe (Tablet). */
 const STACKED_ZOOM_HEIGHT = 0.33;
-/** Senkrechter Mittelpunkt der gezoomten Dose im gestapelten Layout (von oben). */
+/** Senkrechter Mittelpunkt der gezoomten Dose im gestapelten Layout (von oben, Tablet). */
 const STACKED_ZOOM_CENTER = 0.235;
+/** Oberkante des Zutatenpanels im gestapelten Layout (Tablet), identisch zu globals.css. */
+const STACKED_FACTS_TOP = 0.417;
+
+/*
+ * Kompaktes Telefonlayout im Zutaten-Schritt (Breite unter 768 px): Das ganze
+ * Panel passt ohne inneren Scroll zwischen Dose und Warenkorb-Dock. Die Maße in
+ * Pixeln müssen zu globals.css passen (#pv-hero[data-layout="compact"] und
+ * [data-layout="vignette"]).
+ */
+/** Ab dieser Höhe steht die kleine Dose über dem Panel, darunter als Vignette im Panelkopf. */
+export const VIGNETTE_MAX_HEIGHT = 700;
+/** Oberkante der gezoomten Dose: unter Logo (bis 42 px) und Sortenpunkten (bis 48 px). */
+const COMPACT_CAN_TOP_PX = 50;
+/** Abstand zwischen Dosenunterkante und Panel. */
+const COMPACT_FACTS_GAP_PX = 10;
+/**
+ * Höhe der gezoomten Dose über dem Panel, Anteil der Bildhöhe. Untergrenze bei
+ * 700 px Höhe, Obergrenze auf hohen Telefonen (vorher 33 Prozent).
+ */
+const COMPACT_ZOOM_MIN = 0.19;
+const COMPACT_ZOOM_MAX = 0.26;
+/**
+ * Höhe, die das Panel mindestens bekommt (Pixel). Gemessen: Panel mit Innenabstand
+ * 368 px bei 360 px Breite, 352 px ab 390 px Breite (Sorte mit den längsten
+ * Zutaten). Der Rest ist Reserve für größere Schrifteinstellungen.
+ */
+export const COMPACT_FACTS_MIN_PX = 400;
+/** Platz unter der Dose: Abstand, Panel, Dock (64 px) mit 16 px Rand und 12 px Luft. */
+const COMPACT_BELOW_CAN_PX = COMPACT_FACTS_GAP_PX + COMPACT_FACTS_MIN_PX + 92;
+/** Vignette: Oberkante des Panels mindestens (unter Logo und Punkten). */
+export const VIGNETTE_FACTS_TOP_PX = 54;
+/** Vignette: linker und oberer Innenabstand des Panels. */
+export const VIGNETTE_PAD_X_PX = 16;
+export const VIGNETTE_PAD_TOP_PX = 14;
+/** Vignette: halbe Breite und halbe Höhe des ovalen Fensters im Panelkopf. */
+export const VIGNETTE_RX_PX = 27;
+export const VIGNETTE_RY_PX = 37;
+/** Vignette: Höhe von Kopfzeile plus Titel, an deren Mitte das Fenster ausgerichtet ist. */
+export const VIGNETTE_BLOCK_PX = 54;
+/** Vignette: Höhe der Dose im Fenster. */
+const VIGNETTE_CAN_PX = 58;
+/** Panelbreite: links und rechts 16 px, höchstens 600 px breit, identisch zu globals.css. */
+const FACTS_SIDE_PX = 16;
+const FACTS_STACKED_MAX_PX = 600;
 /** Deckkraft der Nachbardosen im gezoomten Zustand (Feedback 7: dezent sichtbar). */
 export const NEIGHBOR_OPACITY_ZOOM = 0.4;
 /** Kippung der Nachbardosen um die z-Achse, Oberkante nach außen. */
@@ -67,11 +111,24 @@ export const CAN_TILT_Z_DEG = 11.5;
  */
 export const CAN_YAW_DEG = 17;
 
+/** Aufbau des Zutaten-Schritts, steht als data-layout auf #pv-hero. */
+export type HeroFactsLayout = "side" | "stacked" | "compact" | "vignette";
+
 export interface HeroGeometry {
   /** Schmales Layout: kleinere Modelle laden. */
   isMobile: boolean;
   /** Zutaten stehen im gezoomten Zustand seitlich neben der Dose. */
   isSide: boolean;
+  /**
+   * Aufbau im Zutaten-Schritt: "side" Panel rechts, "stacked" Panel unter der
+   * Dose (Tablet), "compact" kleine Dose über dem Panel (Telefon), "vignette"
+   * Dose im Panelkopf links neben dem Titel (Telefon unter 700 px Höhe).
+   */
+  factsLayout: HeroFactsLayout;
+  /** Oberkante des Zutatenpanels als Anteil der Viewporthöhe (nicht im Seitenlayout). */
+  factsTopFraction: number;
+  /** Höhe der gezoomten aktiven Dose als Anteil der Viewporthöhe. */
+  zoomHeightFraction: number;
   /** Seitenverhältnis der Canvas (Breite durch Höhe). */
   aspect: number;
   /** Seitliche Halbachse des Karussell-Rings in Welteinheiten. */
@@ -127,6 +184,13 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
   const aspect = safeWidth / safeHeight;
   const isMobile = safeWidth < MOBILE_MAX_WIDTH;
   const isSide = safeWidth >= SIDE_MIN_WIDTH && aspect >= SIDE_MIN_ASPECT;
+  const factsLayout: HeroFactsLayout = isSide
+    ? "side"
+    : !isMobile
+      ? "stacked"
+      : safeHeight < VIGNETTE_MAX_HEIGHT
+        ? "vignette"
+        : "compact";
 
   /** Halbe sichtbare Breite an einem Kameraabstand, in Welteinheiten. */
   const halfAt = (distance: number) => Math.max(0.0001, distance * TAN_HALF_FOV * aspect);
@@ -181,10 +245,47 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
   // Größenänderung der aktiven Dose am Ende der Sequenz. Bedingung aus dem Plan:
   // die ganze Dose bleibt sichtbar. Im Seitenlayout heißt das Zoom nach vorn mit
   // Versatz nach links (Zutaten rechts daneben). Steht der Zutatenblock unter der
-  // Dose, tritt sie leicht zurück und wandert nach oben.
-  // Gestapelt (Richtung A, Mobil 2 Zutaten): Die gezoomte Dose ist ein Drittel der
+  // Dose, tritt sie zurück und wandert nach oben.
+  // Gestapelt auf dem Tablet (Richtung A): Die gezoomte Dose ist ein Drittel der
   // Bildhöhe hoch und steht oben, das Zutatenpanel beginnt bei rund 42 Prozent.
-  const seqScale = isSide ? 1.12 : clamp(STACKED_ZOOM_HEIGHT / canHeightFraction, 0.55, 1);
+  // Kompakt auf dem Telefon: Die Dose ist nur so groß, dass das ganze Panel samt
+  // Nährwerten und Link darunter Platz hat (19 bis 26 Prozent der Bildhöhe). Als
+  // Vignette steht sie 58 px hoch im ovalen Fenster links neben dem Titel.
+  let zoomHeightFraction = STACKED_ZOOM_HEIGHT;
+  let zoomCenterFromTop = STACKED_ZOOM_CENTER;
+  let factsTopFraction = STACKED_FACTS_TOP;
+  /** Waagerechter Mittelpunkt der gezoomten Dose, Anteil der Bildbreite ab der Mitte. */
+  let zoomCenterX = 0;
+  if (factsLayout === "compact") {
+    zoomHeightFraction = clamp(
+      (safeHeight - COMPACT_CAN_TOP_PX - COMPACT_BELOW_CAN_PX) / safeHeight,
+      COMPACT_ZOOM_MIN,
+      COMPACT_ZOOM_MAX,
+    );
+    const canPx = zoomHeightFraction * safeHeight;
+    // Bleibt auf hohen Telefonen Platz übrig, steht der Block aus Dose und Panel
+    // mittig zwischen Logo und Dock statt oben angeklebt.
+    const spare = safeHeight - COMPACT_CAN_TOP_PX - canPx - COMPACT_BELOW_CAN_PX;
+    const canTop = COMPACT_CAN_TOP_PX + Math.max(0, spare / 2);
+    zoomCenterFromTop = (canTop + canPx / 2) / safeHeight;
+    factsTopFraction = (canTop + canPx + COMPACT_FACTS_GAP_PX) / safeHeight;
+  } else if (factsLayout === "vignette") {
+    zoomHeightFraction = VIGNETTE_CAN_PX / safeHeight;
+    const spare = safeHeight - VIGNETTE_FACTS_TOP_PX - COMPACT_FACTS_MIN_PX - 92;
+    const factsTop = VIGNETTE_FACTS_TOP_PX + Math.max(0, spare / 2);
+    const centerY = factsTop + VIGNETTE_PAD_TOP_PX + VIGNETTE_BLOCK_PX / 2;
+    zoomCenterFromTop = centerY / safeHeight;
+    factsTopFraction = factsTop / safeHeight;
+    const panelLeft = Math.max(FACTS_SIDE_PX, safeWidth / 2 - FACTS_STACKED_MAX_PX / 2);
+    zoomCenterX = (panelLeft + VIGNETTE_PAD_X_PX + VIGNETTE_RX_PX - safeWidth / 2) / safeWidth;
+  }
+  const seqScale = isSide
+    ? 1.12
+    : isMobile
+      ? clamp(zoomHeightFraction / canHeightFraction, 0.08, 1)
+      : clamp(zoomHeightFraction / canHeightFraction, 0.55, 1);
+  // Tatsächliche Höhe nach der Begrenzung von seqScale (Seitenlayout, Tablet).
+  if (!isMobile) zoomHeightFraction = canHeightFraction * seqScale;
   const zoomZ = ringRadiusZ + canRadius + activeFront / seqScale;
   const activeAxisZoom = zoomZ - ringRadiusZ;
   const neighborAxisZoom = zoomZ + 0.5 * ringRadiusZ;
@@ -213,15 +314,33 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
     neighborSpreadZoom = spread / Math.max(0.0001, neighborBaseZoom);
     seqShiftX = shift * halfAt(neighborAxisZoom);
     seqShiftXFraction = seqShiftX / halfAt(activeAxisZoom) / 2;
+  } else if (isMobile) {
+    // Telefon: Dose als Vignette nach links (sonst mittig), die Nachbardosen
+    // weichen beim Zoom ganz aus dem Bild. Neben der kleinen Dose wären sie nur
+    // Störer über Logo, Pfeilen und Panel.
+    seqShiftXFraction = zoomCenterX;
+    seqShiftX = 2 * zoomCenterX * halfAt(activeAxisZoom);
+    const shiftAtNeighbor = Math.abs(seqShiftX) / halfAt(neighborAxisZoom);
+    const outside = 1 + neighborHalfZoom + 0.12 + shiftAtNeighbor;
+    neighborSpreadZoom = Math.max(1, outside / Math.max(0.0001, neighborBaseZoom));
   }
 
-  // Gestapelt: Mittelpunkt der gezoomten Dose auf 23,5 Prozent der Bildhöhe.
-  const seqShiftYFraction = isSide ? -0.02 : STACKED_ZOOM_CENTER - (0.5 - canCenterYFraction);
-  const seqShiftY = -seqShiftYFraction * visibleHeightAt(activeAxisZoom);
+  // Gestapelt: Mittelpunkt der gezoomten Dose auf zoomCenterFromTop der Bildhöhe.
+  // Für das PNG ist das ein Versatz in Bildanteilen. In der 3D-Szene wirkt der
+  // Grundversatz canCenterY nach dem Zurückfahren der Kamera nur noch verkleinert,
+  // deshalb wird dort die Zielhöhe direkt in Welteinheiten gelöst. Sonst sitzt die
+  // 3D-Dose auf dem Telefon bis zu 50 px tiefer als ihr PNG und unter dem Panel.
+  const seqShiftYFraction = isSide ? -0.02 : zoomCenterFromTop - (0.5 - canCenterYFraction);
+  const seqShiftY = isSide
+    ? -seqShiftYFraction * visibleHeightAt(activeAxisZoom)
+    : (0.5 - zoomCenterFromTop) * visibleHeightAt(activeAxisZoom) - canCenterY;
 
   return {
     isMobile,
     isSide,
+    factsLayout,
+    factsTopFraction,
+    zoomHeightFraction,
     aspect,
     ringRadiusX,
     ringRadiusZ,

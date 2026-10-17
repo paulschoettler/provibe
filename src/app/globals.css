@@ -196,14 +196,32 @@ body {
   padding: 7px 16px;
   text-align: center;
 }
+/* Genau eine Meldung sichtbar. Inaktive sind nicht nur durchsichtig, sondern
+   visibility: hidden: Eine nur per Opacity versteckte Meldung lag früher 450 ms
+   lang voll überlappend auf der neuen und blieb in Safari beim Scrollen
+   (eingefrorener Übergang) halb sichtbar stehen. Crossfade: alt 240 ms aus,
+   neu ab 120 ms ein, Überlappung also höchstens 120 ms. */
 .pv-announce-item {
   grid-area: 1 / 1;
   margin: 0;
   opacity: 0;
-  transition: opacity 0.45s ease;
+  visibility: hidden;
+  transition:
+    opacity 0.24s ease,
+    visibility 0s linear 0.24s;
 }
 .pv-announce-item[data-active] {
   opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.24s ease 0.12s,
+    visibility 0s linear 0.12s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-announce-item,
+  .pv-announce-item[data-active] {
+    transition: none;
+  }
 }
 .pv-headerbar {
   position: relative;
@@ -978,6 +996,12 @@ html[data-tier="static"] .pv-canvas {
   position: relative;
   height: 400vh;
   color: var(--color-aubergine);
+  /* Sticker und Riesentypo ragen auf schmalen Telefonen über den rechten Rand.
+     Ohne Abschneiden verbreitert das den Layout-Viewport (Chrome zoomt heraus),
+     innerHeight wird größer als der sichtbare Bereich und alle Maße der
+     Sequenz, auch der Platz für das Zutatenpanel, sind zu groß gerechnet.
+     clip statt hidden: kein Scrollcontainer, die Bühne klebt weiter. */
+  overflow-x: clip;
 
   --seq: 0;
   --pv-vh: 100svh;
@@ -1946,6 +1970,165 @@ html[data-js]:not([data-flat]) .pv-stage:not([data-facts="true"]) .pv-facts {
   order: -1;
   flex-basis: 100%;
   height: 0;
+}
+
+/* --- Zutatenpanel auf dem Telefon: alles sichtbar, kein innerer Scroll -------
+   Unter 768 px Breite passt der ganze Inhalt (Name, Badges, Zutaten, Allergene,
+   Nährwerte samt Restzeile, "Alle Details") zusammen mit der Dose darüber und
+   dem Dock darunter in den sichtbaren Bereich. Typografie hier kompakter, die
+   Lage von Dose und Panel rechnet hero-geometry.ts (data-layout auf #pv-hero,
+   --pv-facts-top). Die Restzeile der Nährwerte bleibt immer stehen (LMIV). */
+@media (max-width: 767px) {
+  .pv-facts__item {
+    gap: 6px;
+  }
+  .pv-eyebrow {
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+  .pv-eyebrow::before {
+    width: 7px;
+    height: 7px;
+  }
+  .pv-more {
+    font-size: 13px;
+  }
+  .pv-facts__title {
+    font-size: 24px;
+  }
+  .pv-badges {
+    gap: 6px;
+  }
+  .pv-badge {
+    padding: 3px 11px;
+    border-width: 1.5px;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  .pv-badge[data-kind="protein"] {
+    top: -36px;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+  }
+  .pv-badge__value {
+    font-size: 18px;
+  }
+  .pv-badge__label {
+    font-size: 6.5px;
+  }
+  .pv-facts__text {
+    font-size: clamp(12.5px, 3.34vw, 13px);
+    line-height: 1.35;
+  }
+  .pv-facts__label {
+    margin-bottom: 4px;
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+  .pv-nutrition {
+    gap: 0 6px;
+  }
+  .pv-nutrition__row {
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+  .pv-nutrition__row[data-featured="true"] {
+    margin-bottom: 5px;
+    padding: 6px 10px;
+    border-radius: 14px;
+  }
+  .pv-nutrition__row[data-featured="true"] dd {
+    font-size: 17px;
+  }
+}
+
+/* Lage im Zutaten-Schritt. Gilt nur mit Scroll-Sequenz (nicht im flachen Aufbau). */
+html:not([data-flat]) :is(#pv-hero[data-layout="compact"], #pv-hero[data-layout="vignette"]) {
+  /* Oberkante des Docks: 64 px Dock, 12 px Luft, darunter max(16 px, Safe-Area) */
+  --pv-dock-reserve: calc(76px + max(16px, env(safe-area-inset-bottom)));
+}
+html:not([data-flat])
+  :is(#pv-hero[data-layout="compact"], #pv-hero[data-layout="vignette"])
+  .pv-facts {
+  top: var(--pv-facts-top);
+  bottom: auto;
+  /* 400 px (COMPACT_FACTS_MIN_PX), höchstens bis kurz über das Dock. Wächst der
+     Inhalt doch einmal darüber hinaus (große Schrifteinstellung), wächst die
+     Fläche mit, statt einen Scrollbalken zu zeigen. */
+  min-height: min(400px, calc(var(--pv-vh) - var(--pv-facts-top) - var(--pv-dock-reserve)));
+}
+html:not([data-flat])
+  :is(#pv-hero[data-layout="compact"], #pv-hero[data-layout="vignette"])
+  .pv-facts__scroll {
+  flex: 1 0 auto;
+  padding: 14px 16px;
+  overflow: visible;
+}
+/* Nachbardosen-PNG blenden beim Zoom aus (in der 3D-Szene weichen sie aus dem
+   Bild). Kein Verschieben über den Rand: Auf Mobil verbreitert jedes Element
+   jenseits des Rands den Layout-Viewport, auch hinter overflow-x: clip. */
+html:not([data-flat])
+  :is(#pv-hero[data-layout="compact"], #pv-hero[data-layout="vignette"])
+  .pv-can:is([data-pos="prev"], [data-pos="next"]) {
+  opacity: calc(0.9 * (1 - var(--seqz)));
+}
+
+/* Vignette (Telefon unter 700 px Höhe): Die Dose steht in einem ovalen Fenster
+   links neben Kopfzeile und Titel. Die Fläche des Panels hat dort ein Loch, durch
+   das die 3D-Dose (oder ihr PNG) auf dem Sortenverlauf zu sehen ist. Maße wie
+   VIGNETTE_* in hero-geometry.ts: Mitte 16 + 27 px von links, 14 + 27 px von
+   oben, Halbachsen 27 und 37 px. */
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-facts {
+  background: none;
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-facts::before,
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-facts::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-facts::before {
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-cream);
+  -webkit-mask: radial-gradient(ellipse 27px 37px at 43px 41px, transparent 96%, #000 100%);
+  mask: radial-gradient(ellipse 27px 37px at 43px 41px, transparent 96%, #000 100%);
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-facts::after {
+  left: 16px;
+  top: 4px;
+  width: 54px;
+  height: 74px;
+  box-sizing: border-box;
+  border: 2px solid var(--color-aubergine);
+  border-radius: 50%;
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] :is(.pv-facts__head, .pv-facts__title) {
+  padding-left: 64px;
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-badges {
+  margin-top: 6px;
+}
+/* Die Sticker gehören zur großen Dose, neben der Vignette lägen sie auf dem Text. */
+html:not([data-flat]) #pv-hero[data-layout="vignette"] :is(.pv-sticker--f1, .pv-sticker--f2) {
+  opacity: var(--pv-hero-out);
+}
+/* Pfeile wandern im Zoom klein nach oben rechts, neben dem Panel ist kein Platz. */
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-arrow {
+  top: calc(
+    (var(--pv-can-top) + var(--pv-can-h) * var(--pv-arrow-dy)) * (1 - var(--seqz)) + var(--seqz) *
+      (26px + env(safe-area-inset-top))
+  );
+  scale: calc(1 - var(--seqz) * 0.2143);
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-arrow--prev {
+  margin-left: calc((1 - var(--seqz)) * (0px - var(--pv-arrow-r0)) + var(--seqz) * (50% - 88px));
+}
+html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-arrow--next {
+  margin-left: calc((1 - var(--seqz)) * var(--pv-arrow-r0) + var(--seqz) * (50% - 38px));
 }
 
 /* --- Warenkorb-Dock (G5, Richtung A) ---------------------------------------- */
@@ -5543,3 +5726,576 @@ select.pv-acc-input {
     transition: none;
   }
 }
+
+/* Admin Shell */
+/* Backoffice-Tokens (Figma-Variablensammlung "Admin", Datei wttVzqEheGArNkqUliXd3x, Bausteine 24:1399).
+   Wirksam nur unter [data-admin]; die Utilities (bg-admin-karte, text-admin-text-2, rounded-admin-karte …)
+   lösen auf diese Variablen auf und bleiben außerhalb des Backoffice ohne Wert. */
+@theme inline {
+  --color-admin-hintergrund: var(--admin-farbe-hintergrund);
+  --color-admin-karte: var(--admin-farbe-karte);
+  --color-admin-flaeche: var(--admin-farbe-flaeche-2);
+  --color-admin-rahmen: var(--admin-farbe-rahmen);
+  --color-admin-rahmen-stark: var(--admin-farbe-rahmen-stark);
+  --color-admin-text: var(--admin-farbe-text);
+  --color-admin-text-2: var(--admin-farbe-text-sekundaer);
+  --color-admin-akzent: var(--admin-farbe-akzent);
+  --color-admin-akzent-hover: var(--admin-farbe-akzent-hover);
+  --color-admin-akzent-hell: var(--admin-farbe-akzent-hell);
+  --color-admin-auf-akzent: var(--admin-farbe-auf-akzent);
+  --color-admin-seitenleiste: var(--admin-farbe-seitenleiste);
+  --color-admin-seitenleiste-text: var(--admin-farbe-seitenleiste-text);
+  --color-admin-gruen: var(--admin-status-gruen);
+  --color-admin-gruen-hell: var(--admin-status-gruen-hell);
+  --color-admin-gelb: var(--admin-status-gelb);
+  --color-admin-gelb-text: var(--admin-status-gelb-text);
+  --color-admin-gelb-hell: var(--admin-status-gelb-hell);
+  --color-admin-blau: var(--admin-status-blau);
+  --color-admin-blau-hell: var(--admin-status-blau-hell);
+  --color-admin-rot: var(--admin-status-rot);
+  --color-admin-rot-hover: var(--admin-status-rot-hover);
+  --color-admin-rot-hell: var(--admin-status-rot-hell);
+  --color-admin-grau: var(--admin-status-grau);
+  --color-admin-grau-text: var(--admin-status-grau-text);
+  --color-admin-grau-hell: var(--admin-status-grau-hell);
+  --radius-admin-karte: var(--admin-radius-karte);
+  --radius-admin-feld: var(--admin-radius-feld);
+  --radius-admin-badge: var(--admin-radius-badge);
+  --radius-admin-dialog: var(--admin-radius-dialog);
+  --shadow-admin-karte: var(--admin-schatten-karte);
+}
+
+[data-admin] {
+  --admin-farbe-hintergrund: #f6f6f7;
+  --admin-farbe-karte: #ffffff;
+  --admin-farbe-flaeche-2: #f1f1f2;
+  --admin-farbe-rahmen: #e3e3e3;
+  --admin-farbe-rahmen-stark: #c9cccf;
+  --admin-farbe-text: #1a1a1a;
+  --admin-farbe-text-sekundaer: #616161;
+  --admin-farbe-akzent: #d9306e;
+  --admin-farbe-akzent-hover: #c22860;
+  --admin-farbe-akzent-hell: #fbe6ee;
+  --admin-farbe-auf-akzent: #ffffff;
+  --admin-farbe-seitenleiste: #4a2f39;
+  --admin-farbe-seitenleiste-text: #fbf8ee;
+  --admin-status-gruen: #1f7a4d;
+  --admin-status-gruen-hell: #e3f3ea;
+  --admin-status-gelb: #b7791f;
+  --admin-status-gelb-text: #87570f;
+  --admin-status-gelb-hell: #fbf0da;
+  --admin-status-blau: #2b6cb0;
+  --admin-status-blau-hell: #e4eef8;
+  --admin-status-rot: #c53030;
+  --admin-status-rot-hover: #a82828;
+  --admin-status-rot-hell: #fbe8e8;
+  --admin-status-grau: #6b7280;
+  --admin-status-grau-text: #4b5563;
+  --admin-status-grau-hell: #eeeff1;
+  --admin-radius-karte: 10px;
+  --admin-radius-feld: 8px;
+  --admin-radius-badge: 100px;
+  --admin-radius-dialog: 12px;
+  --admin-schatten-karte: 0 12px 32px -6px rgba(74, 46, 56, 0.12);
+
+  min-height: 100dvh;
+  background: var(--admin-farbe-hintergrund);
+  color: var(--admin-farbe-text);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+[data-admin] :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--admin-farbe-akzent);
+  outline-offset: 2px;
+  border-radius: var(--admin-radius-feld);
+}
+/* Modale Dialoge und Drawer (natives <dialog>): Abdunklung in Aubergine */
+[data-admin] dialog::backdrop {
+  background: rgba(26, 26, 26, 0.45);
+}
+/* Seitenpanel fährt von rechts ein, Navigation von links */
+@media (prefers-reduced-motion: no-preference) {
+  [data-admin] .admin-drawer[open] {
+    animation: admin-drawer-rechts 180ms ease-out;
+  }
+  [data-admin] .admin-drawer--links[open] {
+    animation: admin-drawer-links 180ms ease-out;
+  }
+  [data-admin] .admin-dialog[open] {
+    animation: admin-dialog-ein 140ms ease-out;
+  }
+}
+@keyframes admin-drawer-rechts {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@keyframes admin-drawer-links {
+  from {
+    transform: translateX(-24px);
+    opacity: 0;
+  }
+}
+@keyframes admin-dialog-ein {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+}
+/* Ende Admin Shell */
+
+/* Consent */
+/* Consent-Banner, Einstellungsdialog und /cookie-einstellungen (Figma Seite 07, 75:1822).
+   Banner fest unten über der Seite, keine Layout-Verschiebung; ausgeblendet, sobald eine
+   gültige Entscheidung vorliegt (data-consent-decided setzt ein Inline-Skript vor dem Zeichnen). */
+html[data-consent-decided] .pv-consent-banner {
+  display: none;
+}
+.pv-consent-banner {
+  position: fixed;
+  z-index: 90;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+  background: var(--color-cream);
+  color: var(--color-aubergine);
+  border: 1px solid var(--color-aubergine);
+  border-bottom: 0;
+  border-radius: 26px 26px 0 0;
+  box-shadow: 0 -8px 20px rgba(74, 46, 56, 0.22);
+}
+@media (min-width: 768px) {
+  .pv-consent-banner {
+    left: 24px;
+    right: auto;
+    bottom: 24px;
+    width: 440px;
+    padding: 24px;
+    border-bottom: 1px solid var(--color-aubergine);
+    border-radius: 26px;
+    box-shadow: 0 16px 20px rgba(74, 46, 56, 0.22);
+  }
+}
+.pv-consent-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pv-consent-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.pv-consent-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.pv-consent-inline-link,
+.pv-consent-link,
+.pv-consent-details > summary,
+.pv-consent-links a,
+.pv-consent-vendor-info a {
+  color: var(--color-plum);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.pv-consent-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+/* Beide Entscheidungen gleich groß, gleich gefärbt, gleich gewichtet (kein Dark Pattern) */
+.pv-consent-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-magenta);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+.pv-consent-btn:hover {
+  background: #c22860;
+}
+.pv-consent-btn--wide {
+  width: 100%;
+  margin-top: 10px;
+}
+.pv-consent-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font-size: 14px;
+}
+
+/* Dialog: mobil Bottom Sheet, ab Tablet zentriert */
+.pv-consent-dialog {
+  width: 100%;
+  max-width: 100%;
+  max-height: calc(100dvh - 41px);
+  margin: auto 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 26px 26px 0 0;
+  background: var(--color-cream);
+  color: var(--color-aubergine);
+  box-shadow: 0 24px 32px rgba(74, 46, 56, 0.25);
+  overscroll-behavior: contain;
+}
+.pv-consent-dialog::backdrop {
+  background: rgba(74, 47, 57, 0.55);
+}
+.pv-consent-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 16px calc(24px + env(safe-area-inset-bottom));
+}
+.pv-consent-grip {
+  align-self: center;
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--color-mauve-2);
+}
+@media (min-width: 768px) {
+  .pv-consent-dialog {
+    width: 640px;
+    max-height: calc(100dvh - 48px);
+    margin: auto;
+    border-radius: 26px;
+  }
+  .pv-consent-sheet {
+    padding: 24px 28px 28px;
+  }
+  .pv-consent-grip {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pv-consent-dialog[open] {
+    animation: pv-consent-in 180ms ease-out;
+  }
+}
+@keyframes pv-consent-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+.pv-consent-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pv-consent-dialog-head h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+@media (min-width: 768px) {
+  .pv-consent-dialog-head h2 {
+    font-size: 28px;
+  }
+}
+.pv-consent-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-cream-2);
+  color: var(--color-aubergine);
+  cursor: pointer;
+}
+.pv-consent-intro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Formular mit Kategorien (Dialog und Seite) */
+.pv-consent-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pv-consent-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid var(--color-mauve);
+  border-radius: 18px;
+}
+.pv-consent-cat--off {
+  background: var(--color-cream-2);
+  border-style: dashed;
+}
+.pv-consent-cat-head,
+.pv-consent-vendor-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pv-consent-cat-title,
+.pv-consent-vendor-title {
+  flex: 1;
+  min-width: 0;
+}
+.pv-consent-cat-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.pv-consent-cat-sub,
+.pv-consent-vendor-short {
+  margin: 2px 0 0;
+  color: var(--color-plum);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.pv-consent-cat-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.pv-consent-details > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+.pv-consent-details > summary::-webkit-details-marker {
+  display: none;
+}
+.pv-consent-details[open] > summary {
+  min-height: 36px;
+}
+.pv-consent-vendors,
+.pv-consent-cookie-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pv-consent-cookie-list li {
+  padding: 6px 0;
+  border-top: 1px solid var(--color-sand);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.pv-consent-vendor {
+  padding: 4px 0 8px;
+  border-top: 1px solid var(--color-mauve);
+}
+.pv-consent-vendor-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+.pv-consent-badge {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-butter);
+  color: var(--color-aubergine);
+  font-size: 11px;
+  font-weight: 600;
+}
+.pv-consent-vendor-info {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.pv-consent-vendor-info dt {
+  margin-top: 4px;
+  font-weight: 600;
+}
+.pv-consent-vendor-info dd {
+  margin: 0;
+}
+@media (min-width: 768px) {
+  .pv-consent-vendor-info {
+    grid-template-columns: 112px 1fr;
+    column-gap: 12px;
+  }
+  .pv-consent-vendor-info dt {
+    margin-top: 0;
+  }
+}
+.pv-consent-helper {
+  margin-top: 8px;
+}
+.pv-consent-form code,
+.pv-consent-cookie-list code {
+  font-family: inherit;
+  font-weight: 600;
+}
+
+/* Schalter 52 × 30 in einem 52 × 44 großen Touchziel; echtes Kontrollkästchen mit role="switch" */
+.pv-switch {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.pv-switch-input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.pv-switch-input:disabled {
+  cursor: not-allowed;
+}
+.pv-switch-track {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--color-mauve);
+  transition: background-color 150ms ease;
+}
+.pv-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(74, 46, 56, 0.3);
+  transition: transform 150ms ease;
+}
+.pv-switch-input:checked + .pv-switch-track {
+  background: var(--color-magenta);
+}
+.pv-switch-input:checked + .pv-switch-track::after {
+  transform: translateX(22px);
+}
+.pv-switch-input:disabled:checked + .pv-switch-track {
+  background: var(--color-pink);
+}
+.pv-switch-input:disabled:not(:checked) + .pv-switch-track {
+  background: var(--color-mauve-2);
+  opacity: 0.6;
+}
+.pv-switch-input:focus-visible + .pv-switch-track {
+  outline: 3px solid var(--color-magenta);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-switch-track,
+  .pv-switch-track::after {
+    transition: none;
+  }
+}
+.pv-consent-status:empty {
+  display: none;
+}
+.pv-consent-status,
+.pv-consent-notice {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--color-cream-3);
+  color: var(--color-aubergine);
+  font-size: 14px;
+  font-weight: 500;
+}
+.pv-consent-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 0;
+}
+.pv-consent-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+}
+
+/* Seite /cookie-einstellungen */
+.pv-consent-page-title {
+  margin: 12px 0 0;
+  color: var(--color-aubergine);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+@media (min-width: 1024px) {
+  .pv-consent-page-title {
+    font-size: 64px;
+  }
+}
+.pv-consent-page-lead {
+  margin: 16px 0 0;
+  max-width: 60ch;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.pv-consent-current {
+  margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.pv-consent-notice {
+  margin-bottom: 16px;
+}
+.pv-consent-page-foot {
+  margin: 24px 0 0;
+  color: var(--color-plum);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Footer: "Cookie-Einstellungen" klein neben dem Copyright (Figma 75:2334) */
+.pv-consent-footer-link {
+  margin-left: 16px;
+  color: var(--color-cream);
+  text-decoration: underline;
+}
+/* Ende Consent */

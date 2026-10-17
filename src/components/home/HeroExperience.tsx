@@ -85,6 +85,11 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       style.setProperty("--pv-neighbor-x", `${geometry.neighborCenterFraction * half}px`);
       style.setProperty("--pv-neighbor-scale", geometry.neighborScreenScale.toFixed(4));
 
+      // Zutatenpanel: Aufbau und Oberkante kommen aus derselben Rechnung wie die
+      // Dose, damit beide auf jeder Höhe zusammenpassen (globals.css, Block A).
+      section.dataset.layout = geometry.factsLayout;
+      style.setProperty("--pv-facts-top", `${geometry.factsTopFraction * height}px`);
+
       // Pfeile stehen immer neben der aktiven Dose, im Hero weit außen (Richtung A:
       // 76 px ab 1024 px Breite, sonst 56 px, Abstand zum Rand 4 Prozent bzw. 12 px).
       // Im Seitenlayout rücken sie im gezoomten Zustand an die Dose, damit sie
@@ -105,14 +110,21 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
 
     applyGeometry();
 
-    // Auf Mobil ändert die ein- und ausfahrende Adressleiste nur die Höhe. Erst ab
-    // 120 px neu rechnen, sonst springt das Layout beim Scrollen.
+    // Auf Mobil ändert die ein- und ausfahrende Adressleiste nur die Höhe. Die
+    // Maße folgen ihr sofort, wie die 3D-Szene, die bei jeder Größenänderung der
+    // Canvas neu rechnet: Sonst passt das Zutatenpanel mit eingeblendeter Leiste
+    // nicht mehr zwischen Dose und Dock. Die Scrollstrecke hängt nicht an diesen
+    // Maßen, ScrollTrigger rechnet deshalb erst ab 120 px neu, sonst springt die
+    // Seite beim Scrollen.
+    let refreshHeight = window.innerHeight;
     const onResize = () => {
       const widthChanged = window.innerWidth !== lastWidth;
-      const heightChanged = Math.abs(window.innerHeight - lastHeight) > 120;
-      if (!widthChanged && !heightChanged) return;
+      if (!widthChanged && window.innerHeight === lastHeight) return;
       applyGeometry();
-      ScrollTrigger.refresh();
+      if (widthChanged || Math.abs(window.innerHeight - refreshHeight) > 120) {
+        refreshHeight = window.innerHeight;
+        ScrollTrigger.refresh();
+      }
     };
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", onResize);

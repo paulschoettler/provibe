@@ -2,31 +2,49 @@
 
 import { useEffect, useState } from "react";
 
+/** Anzeigedauer einer Meldung in Millisekunden. */
+const ROTATE_MS = 5000;
+
 /**
  * Announcement-Bar mit rotierenden Meldungen (wie im alten Shop).
  *
- * Alle Meldungen stehen im Server-HTML. Ohne JavaScript ist die erste sichtbar,
- * mit JavaScript wechseln sie alle 5 Sekunden. aria-live ist bewusst aus: der Wechsel
- * ist rein dekorativ und soll Screenreader nicht unterbrechen.
+ * Alle Meldungen stehen im Server-HTML. Genau eine trägt data-active und ist
+ * sichtbar, alle anderen sind per CSS `visibility: hidden` und `aria-hidden`.
+ * Ohne JavaScript bleibt es bei der ersten. Mit JavaScript wechseln sie alle
+ * 5 Sekunden per kurzem Crossfade (globals.css, Block B): Die alte Meldung ist
+ * nach 240 ms weg, die neue beginnt erst nach 120 ms, beide zusammen also nie
+ * länger als 120 ms und nie beide voll deckend.
+ *
+ * aria-live ist bewusst aus: der Wechsel ist rein dekorativ und soll
+ * Screenreader nicht unterbrechen. In einem Hintergrund-Tab ruht die Rotation.
  */
 export function AnnouncementBar({ messages }: { messages: string[] }) {
   const [index, setIndex] = useState(0);
+  const count = messages.length;
 
   useEffect(() => {
-    if (messages.length < 2) return;
+    if (count < 2) return;
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % messages.length);
-    }, 5000);
+      if (document.visibilityState === "hidden") return;
+      setIndex((current) => (current + 1) % count);
+    }, ROTATE_MS);
     return () => window.clearInterval(timer);
-  }, [messages.length]);
+  }, [count]);
 
-  if (messages.length === 0) return null;
+  if (count === 0) return null;
+  // Schrumpft die Liste zwischen zwei Renderings, bleibt trotzdem genau eine aktiv.
+  const active = index < count ? index : 0;
 
   return (
     <div className="pv-announce" aria-live="off">
       <div className="pv-announce-track">
         {messages.map((message, i) => (
-          <p key={message} className="pv-announce-item" data-active={i === index ? "" : undefined}>
+          <p
+            key={`${i}:${message}`}
+            className="pv-announce-item"
+            data-active={i === active ? "" : undefined}
+            aria-hidden={i === active ? undefined : true}
+          >
             {message}
           </p>
         ))}
