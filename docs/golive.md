@@ -10,6 +10,7 @@ Stand: 17.10.2026. Wird bis zum Go-live gepflegt. Punkte mit **Auftraggeber** br
 - **Auftraggeber: Lexware Office** (Rechnungen) und **DHL** (Labels): Zugänge erst anlegen, wenn die Module stehen; bis dahin Mock und Entwürfe.
 - Netlify: Repo wieder auf privat stellen, sobald die Git-Autor-Frage gelöst ist (Celines GitHub oder eigener Netlify-Account). Deploy Previews ohne Secrets.
 - Rechtstexte: Gegenüberstellung alt gegen neu in `docs/rechtstexte-aenderungen.md` freigeben (Shopify-Passagen ersetzt, Bestellablauf, Zahlarten, Abo-Bedingungen).
+- **Auftraggeber: Shopify-Exporte** (docs/import.md): Kunden, Bestellungen, Rabattcodes; für den Newsletter zusätzlich eine Quelle mit Einwilligungszeitpunkt (Shopify-Admin-Token nur mit read_customers oder Matrixify-Export), sonst wird niemand versandfähig (D3). Vorab ein Testexport mit wenigen Zeilen (C9). Bitte sagen, ob es Zeiträume ohne 0,25 € Pfand im Preis gab.
 - Lieferungen aus Phase 1: Gewichte je Variante (für DHL), EANs, Etikett-Texte (LMIV-Abgleich), LUCID-Nummer fürs Impressum, Shopify-Exporte (Kunden, Bestellungen, Rabattcodes, Newsletter) für den Import.
 
 ## Technische Prüfungen vor dem DNS-Umzug
