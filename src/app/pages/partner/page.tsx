@@ -208,7 +208,7 @@ export default async function PartnerPage() {
       {/* Anfrage mit Formular */}
       <section
         id="anfrage"
-        className="pv-container pv-before-footer relative grid scroll-mt-28 gap-6 overflow-x-clip pt-6 lg:grid-cols-[1fr_1.45fr] lg:gap-16 lg:pt-12"
+        className="pv-container pv-before-footer relative grid scroll-mt-28 gap-6 pt-6 lg:grid-cols-[1fr_1.45fr] lg:gap-16 lg:pt-12"
         aria-labelledby="anfrage-titel"
       >
         <Blob

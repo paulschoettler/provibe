@@ -152,7 +152,9 @@ html.lenis body {
   z-index: 1;
 }
 .pv-wave--top {
-  bottom: 100%;
+  /* 1 px in die eigene Sektion hinein, sonst bleibt durch Rundung eine helle Linie
+     zwischen Welle und Fläche (gleiche Füllfarbe, deshalb unsichtbar) */
+  bottom: calc(100% - 1px);
 }
 .pv-wave--bottom {
   top: 100%;
