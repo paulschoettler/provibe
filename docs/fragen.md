@@ -182,3 +182,9 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **H9. Fehlerfarbe.** Die Marke hat kein Rot. Fehler zeigen wir mit Magenta-Rahmen, Berry-Text und Icon. Annahme: so lassen, kein Signalrot.
 
 **H10. Checkout-Texte.** Eigene Formulierungen wie "Wohin geht dein Vibe?", "Wie willst du zahlen?", "Schön, dass du da bist.", "Wir packen schon …" sind Vorschläge; bitte beim Abnahmedurchgang gegenlesen. Zustellfenster wird aus Bestelldatum plus 3 bis 5 Werktage dynamisch berechnet.
+
+**H11. Hauptpreis in Produktkarten.** Verkauft werden nur Packs ab 9 Dosen. Entscheidung (konservativ nach Preisangabenverordnung): Hauptpreis ist der Packpreis "ab 26,10 €" mit "9 Dosen", darunter "2,65 € je Dose · zzgl. 0,25 € Pfand je Dose · 8,03 €/l". Der alte Shop zeigte nur 2,65 €; wenn du das zurück willst, bitte mit deinem Anwalt klären.
+
+**H12. Einzelpreis Founder Bundle III.** Aus den Komponentenpreisen ergibt sich 67,20 € (6 × 2,90 € + 19,90 € + 29,90 €), Shopify zeigte 63,90 €. Entscheidung: Wert aus der Datenbank berechnen, keine Handzahl.
+
+**H13. Shirt-Größen und Produktfotos.** Im Shopify-Snapshot gibt es für das Shirt nur S, M und L; XL wird nicht angeboten. Für Shirt, Cup und weitere Galeriebilder fehlen Fotos, bis dahin Platzhalterkarten. Lagerhinweis (LMIV) fehlt in den Daten: Annahme "Kühl und trocken lagern, vor Sonnenlicht schützen, gekühlt servieren" bis zur Freigabe.
