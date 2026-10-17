@@ -51,6 +51,13 @@ const RING_EASE = "power3.inOut";
  * falls der Schriftzug beim ersten Blick nicht mittig sitzt.
  */
 const CAN_BASE_ROTATION_Y = (120 * Math.PI) / 180;
+/**
+ * Oberfläche der Dosen: matt statt glänzend. Die Werte wirken auf alle Sorten
+ * gleich, weil sie dieselbe Metal/Roughness-Textur teilen (siehe normalizeCan).
+ * Stellschrauben für die Abnahme.
+ */
+const CAN_ROUGHNESS_SCALE = 3.8;
+const CAN_ENV_INTENSITY = 0.7;
 
 /** Lineare Mischung, damit wir nicht für jede Zeile THREE.MathUtils bemühen. */
 function mix(from: number, to: number, t: number): number {
@@ -107,9 +114,15 @@ function normalizeCan(source: THREE.Object3D): THREE.Group {
       standard.side = THREE.FrontSide;
       standard.needsUpdate = true;
       if (typeof standard.roughness === "number") {
-        // Die Quelle liefert roughnessFactor 1.7, außerhalb der glTF-Spanne.
-        standard.roughness = Math.min(1, standard.roughness);
-        standard.envMapIntensity = 0.85;
+        // Mattes Finish (Feedback vom 17.10.2026). Die Metal/Roughness-Textur
+        // der Quelle liefert Metalness 1 und Roughness um 0,17, also glänzendes
+        // Aluminium. three multipliziert den Faktor mit dem Texturwert und
+        // begrenzt erst das Ergebnis auf 1, deshalb hebt der Faktor die Spanne
+        // der Textur auf etwa 0,5 bis 0,75 und erhält dabei ihre leichte
+        // Fleckigkeit. Metalness bleibt bei 1, damit Deckel und Falz weiter
+        // wie Aluminium lesen, nur ohne harte Spiegelung.
+        standard.roughness = CAN_ROUGHNESS_SCALE;
+        standard.envMapIntensity = CAN_ENV_INTENSITY;
       }
       return standard;
     });

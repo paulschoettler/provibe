@@ -144,6 +144,8 @@ Abweichungen vom Plan, jeweils mit Grund:
 - Im 3D-Modus ist `#pvlogo` durchsichtig, damit die Canvas mit den einfliegenden Dosen dahinter sichtbar ist; die PNG-Dosen sind der Fallback.
 - Der Warenkorbstand kommt nach dem Mounten per Server Action, damit das Root-Layout und die Startseite statisch bleiben (`revalidate = 3600`).
 
+Nachbesserung vom 17.10.2026, mattes Finish: Die Metal/Roughness-Textur der GLB-Modelle beschreibt glänzendes Aluminium (Metalness 1, Rauheit um 0,17). `CanScene.tsx` hebt die Rauheit jetzt über den Faktor `CAN_ROUGHNESS_SCALE` (3,8) auf etwa 0,5 bis 0,75 und senkt die Umgebungsspiegelung auf 0,7 (`CAN_ENV_INTENSITY`). Die Fleckigkeit der Textur bleibt erhalten, Metalness bleibt bei 1, damit Deckel und Falz weiter wie Metall wirken, nur ohne harte Spiegelung. Die Modelle selbst sind unverändert. Geprüft im Headless-Chromium mit derselben Licht- und Umgebungsaufstellung wie in der Szene.
+
 Robustheit gegen Browser-Erweiterungen: Schreibt eine Erweiterung vor der Hydration ins DOM, rendert React die Seite client-seitig neu und setzt dabei die Attribute von `<html>` aus seinem eigenen Bild. Zustands-Flags liegen deshalb als data-Attribute (`data-js`, `data-tier`, `data-flat`, `data-lenis`, `data-scrolled`), nie als Klassen; das Inline-Skript in `layout.tsx` hält `data-js` per MutationObserver fest, `HomeMotion` setzt es im Effekt erneut. Ein Playwright-Test mit simulierter Erweiterung ist Teil der Abnahme.
 
 Geprüft am Produktions-Build (`pnpm build`, `pnpm start`):
