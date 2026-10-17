@@ -74,10 +74,11 @@ const CAN_UV_LID_SPLIT = 0.565;
  * Material: three überschreibt material.envMapIntensity mit
  * scene.environmentIntensity, sobald die Umgebung über scene.environment kommt.
  * Zusammen mit den Lichtern in Scene so abgestimmt, dass eine freie
- * Etikettfläche im Bild die Farbe der Textur trifft (gemessen am Wildberry-Rot,
- * Headless-Chromium mit ACES wie in der Canvas).
+ * Etikettfläche im Bild knapp unter der Farbe der Textur liegt (gemessen am
+ * Wildberry-Rot, Headless-Chromium mit ACES wie in der Canvas; Abgleich 3 vom
+ * 17.10.2026: der Auftraggeber wollte es dunkler).
  */
-const CAN_ENV_INTENSITY = 0.4;
+const CAN_ENV_INTENSITY = 0.28;
 
 /**
  * Eine 1 × 256 Pixel große Metal/Roughness-Textur, die die der Modelle ersetzt:
@@ -514,10 +515,10 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     <>
       <LocalEnvironment />
       {/* Lichter auf das matte Material abgestimmt, siehe CAN_ENV_INTENSITY. */}
-      <ambientLight intensity={0.2} />
-      <directionalLight position={[3.2, 4.5, 5]} intensity={0.95} />
-      <directionalLight position={[-4, 2.2, -3.5]} intensity={0.4} color="#ffe9f2" />
-      <directionalLight position={[0, -3, 3]} intensity={0.18} />
+      <ambientLight intensity={0.14} />
+      <directionalLight position={[3.2, 4.5, 5]} intensity={0.66} />
+      <directionalLight position={[-4, 2.2, -3.5]} intensity={0.28} color="#ffe9f2" />
+      <directionalLight position={[0, -3, 3]} intensity={0.12} />
 
       <group ref={ringRef}>
         {flavors.map((flavor, index) => (
