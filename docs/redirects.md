@@ -1,6 +1,6 @@
 # Redirects: alte Shopify-Pfade auf den neuen Shop
 
-Stand: 17.10.2026. Grundlage: URL-Inventar in `docs/analyse.md` (Abschnitt 2), `docs/seitenplan.md`, Fragen F2 und F12 in `docs/fragen.md`. Ziel laut Briefing Abschnitt 3: Kein alter Pfad endet in einer 404. Alle Weiterleitungen sind dauerhaft (301) und stehen in `netlify.toml`. Die Tabelle `redirects` in Supabase ist für später im Backoffice gepflegte Weiterleitungen vorbereitet.
+Stand: 17.10.2026. Grundlage: URL-Inventar in `docs/analyse.md` (Abschnitt 2), `docs/seitenplan.md`, Fragen F2 und F12 in `docs/fragen.md`. Ziel laut Briefing Abschnitt 3: Kein alter Pfad endet in einer 404. Alle Weiterleitungen sind dauerhaft (301) und stehen in `netlify.toml`. Im Backoffice gepflegte Weiterleitungen stehen in der Tabelle `redirects` (Abschnitt 4).
 
 ## 1. Pfade, die unverändert bleiben (keine Weiterleitung)
 
@@ -149,7 +149,13 @@ Ob `/account/konto-aktivieren` das richtige Ziel für Aktivierungslinks ist, ent
 
 Passend dazu sperrt `src/app/robots.ts` im Live-Zustand noch `/konto` statt `/account` (Vorschlag: `"/konto"` durch `"/account"` ersetzen).
 
-## 4. Prüfung vor dem Go-live
+## 4. Pflege im Backoffice
+
+Die bekannten Shopify-Pfade aus Abschnitt 2 stehen fest in `netlify.toml`. Neue Weiterleitungen (zum Beispiel nach dem Umbenennen einer Seite, eines Produkts oder einer Kollektion, die das Backoffice automatisch anlegt) kommen in die Tabelle `redirects` und werden vom Proxy (`src/proxy.ts` mit `src/lib/redirects/proxy.ts`) vor dem Routing ausgewertet, mit dem Statuscode aus der Tabelle und erhaltener Query. Änderungen greifen nach spätestens fünf Minuten, weil jede Server-Instanz die aktiven Zeilen so lange im Speicher hält.
+
+Warum Proxy statt Catch-all-Seite: Ein `notFound()` aus einer Seite liefert in Next 16.3 einen leeren `<body>` (die 404 entsteht erst im Browser), unbekannte Pfade ohne Catch-all bekommen dagegen die vollständige 404 aus dem Build. Der Proxy leitet nur Treffer weiter und lässt alles andere unverändert ins Routing.
+
+## 5. Prüfung vor dem Go-live
 
 1. Jede Zeile aus Abschnitt 2 per `curl -sI https://<netlify-domain><alter-pfad>` prüfen: Status 301, `location` wie in der Tabelle.
 2. Jede Zeile aus Abschnitt 1 liefert 200.

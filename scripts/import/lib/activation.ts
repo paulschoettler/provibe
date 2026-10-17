@@ -1,14 +1,17 @@
 /**
  * Aktivierungsmails für importierte Shopify-Kunden (docs/konto-und-abo-plan.md Teil A).
- * Versand über src/lib/auth/mails.ts (Vorlage account_activate) und integrations().email.
+ * Versand über src/lib/auth/mails.ts (Vorlage account_activate_bulk, "Konto aktivieren
+ * (Massenversand)") und integrations().email.
  *
  * Schutz bis zum Go-live: nur Empfänger auf der Allowlist (EMAIL_ALLOWLIST, Antwort F7). Der
  * Mail-Provider prüft die Allowlist nicht selbst, deshalb passiert es hier vor jedem Versand.
  * Versandrate pro Minute begrenzt (--rate, Standard 20).
  *
- * Link: Mit APP_INTEGRATIONS=live und Remote-Datenbank wie im Backoffice per
- * auth.admin.generateLink (Magic Link über /auth/callback). Lokal oder im Mock-Modus zeigt der
- * Link auf /account/konto-aktivieren, dort fordert die Person einen frischen Link an.
+ * Link: immer /account/konto-aktivieren?email=… (Feld vorbelegt), dort fordert die Person per
+ * Klick einen frischen Magic Link an. Früher erzeugte das Skript mit APP_INTEGRATIONS=live direkt
+ * einen Magic Link; der galt nur 15 Minuten und war bei einer Massenmail meist abgelaufen, bevor
+ * jemand die Mail öffnete. Die Einzelvorlage mit Magic Link (sendActivationMail) bleibt für die
+ * Anforderung auf der Seite und das Backoffice.
  */
 import { isEmailAllowlisted, type AllowlistEnv } from "@/lib/env/allowlist";
 import type { Db } from "./db";
@@ -24,8 +27,6 @@ export interface ActivationCandidate {
 export interface ActivationOptions {
   ratePerMinute: number;
   resend: boolean;
-  /** false bei lokaler DB: dann nie generateLink gegen die Live-Auth */
-  remoteTarget: boolean;
   limit: number | null;
 }
 
@@ -34,7 +35,8 @@ export interface ActivationOutcome {
   blockedAllowlist: number;
   alreadySent: number;
   failed: { email: string; reason: string }[];
-  linkMode: "magiclink" | "page";
+  /** Ziel der Links, zum Beispiel https://www.provibe-drinks.de/account/konto-aktivieren */
+  activationPage: string;
   /** Versandzeitpunkt (UTC) je Kunden-ID */
   sentAt: Map<string, string>;
 }
@@ -58,34 +60,18 @@ export async function sendActivationMails(
   env: Record<string, string | undefined> = process.env,
 ): Promise<ActivationOutcome> {
   const allow = allowlistEnv(env);
-  const linkMode = allow.APP_INTEGRATIONS === "live" && opts.remoteTarget ? "magiclink" : "page";
+  const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const outcome: ActivationOutcome = {
     sent: 0,
     blockedAllowlist: 0,
     alreadySent: 0,
     failed: [],
-    linkMode,
+    activationPage: `${siteUrl}/account/konto-aktivieren`,
     sentAt: new Map(),
   };
 
   // Erst hier laden: mails.ts ist server-only (Aufruf mit --conditions=react-server, siehe package.json)
-  const { sendActivationMail } = await import("@/lib/auth/mails");
-  const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
-  const buildLink = async (email: string): Promise<string> => {
-    if (linkMode === "page") {
-      return `${siteUrl}/account/konto-aktivieren?email=${encodeURIComponent(email)}`;
-    }
-    const { supabaseAdmin } = await import("@/lib/supabase/admin");
-    const next = "/account";
-    const { data, error } = await supabaseAdmin().auth.admin.generateLink({
-      type: "magiclink",
-      email,
-      options: { redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}` },
-    });
-    const hashed = data?.properties?.hashed_token;
-    if (error || !hashed) throw new Error(`Link nicht erzeugt: ${error?.message ?? "ohne Token"}`);
-    return `${siteUrl}/auth/callback?token_hash=${encodeURIComponent(hashed)}&type=magiclink&next=${encodeURIComponent(next)}`;
-  };
+  const { sendBulkActivationMail } = await import("@/lib/auth/mails");
 
   const delayMs = Math.ceil(60_000 / Math.max(1, opts.ratePerMinute));
   let attempts = 0;
@@ -102,7 +88,7 @@ export async function sendActivationMails(
     if (attempts > 0) await sleep(delayMs);
     attempts++;
     try {
-      const result = await sendActivationMail(c.email, await buildLink(c.email), c.firstName);
+      const result = await sendBulkActivationMail(c.email, c.firstName, { siteUrl });
       if (result.status !== "sent") throw new Error(`Versandstatus ${result.status}`);
       const sentAt = new Date().toISOString();
       await db.query(`update public.customers set activation_email_sent_at = $2 where id = $1`, [
@@ -116,7 +102,7 @@ export async function sendActivationMails(
           c.customerId,
           JSON.stringify({
             source: "import_shopify",
-            link_mode: linkMode,
+            template: "account_activate_bulk",
             message_id: result.providerMessageId,
           }),
         ],

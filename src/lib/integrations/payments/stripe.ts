@@ -1,12 +1,20 @@
 import Stripe from "stripe";
 import type {
   CreatePaymentIntentInput,
+  CreateSetupIntentInput,
+  OffSessionPaymentInput,
+  OffSessionPaymentResult,
   PaymentIntentRef,
   PaymentProvider,
   RefundInput,
   RefundRef,
+  SavedPaymentMethod,
+  SetupIntentRef,
   VerifiedWebhookEvent,
 } from "./types";
+
+/** Zahlarten im Abo (H25): Karte (inklusive Apple Pay und Google Pay) und PayPal, kein Klarna. */
+const SUBSCRIPTION_METHOD_TYPES = ["card", "paypal"];
 
 /** Stripe-Implementierung. Nur serverseitig instanziieren (Secret Key). */
 export class StripePaymentProvider implements PaymentProvider {
@@ -25,7 +33,9 @@ export class StripePaymentProvider implements PaymentProvider {
       {
         amount: input.amountCents,
         currency: input.currency,
-        automatic_payment_methods: { enabled: true },
+        ...(input.paymentMethodTypes && input.paymentMethodTypes.length > 0
+          ? { payment_method_types: input.paymentMethodTypes }
+          : { automatic_payment_methods: { enabled: true } }),
         receipt_email: input.email,
         customer: input.providerCustomerId ?? undefined,
         description: input.description,
@@ -104,6 +114,133 @@ export class StripePaymentProvider implements PaymentProvider {
     });
     return { id: created.id };
   }
+
+  async createSetupIntent(input: CreateSetupIntentInput): Promise<SetupIntentRef> {
+    const si = await this.stripe.setupIntents.create(
+      {
+        customer: input.providerCustomerId,
+        usage: "off_session",
+        payment_method_types: input.paymentMethodTypes ?? SUBSCRIPTION_METHOD_TYPES,
+        metadata: input.metadata,
+      },
+      { idempotencyKey: input.idempotencyKey },
+    );
+    return toSetupRef(si);
+  }
+
+  async retrieveSetupIntent(id: string): Promise<SetupIntentRef> {
+    return toSetupRef(await this.stripe.setupIntents.retrieve(id));
+  }
+
+  async retrievePaymentMethod(id: string): Promise<SavedPaymentMethod> {
+    const pm = await this.stripe.paymentMethods.retrieve(id);
+    const card = pm.card;
+    return {
+      id: pm.id,
+      type: pm.type,
+      brand: card
+        ? cardBrandLabel(card.brand, card.wallet?.type ?? null)
+        : pm.type === "paypal"
+          ? "PayPal"
+          : null,
+      last4: card?.last4 ?? null,
+      expMonth: card?.exp_month ?? null,
+      expYear: card?.exp_year ?? null,
+    };
+  }
+
+  async detachPaymentMethod(id: string): Promise<void> {
+    await this.stripe.paymentMethods.detach(id);
+  }
+
+  /**
+   * Abbuchung im Abo-Lauf. Stripe wirft bei Ablehnung einen StripeCardError; bei
+   * authentication_required liegt der PaymentIntent mit client_secret im Fehler, der Kunde
+   * bestätigt dann im Portal (stripe.confirmCardPayment beziehungsweise handleNextAction).
+   */
+  async chargeOffSession(input: OffSessionPaymentInput): Promise<OffSessionPaymentResult> {
+    try {
+      const pi = await this.stripe.paymentIntents.create(
+        {
+          amount: input.amountCents,
+          currency: input.currency,
+          customer: input.providerCustomerId,
+          payment_method: input.paymentMethodId,
+          off_session: true,
+          confirm: true,
+          description: input.description,
+          metadata: input.metadata,
+        },
+        { idempotencyKey: input.idempotencyKey },
+      );
+      if (pi.status === "succeeded" || pi.status === "processing") {
+        return {
+          status: "succeeded",
+          intentId: pi.id,
+          amountCents: pi.amount,
+          paymentMethodType: pi.payment_method_types?.[0] ?? "card",
+        };
+      }
+      if (pi.status === "requires_action") {
+        return { status: "requires_action", intentId: pi.id, clientSecret: pi.client_secret ?? "" };
+      }
+      return {
+        status: "declined",
+        intentId: pi.id,
+        code: pi.last_payment_error?.code ?? pi.status,
+        message: pi.last_payment_error?.message ?? "Zahlung nicht abgeschlossen",
+      };
+    } catch (error) {
+      if (error instanceof Stripe.errors.StripeError) {
+        const raw = error.raw as { payment_intent?: Stripe.PaymentIntent } | undefined;
+        const pi = raw?.payment_intent;
+        if (error.code === "authentication_required" && pi) {
+          return {
+            status: "requires_action",
+            intentId: pi.id,
+            clientSecret: pi.client_secret ?? "",
+          };
+        }
+        if (error.type === "StripeCardError") {
+          return {
+            status: "declined",
+            intentId: pi?.id ?? null,
+            code: error.decline_code ?? error.code ?? "card_declined",
+            message: error.message,
+          };
+        }
+      }
+      throw error;
+    }
+  }
+}
+
+function cardBrandLabel(brand: string, wallet: string | null): string {
+  const names: Record<string, string> = {
+    visa: "Visa",
+    mastercard: "Mastercard",
+    amex: "American Express",
+    maestro: "Maestro",
+    discover: "Discover",
+    unionpay: "UnionPay",
+    jcb: "JCB",
+    diners: "Diners Club",
+  };
+  const label = names[brand] ?? "Karte";
+  if (wallet === "apple_pay") return `Apple Pay (${label})`;
+  if (wallet === "google_pay") return `Google Pay (${label})`;
+  return label;
+}
+
+function toSetupRef(si: Stripe.SetupIntent): SetupIntentRef {
+  return {
+    id: si.id,
+    clientSecret: si.client_secret ?? "",
+    status: si.status,
+    paymentMethodId:
+      typeof si.payment_method === "string" ? si.payment_method : (si.payment_method?.id ?? null),
+    metadata: si.metadata ?? {},
+  };
 }
 
 function toRef(pi: Stripe.PaymentIntent): PaymentIntentRef {

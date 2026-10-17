@@ -27,6 +27,7 @@ export function PaymentForm({
   intro,
   summary,
   serverError,
+  subscription = null,
 }: {
   mode: "mock" | "live";
   publishableKey: string;
@@ -36,7 +37,13 @@ export function PaymentForm({
   intro: React.ReactNode;
   summary: React.ReactNode;
   serverError?: { title: string; text: string } | null;
+  /**
+   * Abo-Positionen im Warenkorb (Paket Abo): Pflichtangaben-Block vor dem Button, Button
+   * "Zahlungspflichtig abonnieren", kein Klarna (Zahlungsmittel wird gespeichert, H25).
+   */
+  subscription?: { termsBlock: React.ReactNode } | null;
 }) {
+  const methods = subscription ? PAYMENT_METHODS.filter((m) => m.id !== "klarna") : PAYMENT_METHODS;
   const [mockState, mockAction, mockPending] = useActionState(placeOrderAction, INITIAL_FORM_STATE);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [livePending, startLive] = useTransition();
@@ -129,7 +136,7 @@ export function PaymentForm({
               </noscript>
             </div>
           ) : (
-            PAYMENT_METHODS.map((m) => (
+            methods.map((m) => (
               <div key={m.id} className="co-paycard">
                 <label className="co-choice co-choice--pay">
                   <input
@@ -191,10 +198,24 @@ export function PaymentForm({
           {errors.paymentMethod ? (
             <p className="text-berry text-[13px] font-semibold">{errors.paymentMethod}</p>
           ) : null}
-          <p className="flex items-center gap-2 text-[13px] leading-[1.4]">
-            <LockIcon className="h-4 w-4" />
-            Zahlungsdaten gehen verschlüsselt direkt an Stripe, nicht an uns.
-          </p>
+          {subscription ? (
+            <>
+              <p className="bg-cream-2 rounded-[12px] px-3 py-2 text-[13px] leading-[1.45]">
+                Klarna geht beim Abo nicht, weil wir dein Zahlungsmittel für künftige Lieferungen
+                speichern.
+              </p>
+              <p className="flex items-start gap-2 text-[13px] leading-[1.4]">
+                <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
+                Dein Zahlungsmittel wird für künftige Lieferungen gespeichert (verschlüsselt bei
+                Stripe) und erst am jeweiligen Liefertag belastet.
+              </p>
+            </>
+          ) : (
+            <p className="flex items-center gap-2 text-[13px] leading-[1.4]">
+              <LockIcon className="h-4 w-4" />
+              Zahlungsdaten gehen verschlüsselt direkt an Stripe, nicht an uns.
+            </p>
+          )}
         </fieldset>
 
         <BackLink className="hidden lg:flex" />
@@ -202,15 +223,19 @@ export function PaymentForm({
 
       <aside className="lg:bg-cream-2 flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start lg:rounded-[22px] lg:p-5 lg:shadow-[0_24px_50px_rgba(74,47,57,0.14)]">
         <div className="bg-cream-2 rounded-[22px] p-4 lg:bg-transparent lg:p-0">{summary}</div>
+        {subscription?.termsBlock}
         <p className="text-[14px] leading-[1.5]">
-          Mit deiner Bestellung akzeptierst du unsere{" "}
+          {subscription
+            ? "Mit deinem Abo akzeptierst du unsere "
+            : "Mit deiner Bestellung akzeptierst du unsere "}
           <Link
             href={LEGAL_LINKS.agb as Route}
             className="text-plum font-semibold underline underline-offset-2"
           >
             AGB
           </Link>
-          . Informationen zum Widerrufsrecht findest du{" "}
+          {subscription ? " inklusive der Abo-Bedingungen" : ""}. Informationen zum Widerrufsrecht
+          findest du{" "}
           <Link
             href={LEGAL_LINKS.widerruf as Route}
             className="text-plum font-semibold underline underline-offset-2"
@@ -226,11 +251,17 @@ export function PaymentForm({
           defaultChecked={values.newsletter === "on"}
         />
         <button type="submit" disabled={pending} className="btn-primary h-14 w-full">
-          {pending ? "Zahlung läuft …" : "Zahlungspflichtig bestellen"}
+          {pending
+            ? "Zahlung läuft …"
+            : subscription
+              ? "Zahlungspflichtig abonnieren"
+              : "Zahlungspflichtig bestellen"}
         </button>
         <p className="hidden items-center justify-center gap-2 text-[12px] lg:flex">
           <LockIcon className="h-3.5 w-3.5" />
-          Sicher bezahlen mit Karte, Apple Pay, Google Pay, PayPal oder Klarna
+          {subscription
+            ? "Sicher bezahlen mit Karte, Apple Pay, Google Pay oder PayPal"
+            : "Sicher bezahlen mit Karte, Apple Pay, Google Pay, PayPal oder Klarna"}
         </p>
         <BackLink className="flex justify-center lg:hidden" />
       </aside>

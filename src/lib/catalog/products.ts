@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { publicEnv } from "@/lib/env/public";
 import { calculateBasePrice, formatBasePrice, type UnitMeasure } from "@/lib/pricing";
 import type { Database, Json } from "@/lib/supabase/database.types";
+import { automaticCollectionPositions, matchesCollectionRules } from "./collection-rules";
 
 /**
  * Datenzugriff für Shop-Übersicht, Kollektionen, Produktseiten und Suche (Paket Katalog).
@@ -959,8 +960,38 @@ function productsOfCollection(
   c: CollectionRow,
 ): { ids: string[]; positions: Map<string, number> | undefined } {
   if (c.kind === "automatic") {
-    // Regeln der automatischen Kollektion "all": status = active (RLS liefert ohnehin nur aktive)
-    return { ids: raw.products.map((p) => p.id), positions: undefined };
+    // Regeln aus collections.rules (Backoffice-Format, siehe collection-rules.ts) gegen die
+    // aktiven Produkte; raw.variants enthält nur aktive Varianten. Seed "all": status = active.
+    const matched = raw.products.filter((p) =>
+      matchesCollectionRules(
+        {
+          handle: p.handle,
+          title: raw.translations.get(p.id)?.title ?? p.handle,
+          tags: p.tags,
+          product_type: p.product_type,
+          vendor: p.vendor,
+          status: p.status,
+          kind: p.kind,
+          is_food: p.is_food,
+        },
+        c.rules,
+        raw.variants.get(p.id) ?? [],
+        { collectionKey: c.handle },
+      ),
+    );
+    const positions = automaticCollectionPositions(
+      matched.map((p) => {
+        const prices = (raw.variants.get(p.id) ?? []).map((v) => v.price_cents);
+        return {
+          handle: p.handle,
+          title: raw.translations.get(p.id)?.title ?? p.handle,
+          priceCents: prices.length ? Math.min(...prices) : null,
+          createdAt: p.created_at,
+        };
+      }),
+      c.sort_key,
+    );
+    return { ids: matched.map((p) => p.id), positions };
   }
   const rows = raw.collectionProducts.get(c.id) ?? [];
   const byId = new Map(raw.products.map((p) => [p.id, p.handle]));

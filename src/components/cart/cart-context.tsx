@@ -15,8 +15,12 @@ export interface CartContextValue {
   close: () => void;
   /** Eine Server Action läuft gerade */
   pending: boolean;
-  /** Legt eine Variante in den Warenkorb und öffnet den Drawer bei Erfolg */
-  addLine: (variantId: string, quantity?: number) => Promise<CartActionResult>;
+  /** Legt eine Variante in den Warenkorb und öffnet den Drawer bei Erfolg (optional als Abo) */
+  addLine: (
+    variantId: string,
+    quantity?: number,
+    options?: { subscriptionIntervalWeeks?: number | null },
+  ) => Promise<CartActionResult>;
   updateLine: (lineId: string, quantity: number) => Promise<CartActionResult>;
   removeLine: (lineId: string) => Promise<CartActionResult>;
 }

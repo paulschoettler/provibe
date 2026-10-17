@@ -6,6 +6,7 @@ import {
   type ShippingRateRule,
   type UnitMeasure,
 } from "@/lib/pricing";
+import { subscriptionUnitPriceCents } from "@/lib/pricing/subscription";
 import type { CartLineView, CartView } from "./types";
 import { EMPTY_CART } from "./types";
 
@@ -40,6 +41,8 @@ export interface CartRawLine {
   weightGrams: number;
   imageUrl: string | null;
   productUrl: string;
+  /** Abo-Position: Intervall und Abo-Rabatt (Basispunkte, nur auf den Warenwert) */
+  subscription?: { intervalWeeks: number; discountBp: number } | null;
 }
 
 export interface BuildCartViewInput {
@@ -69,11 +72,14 @@ export function buildCartView(input: BuildCartViewInput): CartView {
 
   const priced: PricedLine[] = input.lines.map((l) => {
     const unitDepositCents = depositPerItemCents(l);
+    const listUnitPriceCents = l.priceCents - unitDepositCents;
     return {
       variantId: l.variantId,
       productId: l.productId,
       quantity: l.quantity,
-      unitPriceCents: l.priceCents - unitDepositCents,
+      unitPriceCents: l.subscription
+        ? subscriptionUnitPriceCents(listUnitPriceCents, l.subscription.discountBp)
+        : listUnitPriceCents,
       unitDepositCents,
       taxRateBp: l.taxRateBp,
       weightGrams: l.weightGrams,
@@ -93,7 +99,8 @@ export function buildCartView(input: BuildCartViewInput): CartView {
     // Wenn das Pfand defensiv auf 0 begrenzt wurde, rechnet auch der Grundpreis ohne Pfand.
     const effectiveDepositPerUnit = priceLine.unitDepositCents === 0 ? 0 : l.depositCentsPerUnit;
     const basePrice = calculateBasePrice({
-      priceCents: l.priceCents,
+      // tatsächlicher Preis (beim Abo nach Rabatt) plus Pfand; der Grundpreis rechnet das Pfand heraus
+      priceCents: priceLine.unitPriceCents + effectiveDepositPerUnit * l.unitCount,
       depositCentsPerUnit: effectiveDepositPerUnit,
       unitCount: l.unitCount,
       netContentPerUnit: l.netContentPerUnit,
@@ -115,6 +122,15 @@ export function buildCartView(input: BuildCartViewInput): CartView {
       imageUrl: l.imageUrl,
       productUrl: l.productUrl,
       basePriceText: formatBasePrice(basePrice),
+      ...(l.subscription
+        ? {
+            subscription: {
+              intervalWeeks: l.subscription.intervalWeeks,
+              discountBp: l.subscription.discountBp,
+              listUnitPriceCents: l.priceCents - priceLine.unitDepositCents,
+            },
+          }
+        : {}),
     };
   });
 

@@ -6299,3 +6299,419 @@ html[data-consent-decided] .pv-consent-banner {
   text-decoration: underline;
 }
 /* Ende Consent */
+
+/* Abo */
+/* Paket Abo: Kaufart in der Kaufbox, Abo-Kennzeichen im Warenkorb, Abo-Block im Checkout,
+   Portal /account/abo mit Dialogen, Kündigung ohne Login. Figma Seite "07 Abo und Einwilligung". */
+.pv-abo-choice {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-mauve);
+  border-radius: 18px;
+  background: var(--color-cream-2);
+  cursor: pointer;
+}
+.pv-abo-choice:has(> input:checked),
+.pv-abo-choice--abo:has(.co-radio:checked) {
+  border: 2.5px solid var(--color-magenta);
+  background: var(--color-pink-light);
+  padding: 13px 15px;
+}
+.pv-abo-choice:has(.co-radio:focus-visible) {
+  outline: 3px solid var(--color-magenta);
+  outline-offset: 3px;
+}
+.pv-abo-choice--abo {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+.pv-abo-panel {
+  display: none;
+  margin-top: 14px;
+}
+.pv-abo-choice--abo:has(.co-radio:checked) .pv-abo-panel {
+  display: block;
+}
+.pv-abo-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--color-magenta);
+  padding: 2px 10px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.pv-abo-interval {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--color-mauve);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0 4px;
+  color: var(--color-aubergine);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+}
+@media (max-width: 420px) {
+  .pv-abo-interval {
+    font-size: 13px;
+  }
+}
+.peer:checked + .pv-abo-interval {
+  border-color: var(--color-wine);
+  background: var(--color-wine);
+  color: #fff;
+  font-weight: 600;
+}
+.peer:focus-visible + .pv-abo-interval {
+  outline: 3px solid var(--color-magenta);
+  outline-offset: 2px;
+}
+.pv-abo-flex {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.pv-abo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid var(--color-magenta);
+  border-radius: 999px;
+  background: var(--color-pink-light);
+  padding: 1px 9px;
+  color: var(--color-berry);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+/* Checkout: Pflichtangaben vor "Zahlungspflichtig abonnieren" (Figma 60:472) */
+.pv-abo-terms {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 2px solid var(--color-magenta);
+  border-radius: 22px;
+  background: #fff;
+  padding: 16px 18px;
+}
+.pv-abo-terms__list {
+  display: grid;
+  grid-template-columns: minmax(96px, 0.8fr) 1.2fr;
+  gap: 8px 14px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.pv-abo-terms__list dt {
+  color: var(--color-plum);
+}
+.pv-abo-terms__list dd {
+  margin: 0;
+  font-weight: 600;
+}
+/* Ohne JavaScript bleiben Grund und Wunschdatum sichtbar, mit JavaScript nur bei Bedarf */
+html[data-js] .pv-abo-js-hide {
+  display: none;
+}
+/* Kündigung ohne Login (Figma 71:2162, 71:2602) */
+.pv-abo-cancel {
+  position: relative;
+  overflow: hidden;
+}
+.pv-abo-cancel__blob {
+  position: absolute;
+  top: 40px;
+  right: -180px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: var(--color-pink-light);
+  pointer-events: none;
+}
+@media (min-width: 1024px) {
+  .pv-abo-cancel__blob {
+    top: 60px;
+    right: -120px;
+    width: 640px;
+    height: 640px;
+  }
+}
+.pv-abo-know {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: 26px;
+  background: var(--color-cream-2);
+  padding: 22px;
+  box-shadow: 0 12px 32px -6px rgb(74 46 56 / 0.14);
+}
+.pv-abo-know li {
+  position: relative;
+  padding-left: 18px;
+}
+.pv-abo-know li::before {
+  content: "";
+  position: absolute;
+  top: 0.6em;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-magenta);
+}
+.pv-abo-done {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  border-radius: 26px;
+  background: var(--color-cream-2);
+  padding: 22px;
+  box-shadow: 0 12px 32px -6px rgb(74 46 56 / 0.14);
+}
+.pv-abo-done dl {
+  align-self: stretch;
+}
+/* Portal: Dialoge (Figma 68:1464, 68:1678) */
+.pv-abo-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.pv-abo-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(74 47 57 / 0.55);
+}
+.pv-abo-dialog__panel {
+  position: relative;
+  width: 100%;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  border-radius: 26px 26px 0 0;
+  background: var(--color-cream);
+  padding: 22px 16px 28px;
+  box-shadow: 0 24px 60px rgb(74 47 57 / 0.3);
+}
+@media (min-width: 640px) {
+  .pv-abo-dialog {
+    align-items: center;
+    padding: 24px;
+  }
+  .pv-abo-dialog__panel {
+    max-width: 544px;
+    border-radius: 26px;
+    padding: 26px 28px 28px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pv-abo-dialog__panel {
+    animation: pv-abo-rise 200ms ease-out;
+  }
+}
+@keyframes pv-abo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.pv-abo-flavor {
+  gap: 6px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+/* Ende Abo */
+
+/* Bewertungen */
+/* Paket Bewertungen: Sterne-Auswahl als Radiogruppe (Figma "6 Bewertungen", 89:1763 / 91:1867).
+   Die Füllung bis zur gewählten Stufe kommt aus :has(), ganz ohne JavaScript. */
+.pv-stars {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.pv-stars-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.pv-star {
+  position: relative;
+  display: inline-flex;
+}
+.pv-star-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.pv-star-label {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 1.5px solid rgb(74 47 57 / 0.28);
+  border-radius: 14px;
+  background: var(--color-cream);
+  color: var(--color-mauve);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+.pv-star-label:hover {
+  border-color: var(--color-plum);
+}
+/* gewählter Stern und alle davor: gefüllt in Magenta */
+.pv-star:has(.pv-star-input:checked) .pv-star-label,
+.pv-star:has(~ .pv-star .pv-star-input:checked) .pv-star-label {
+  color: var(--color-magenta);
+}
+.pv-star:has(.pv-star-input:checked) path,
+.pv-star:has(~ .pv-star .pv-star-input:checked) path {
+  fill: currentColor;
+}
+.pv-star:has(.pv-star-input:checked) .pv-star-label {
+  border: 2px solid var(--color-plum);
+  background: var(--color-pink-light);
+}
+.pv-star-input:focus-visible + .pv-star-label {
+  outline: 3px solid var(--color-magenta);
+  outline-offset: 3px;
+}
+.pv-stars[data-invalid] .pv-star-label {
+  border-color: var(--color-magenta);
+}
+.pv-stars-caption {
+  margin: 10px 0 0;
+  color: var(--color-plum);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.pv-stars-caption > span {
+  display: none;
+}
+.pv-stars:not(:has(.pv-star-input:checked)) .pv-stars-caption > [data-n="0"],
+.pv-stars:has(.pv-star-input[value="1"]:checked) .pv-stars-caption > [data-n="1"],
+.pv-stars:has(.pv-star-input[value="2"]:checked) .pv-stars-caption > [data-n="2"],
+.pv-stars:has(.pv-star-input[value="3"]:checked) .pv-stars-caption > [data-n="3"],
+.pv-stars:has(.pv-star-input[value="4"]:checked) .pv-stars-caption > [data-n="4"],
+.pv-stars:has(.pv-star-input[value="5"]:checked) .pv-stars-caption > [data-n="5"] {
+  display: inline;
+}
+@media (min-width: 1024px) {
+  .pv-stars-row {
+    gap: 8px;
+  }
+  .pv-star-label {
+    width: 56px;
+    height: 56px;
+  }
+}
+/* "Bewertung ändern" und "Alle Bewertungen anzeigen" als details/summary */
+.pv-review-edit > summary,
+.pv-review-more > summary {
+  list-style: none;
+}
+.pv-review-edit > summary::-webkit-details-marker,
+.pv-review-more > summary::-webkit-details-marker {
+  display: none;
+}
+.pv-review-more[open] > summary {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pv-star-label {
+    transition: none;
+  }
+}
+/* Ende Bewertungen */
+
+/* Admin Inhalte */
+/* Editor- und Vorschautext im Backoffice (Seiten, Rechtstexte, Blog, Versionsvergleich) */
+[data-admin] .admin-inhalte-prosa > * + * {
+  margin-top: 0.75em;
+}
+[data-admin] .admin-inhalte-prosa h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.2em;
+}
+[data-admin] .admin-inhalte-prosa h3,
+[data-admin] .admin-inhalte-prosa h4,
+[data-admin] .admin-inhalte-prosa h5 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 1em;
+}
+[data-admin] .admin-inhalte-prosa > :first-child {
+  margin-top: 0;
+}
+[data-admin] .admin-inhalte-prosa ul {
+  list-style: disc;
+  padding-left: 1.4em;
+}
+[data-admin] .admin-inhalte-prosa ol {
+  list-style: decimal;
+  padding-left: 1.4em;
+}
+[data-admin] .admin-inhalte-prosa li + li {
+  margin-top: 0.25em;
+}
+[data-admin] .admin-inhalte-prosa a {
+  color: var(--color-admin-akzent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+[data-admin] .admin-inhalte-prosa table {
+  border-collapse: collapse;
+  width: 100%;
+}
+[data-admin] .admin-inhalte-prosa th,
+[data-admin] .admin-inhalte-prosa td {
+  border: 1px solid var(--color-admin-rahmen);
+  padding: 4px 8px;
+  text-align: left;
+}
+[data-admin] .admin-inhalte-prosa img {
+  max-width: 100%;
+  height: auto;
+}
+[data-admin] .admin-diff-entfernt {
+  text-decoration: line-through;
+}
+/* Ende Admin Inhalte */

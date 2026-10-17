@@ -3,6 +3,11 @@ import { ensureInvoice } from "@/lib/admin/invoices/invoices";
 import { sendRefundMail, sendShippingMail } from "@/lib/admin/orders/notifications";
 import { CHECKOUT_JOB_KINDS, runCheckoutJob } from "@/lib/checkout/jobs";
 import { CRM_JOB_KINDS, isCrmJobKind, runCrmJob } from "@/lib/admin/automations/jobs";
+import {
+  isSubscriptionJobKind,
+  runSubscriptionJob,
+  SUBSCRIPTION_JOB_KINDS,
+} from "@/lib/subscriptions/jobs";
 import type { ClaimedJob } from "./core";
 
 /**
@@ -20,6 +25,7 @@ export const KNOWN_JOB_KINDS: readonly string[] = [
   ...CHECKOUT_JOB_KINDS,
   ...ADMIN_JOB_KINDS,
   ...CRM_JOB_KINDS,
+  ...SUBSCRIPTION_JOB_KINDS,
 ];
 
 function requireString(payload: Record<string, unknown>, key: string, kind: string): string {
@@ -36,6 +42,9 @@ export async function dispatchJob(job: Pick<ClaimedJob, "kind" | "payload">): Pr
   }
   if (isCrmJobKind(job.kind)) {
     return runCrmJob(job);
+  }
+  if (isSubscriptionJobKind(job.kind)) {
+    return runSubscriptionJob(job);
   }
   const payload = (job.payload ?? {}) as Record<string, unknown>;
   switch (job.kind as AdminJobKind) {

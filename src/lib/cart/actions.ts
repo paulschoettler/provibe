@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { findOneTimeItem, upsertSubscriptionItem } from "@/lib/subscriptions/cart";
 import { getCartToken, loadCart, loadCartById } from "./server";
 import {
   CART_COOKIE,
@@ -53,10 +54,22 @@ export async function readCart(): Promise<CartView> {
   return loadCart(await getCartToken());
 }
 
-/** Legt eine Variante in den Warenkorb und gibt den neu berechneten Warenkorb zurück. */
-export async function addToCart(variantId: string, quantity = 1): Promise<CartActionResult> {
+const subscriptionWeeksSchema = z.number().int().min(1).max(52).nullable().optional();
+
+/**
+ * Legt eine Variante in den Warenkorb und gibt den neu berechneten Warenkorb zurück.
+ * Mit options.subscriptionIntervalWeeks entsteht eine Abo-Position (Paket Abo): dieselbe Variante
+ * kann zusätzlich als Einmalkauf im Warenkorb liegen, Preise rechnet weiterhin nur der Server.
+ */
+export async function addToCart(
+  variantId: string,
+  quantity = 1,
+  options: { subscriptionIntervalWeeks?: number | null } = {},
+): Promise<CartActionResult> {
   const parsed = addSchema.safeParse({ variantId, quantity });
   if (!parsed.success) return fail(firstIssue(parsed.error, "Bitte prüf deine Eingabe."));
+  const weeks = subscriptionWeeksSchema.safeParse(options.subscriptionIntervalWeeks ?? null);
+  if (!weeks.success) return fail("Bitte wähl ein Lieferintervall.");
 
   const db = supabaseAdmin();
 
@@ -74,12 +87,22 @@ export async function addToCart(variantId: string, quantity = 1): Promise<CartAc
   const cart = await getOrCreateCart();
   if (!cart) return fail("Dein Warenkorb konnte nicht angelegt werden. Bitte versuch es erneut.");
 
-  const { data: existing } = await db
-    .from("cart_items")
-    .select("id, quantity")
-    .eq("cart_id", cart.id)
-    .eq("variant_id", parsed.data.variantId)
-    .maybeSingle();
+  if (weeks.data) {
+    const stockError = await checkStock(parsed.data.variantId, parsed.data.quantity);
+    if (stockError) return fail(stockError);
+    const aboError = await upsertSubscriptionItem({
+      cartId: cart.id,
+      variantId: parsed.data.variantId,
+      quantity: parsed.data.quantity,
+      intervalWeeks: weeks.data,
+      maxQuantity: MAX_LINE_QUANTITY,
+    });
+    if (aboError) return fail(aboError);
+    return { ok: true, cart: await touchAndLoad(cart.id) };
+  }
+
+  // Einmalkauf-Zeile der Variante (eine Abo-Zeile derselben Variante bleibt unberührt)
+  const existing = await findOneTimeItem(cart.id, parsed.data.variantId);
 
   const desired = (existing?.quantity ?? 0) + parsed.data.quantity;
   if (desired > MAX_LINE_QUANTITY) {
@@ -158,9 +181,12 @@ export async function removeCartLine(lineId: string): Promise<CartActionResult> 
 /* Formular-Varianten für die Seite /cart: funktionieren ohne JavaScript. */
 
 export async function addToCartForm(formData: FormData): Promise<void> {
+  // Kaufart aus der Kaufbox (Paket Abo): "abo" mit Intervall, sonst Einmalkauf
+  const isAbo = formData.get("purchaseType") === "abo";
   const result = await addToCart(
     String(formData.get("variantId") ?? ""),
     Number(formData.get("quantity") ?? 1),
+    isAbo ? { subscriptionIntervalWeeks: Number(formData.get("intervalWeeks") ?? 0) } : {},
   );
   finishForm(result, safePath(String(formData.get("redirectTo") ?? "/cart")));
 }

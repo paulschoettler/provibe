@@ -6,11 +6,12 @@ import { signOut } from "@/lib/auth/actions";
 import { BoxIcon, GridIcon, LogoutIcon, PinIcon, UserIcon } from "./icons";
 import { Eyebrow } from "./ui";
 
-export type AccountSection = "uebersicht" | "bestellungen" | "adressen" | "daten";
+export type AccountSection = "uebersicht" | "bestellungen" | "abo" | "adressen" | "daten";
 
 const NAV: { key: AccountSection; label: string; href: Route; Icon: typeof GridIcon }[] = [
   { key: "uebersicht", label: "Übersicht", href: "/account", Icon: GridIcon },
   { key: "bestellungen", label: "Bestellungen", href: "/account/bestellungen", Icon: BoxIcon },
+  { key: "abo", label: "Abo", href: "/account/abo" as Route, Icon: BoxIcon },
   { key: "adressen", label: "Adressen", href: "/account/adressen", Icon: PinIcon },
   { key: "daten", label: "Daten", href: "/account/daten", Icon: UserIcon },
 ];

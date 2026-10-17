@@ -2,6 +2,7 @@ import "server-only";
 import { serverEnv } from "@/lib/env/server";
 import { integrations } from "@/lib/integrations";
 import type { VerifiedWebhookEvent } from "@/lib/integrations/payments/types";
+import { onOrderFinalized } from "@/lib/subscriptions/checkout-hook";
 import { asJson, checkoutDb, UNIQUE_VIOLATION } from "./db";
 import { enqueueJob, runJobsNow, type CheckoutJobKind } from "./jobs";
 import { readSnapshot, type CheckoutSessionRow } from "./session";
@@ -28,6 +29,9 @@ interface IntentObject {
   status?: string;
   metadata?: Record<string, string>;
   payment_method_types?: string[];
+  /** Stripe: gespeichertes Zahlungsmittel und Kunde (Abo, setup_future_usage) */
+  payment_method?: unknown;
+  customer?: unknown;
 }
 
 export type ProcessResult =
@@ -137,6 +141,8 @@ export async function finalizeOrder(
   const customerId = await upsertCustomer(session);
   const paidAt = new Date().toISOString();
   const method = details.method ?? intent.payment_method_types?.[0] ?? "card";
+  // Folgelieferungen aus dem Abo-Lauf tragen order_source=subscription im PaymentIntent (Paket Abo)
+  const source = intent.metadata?.order_source === "subscription" ? "subscription" : "web";
 
   const { data: order, error: orderError } = await db
     .from("orders")
@@ -168,7 +174,7 @@ export async function finalizeOrder(
       legal_versions: session.legal_versions ?? {},
       attribution: session.attribution,
       is_test: isTest,
-      source: "web",
+      source,
     })
     .select("id, order_number")
     .single();
@@ -214,7 +220,11 @@ export async function finalizeOrder(
       order_id: order.id,
       kind: "created",
       message: `Bestellung ${order.order_number} angelegt`,
-      data: asJson({ checkout_session_id: session.id, source: "web" }),
+      data: asJson({
+        checkout_session_id: session.id,
+        source,
+        subscription_id: intent.metadata?.subscription_id ?? null,
+      }),
       visible_to_customer: true,
     },
     {
@@ -253,6 +263,16 @@ export async function finalizeOrder(
   ]);
 
   await runPostOrderJobs(order.id, session.marketing_opt_in);
+  // Abo: Abos aus Abo-Positionen anlegen beziehungsweise Folgelieferung verknüpfen (idempotent,
+  // wirft nie; Fehler landen als order_event an der Bestellung)
+  await onOrderFinalized({
+    orderId: order.id,
+    orderNumber: order.order_number,
+    customerId,
+    session,
+    intent,
+    details,
+  });
   return { status: "order_created", orderId: order.id, sessionId: session.id };
 }
 

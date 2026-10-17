@@ -6,7 +6,12 @@ import { removeCartLineForm, updateCartLineForm } from "@/lib/cart/actions";
 import { getCart } from "@/lib/cart/server";
 import type { CartLineView } from "@/lib/cart/types";
 import { MAX_LINE_QUANTITY } from "@/lib/cart/types";
-import { CartSummary, DepositNote, FreeShippingHint } from "@/components/cart/cart-parts";
+import {
+  CartSummary,
+  DepositNote,
+  FreeShippingHint,
+  SubscriptionLineNote,
+} from "@/components/cart/cart-parts";
 import { formatEur } from "@/lib/money";
 
 /** Hilfsfunktion für die typisierten Routen von Next: /checkout und /collections gibt es noch nicht. */
@@ -110,6 +115,7 @@ function CartPageLine({ line }: { line: CartLineView }) {
               {line.productTitle}
             </Link>
             <p className="text-aubergine/70 text-[15px]">{line.variantTitle}</p>
+            <SubscriptionLineNote subscription={line.subscription} quantity={line.quantity} />
             <p className="text-aubergine/60 text-[13px]">
               {`Einzelpreis ${formatEur(line.unitPriceCents)}${
                 line.unitDepositCents > 0 ? ` zzgl. ${formatEur(line.unitDepositCents)} Pfand` : ""

@@ -1,3 +1,4 @@
+import type { CartLineSubscription } from "@/lib/cart/types";
 import type { CartTotals } from "@/lib/pricing";
 import { formatEur } from "@/lib/money";
 
@@ -85,4 +86,31 @@ function Row({ label, value, hint }: { label: string; value: string; hint?: stri
 export function DepositNote({ lineDepositCents }: { lineDepositCents: number }) {
   if (lineDepositCents <= 0) return null;
   return <p className="text-aubergine/60 text-[13px]">zzgl. {formatEur(lineDepositCents)} Pfand</p>;
+}
+
+/**
+ * Kennzeichnung einer Abo-Position (Paket Abo) in Drawer und /cart: Intervall, Rabatt und der
+ * Einmalpreis zum Vergleich. Der Zeilenpreis daneben ist bereits der Preis je Lieferung.
+ */
+export function SubscriptionLineNote({
+  subscription,
+  quantity,
+}: {
+  subscription: CartLineSubscription | null | undefined;
+  quantity: number;
+}) {
+  if (!subscription) return null;
+  const percent = (subscription.discountBp / 100).toLocaleString("de-DE", {
+    maximumFractionDigits: 2,
+  });
+  return (
+    <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
+      <span className="pv-abo-chip">
+        <span aria-hidden="true">↻</span> Im Abo, alle {subscription.intervalWeeks} Wochen
+      </span>
+      <span className="text-aubergine/70">
+        {percent} % gespart, einmalig {formatEur(subscription.listUnitPriceCents * quantity)}
+      </span>
+    </p>
+  );
 }

@@ -8,8 +8,11 @@ import { MailIcon } from "./icons";
 import { SubmitButton } from "./SubmitButton";
 import { BTN_OUTLINE, CARD, Field, Honeypot, LINK_PLUM, Notice } from "./ui";
 
-/** Aktivierungslink für Shopify-Bestandskunden (/account/konto-aktivieren). */
-export function ActivationForm() {
+/**
+ * Aktivierungslink für Shopify-Bestandskunden (/account/konto-aktivieren). defaultEmail kommt aus
+ * ?email=… (Massenmail "Konto aktivieren") und belegt das Feld nur vor.
+ */
+export function ActivationForm({ defaultEmail }: { defaultEmail?: string }) {
   const [state, action] = useActionState(requestActivation, INITIAL_FORM_STATE);
 
   if (state.status === "ok") {
@@ -65,7 +68,7 @@ export function ActivationForm() {
           autoComplete="email"
           inputMode="email"
           required
-          defaultValue={state.values?.email}
+          defaultValue={state.values?.email ?? defaultEmail}
           error={state.fieldErrors?.email}
         />
         <input type="hidden" name="next" value="/account" />

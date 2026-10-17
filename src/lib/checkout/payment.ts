@@ -10,7 +10,7 @@ import {
   type CheckoutSessionRow,
   type CheckoutState,
 } from "./session";
-import { buildAmountsSnapshot } from "./snapshot";
+import { buildAmountsSnapshot, hasSubscriptionLines } from "./snapshot";
 import type { AmountsSnapshot } from "./types";
 
 /**
@@ -160,12 +160,21 @@ async function ensurePaymentIntent(session: CheckoutSessionRow, snapshot: Amount
     cart_id: session.cart_id,
     discount_code: snapshot.discountCode ?? "",
   };
+  // Abo-Positionen (Paket Abo): Zahlungsmittel am Stripe-Kunden für spätere Lieferungen
+  // speichern, nur Karte (inklusive Apple Pay, Google Pay) und PayPal, kein Klarna (H25)
+  const subscription = hasSubscriptionLines(snapshot);
+  const providerCustomerId =
+    subscription && session.email && payments.name !== "mock"
+      ? (await payments.ensureCustomer({ email: session.email })).id
+      : null;
 
   if (session.payment_intent_id) {
     try {
       const existing = await payments.retrievePaymentIntent(session.payment_intent_id);
       const reusable = ["requires_payment_method", "requires_confirmation", "requires_action"];
-      if (reusable.includes(existing.status)) {
+      // Wechsel zwischen Einmalkauf und Abo ändert die Speicherung: dann neuen Intent anlegen
+      const wasSubscription = existing.metadata?.has_subscription === "1";
+      if (reusable.includes(existing.status) && wasSubscription === subscription) {
         if (existing.amountCents !== snapshot.totalCents) {
           return await payments.updatePaymentIntentAmount(
             existing.id,
@@ -186,8 +195,15 @@ async function ensurePaymentIntent(session: CheckoutSessionRow, snapshot: Amount
     checkoutSessionId: session.id,
     email: session.email ?? undefined,
     customerId: session.customer_id,
-    description: "provibe Bestellung",
-    metadata,
+    description: subscription ? "provibe Bestellung mit Abo" : "provibe Bestellung",
+    metadata: subscription ? { ...metadata, has_subscription: "1" } : metadata,
+    ...(subscription
+      ? {
+          saveForFutureUse: true,
+          providerCustomerId,
+          paymentMethodTypes: ["card", "paypal"],
+        }
+      : {}),
     // Je Session und Betrag eindeutig; bei Neuanlage nach Abbruch mit frischem Suffix
     idempotencyKey: `checkout:${session.id}:${snapshot.totalCents}:${session.payment_intent_id ? randomUUID() : "1"}`,
   });

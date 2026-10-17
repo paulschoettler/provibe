@@ -2,34 +2,23 @@ import "server-only";
 import { publicEnv } from "@/lib/env/public";
 import { serverEnv } from "@/lib/env/server";
 import { integrations } from "@/lib/integrations";
+import {
+  BULK_ACTIVATION_TEMPLATE,
+  accountMailButton as button,
+  accountMailLayout as layout,
+  accountMailP as p,
+  accountMailSmall as small,
+  escapeHtml,
+  renderBulkActivationMail,
+} from "@/emails/account";
 
 /**
  * Konto-Mails über integrations().email (bis zum Go-live Mock beziehungsweise Allowlist).
  * Magic Link, Bestätigung und Passwort-Reset verschickt Supabase Auth selbst (Vorlagen im
- * Supabase-Dashboard, siehe Bericht). Hier nur: Konto aktivieren, E-Mail geändert, Konto gelöscht.
+ * Supabase-Dashboard, siehe Bericht). Hier nur: Konto aktivieren (einzeln mit Magic Link und als
+ * Massenversand ohne Ablauf), E-Mail geändert, Konto gelöscht. Layout und reine Vorlagen liegen in
+ * src/emails/account.ts.
  */
-
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-}
-
-function layout(eyebrow: string, title: string, bodyHtml: string): string {
-  return `<!doctype html><html lang="de"><body style="margin:0;background:#FBF8EE;font-family:Jost,Helvetica,Arial,sans-serif;color:#4A2F39">
-  <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:#7E2856;margin:0 0 12px">${eyebrow}</p>
-    <h1 style="font-size:26px;font-weight:600;letter-spacing:-.02em;margin:0 0 16px;color:#6B1D49">${title}</h1>
-    ${bodyHtml}
-    <p style="font-size:13px;line-height:1.6;color:#8A7680;margin:32px 0 0">provibe · CG Projects UG (haftungsbeschränkt) · Kurt-Viermetz-Straße 1a · 86150 Augsburg<br>Fragen? Antworte einfach auf diese Mail oder schreib an hello@provibe-drinks.de.</p>
-  </div></body></html>`;
-}
-
-function button(href: string, label: string): string {
-  return `<p style="margin:0 0 28px"><a href="${href}" style="display:inline-block;background:#D9306E;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 26px;border-radius:100px">${label}</a></p>`;
-}
-
-const p = (text: string) => `<p style="font-size:16px;line-height:1.6;margin:0 0 20px">${text}</p>`;
-const small = (text: string) =>
-  `<p style="font-size:14px;line-height:1.6;color:#8A7680;margin:0 0 8px">${text}</p>`;
 
 /** Link nur lokal mit Mock in die Konsole schreiben, damit man den Flow ohne Postfach testen kann. */
 function logLinkForLocalDev(label: string, link: string) {
@@ -39,7 +28,11 @@ function logLinkForLocalDev(label: string, link: string) {
   }
 }
 
-/** Aktivierungsmail für Shopify-Bestandskunden (Vorlage account_activate, Briefing 10). */
+/**
+ * Aktivierungsmail mit Magic Link (Vorlage account_activate, Briefing 10) für den Einzelfall:
+ * Anforderung auf /account/konto-aktivieren oder im Login, Versand aus dem Backoffice.
+ * Für den Import-Massenversand gilt sendBulkActivationMail.
+ */
 export async function sendActivationMail(to: string, link: string, firstName?: string | null) {
   logLinkForLocalDev("Aktivierungslink", link);
   const hello = firstName ? `Hallo ${escapeHtml(firstName)},` : "Hallo,";
@@ -68,6 +61,33 @@ export async function sendActivationMail(to: string, link: string, firstName?: s
     text,
     category: "auth",
     template: "account_activate",
+  });
+}
+
+/**
+ * Konto aktivieren (Massenversand) für den Import (--send-activation, docs/import.md Abschnitt 5).
+ * Kein Magic Link: Der Button führt auf /account/konto-aktivieren?email=…, dort fordert die Person
+ * einen frischen Link an. So läuft nichts ab, bevor die Mail geöffnet wird. Die Allowlist prüft
+ * der Aufrufer (scripts/import/lib/activation.ts) vor jedem Versand.
+ */
+export async function sendBulkActivationMail(
+  to: string,
+  firstName?: string | null,
+  options: { siteUrl?: string } = {},
+) {
+  const mail = renderBulkActivationMail({
+    email: to,
+    firstName,
+    siteUrl: options.siteUrl ?? publicEnv.siteUrl,
+  });
+  logLinkForLocalDev("Aktivierungsseite", mail.url);
+  return integrations().email.send({
+    to,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
+    category: "auth",
+    template: BULK_ACTIVATION_TEMPLATE,
   });
 }
 

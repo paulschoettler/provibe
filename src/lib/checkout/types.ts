@@ -62,6 +62,16 @@ export interface CheckoutRawLine {
   weightGrams: number;
   imageUrl: string | null;
   components: ComponentSnapshot[] | null;
+  /**
+   * Abo-Position (cart_items.is_subscription): Intervall und Abo-Rabatt in Basispunkten, der nur
+   * auf den Warenwert wirkt (src/lib/pricing/subscription.ts). Fehlt bei Einmalkäufen.
+   */
+  subscription?: CheckoutSubscriptionInfo | null;
+}
+
+export interface CheckoutSubscriptionInfo {
+  intervalWeeks: number;
+  discountBp: number;
 }
 
 /** Position im Betrags-Snapshot (checkout_sessions.amounts.lines). */
@@ -92,6 +102,8 @@ export interface SnapshotLine {
   basePriceText: string;
   depositCans: number;
   components: ComponentSnapshot[] | null;
+  /** Abo-Position: unitPriceCents ist bereits der Abo-Preis, listUnitPriceCents der Einmalpreis */
+  subscription?: (CheckoutSubscriptionInfo & { listUnitPriceCents: number }) | null;
 }
 
 export interface SnapshotShipping {

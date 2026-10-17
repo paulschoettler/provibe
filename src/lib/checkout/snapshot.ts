@@ -9,6 +9,7 @@ import {
   type PricedLine,
   type ShippingRateRule,
 } from "@/lib/pricing";
+import { subscriptionUnitPriceCents } from "@/lib/pricing/subscription";
 import { DELIVERY_TIME_TEXT } from "./delivery";
 import type {
   AmountsSnapshot,
@@ -46,11 +47,30 @@ export function normalizeDeliveryText(text: string | null | undefined): string {
 /** Zweite Zeile einer Position: "9 Dosen à 0,33 l", bei Bundles der Untertitel. */
 export function lineDescription(line: CheckoutRawLine): string {
   if (line.productKind === "bundle") return line.productSubtitle ?? line.variantTitle;
+  const interval = line.subscription
+    ? ` · im Abo alle ${line.subscription.intervalWeeks} Wochen`
+    : "";
   if (line.unitCount > 1 && line.netContentPerUnit && line.basePriceMeasure === "l") {
     const content = line.netContentPerUnit.toLocaleString("de-DE", { maximumFractionDigits: 3 });
-    return `${line.unitCount} Dosen à ${content} l`;
+    return `${line.unitCount} Dosen à ${content} l${interval}`;
   }
-  return line.variantTitle;
+  return `${line.variantTitle}${interval}`;
+}
+
+/** Ersparnis aller Abo-Positionen gegenüber dem Einmalkauf (nur Anzeige "Abo-Rabatt"). */
+export function subscriptionSavingsCents(snapshot: AmountsSnapshot): number {
+  return snapshot.lines.reduce(
+    (sum, l) =>
+      l.subscription
+        ? sum + l.quantity * (l.subscription.listUnitPriceCents - l.unitPriceCents)
+        : sum,
+    0,
+  );
+}
+
+/** Enthält der Snapshot mindestens eine Abo-Position? */
+export function hasSubscriptionLines(snapshot: { lines: { subscription?: unknown }[] }): boolean {
+  return snapshot.lines.some((l) => Boolean(l.subscription));
 }
 
 export function buildAmountsSnapshot(input: SnapshotInput): SnapshotResult {
@@ -58,11 +78,15 @@ export function buildAmountsSnapshot(input: SnapshotInput): SnapshotResult {
 
   const priced: PricedLine[] = input.lines.map((l) => {
     const unitDepositCents = depositPerItemCents(l);
+    const listUnitPriceCents = l.priceCents - unitDepositCents;
     return {
       variantId: l.variantId,
       productId: l.productId,
       quantity: l.quantity,
-      unitPriceCents: l.priceCents - unitDepositCents,
+      // Abo-Position: Rabatt nur auf den Warenwert, Pfand bleibt unverändert
+      unitPriceCents: l.subscription
+        ? subscriptionUnitPriceCents(listUnitPriceCents, l.subscription.discountBp)
+        : listUnitPriceCents,
       unitDepositCents,
       taxRateBp: l.taxRateBp,
       weightGrams: l.weightGrams,
@@ -82,7 +106,8 @@ export function buildAmountsSnapshot(input: SnapshotInput): SnapshotResult {
     const t = totals.lines[i];
     const effectiveDepositPerUnit = p.unitDepositCents === 0 ? 0 : l.depositCentsPerUnit;
     const basePrice = calculateBasePrice({
-      priceCents: l.priceCents,
+      // Grundpreis auf den tatsächlich zu zahlenden Preis (beim Abo nach Rabatt), ohne Pfand
+      priceCents: p.unitPriceCents + effectiveDepositPerUnit * l.unitCount,
       depositCentsPerUnit: effectiveDepositPerUnit,
       unitCount: l.unitCount,
       netContentPerUnit: l.netContentPerUnit,
@@ -110,6 +135,15 @@ export function buildAmountsSnapshot(input: SnapshotInput): SnapshotResult {
       basePriceText: formatBasePrice(basePrice),
       depositCans: p.unitDepositCents > 0 ? l.depositCansPerItem * l.quantity : 0,
       components: l.components,
+      ...(l.subscription
+        ? {
+            subscription: {
+              intervalWeeks: l.subscription.intervalWeeks,
+              discountBp: l.subscription.discountBp,
+              listUnitPriceCents: l.priceCents - p.unitDepositCents,
+            },
+          }
+        : {}),
     };
   });
 

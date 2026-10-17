@@ -134,7 +134,6 @@ async function execute(ctx: ImportContext): Promise<void> {
       const outcome = await sendActivationMails(ctx.db, activation, {
         ratePerMinute: Number.isFinite(rate) && rate > 0 ? Math.min(rate, 120) : 20,
         resend: args.flags.has("resend"),
-        remoteTarget: !ctx.isLocal,
         limit: limit !== null && Number.isInteger(limit) && limit > 0 ? limit : null,
       });
       for (const a of activation) {
@@ -146,7 +145,7 @@ async function execute(ctx: ImportContext): Promise<void> {
       report.bump("Aktivierungsmails übersprungen (schon gesendet)", outcome.alreadySent);
       report.bump("Aktivierungsmails fehlgeschlagen", outcome.failed.length);
       report.note(
-        `Aktivierung: Link-Modus ${outcome.linkMode === "magiclink" ? "Magic Link (Live-Auth)" : "Seite /account/konto-aktivieren"}, Provider ${allow.APP_INTEGRATIONS}.`,
+        `Aktivierung: Vorlage "Konto aktivieren (Massenversand)", Link auf ${outcome.activationPage}?email=…, Provider ${allow.APP_INTEGRATIONS}.`,
       );
       for (const f of outcome.failed) report.note(`  Versand fehlgeschlagen: ${f.reason}`);
     }

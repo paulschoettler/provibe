@@ -14,7 +14,7 @@ import { processPaymentEvent, type PaymentDetails } from "./finalize";
 import { currentLegalVersions, legalVersionsSnapshot } from "./legal";
 import { preparePayment } from "./payment";
 import { loadCheckoutState, saveSessionDetails, type CheckoutState } from "./session";
-import { buildAmountsSnapshot, splitStreet } from "./snapshot";
+import { buildAmountsSnapshot, hasSubscriptionLines, splitStreet } from "./snapshot";
 import { checkTestCard } from "./test-cards";
 import { PAYMENT_METHODS, type FormState, type StoredAddress } from "./types";
 
@@ -359,6 +359,17 @@ async function beginPayment(formData: FormData) {
   }
   if (Number.isFinite(shownTotal) && shownTotal !== prepared.snapshot.totalCents) {
     redirect(ROUTE("/checkout/zahlung?fehler=geaendert"));
+  }
+  // Abo (Paket Abo, H25): Zahlungsmittel wird gespeichert, Klarna ist dafür nicht möglich
+  if (hasSubscriptionLines(prepared.snapshot) && parsed.data.paymentMethod === "klarna") {
+    return {
+      ok: false as const,
+      state: {
+        status: "error",
+        message: "Klarna geht beim Abo nicht. Bitte wähl Karte, Apple Pay, Google Pay oder PayPal.",
+        fieldErrors: { paymentMethod: "Klarna geht beim Abo nicht." },
+      } satisfies FormState,
+    };
   }
 
   const legal = await currentLegalVersions();

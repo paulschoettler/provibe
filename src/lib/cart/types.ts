@@ -28,6 +28,18 @@ export interface CartLineView {
   productUrl: string;
   /** Grundpreis nach PAngV, fertig formatiert, z.B. "8,79 € / l" (Pflichtangabe neben dem Preis) */
   basePriceText: string;
+  /**
+   * Abo-Position (Paket Abo): Intervall, Rabatt und Einmalpreis ohne Pfand zum Vergleich.
+   * unitPriceCents und lineGoodsCents sind dann bereits Abo-Preise je Lieferung.
+   */
+  subscription?: CartLineSubscription | null;
+}
+
+export interface CartLineSubscription {
+  intervalWeeks: number;
+  discountBp: number;
+  /** Einmalpreis je Stück ohne Pfand */
+  listUnitPriceCents: number;
 }
 
 export interface CartView {

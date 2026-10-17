@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { redirectFromTable } from "@/lib/redirects/proxy";
 
 /**
  * Läuft vor jeder Anfrage.
@@ -37,6 +38,10 @@ export async function proxy(request: NextRequest) {
       });
     }
   }
+
+  // Im Backoffice gepflegte Weiterleitungen (Tabelle redirects, je Instanz fünf Minuten gecacht)
+  const tableRedirect = await redirectFromTable(request);
+  if (tableRedirect) return tableRedirect;
 
   let response = NextResponse.next({ request });
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -10,6 +10,13 @@ import { preparePayment } from "@/lib/checkout/payment";
 import { loadCheckoutState, readAddress } from "@/lib/checkout/session";
 import { formatAddressLine } from "@/lib/checkout/snapshot";
 import { formatEur } from "@/lib/money";
+import { hasSubscriptionLines } from "@/lib/checkout/snapshot";
+import { getCurrentCustomer } from "@/lib/auth/session";
+import { subscriptionTerms } from "@/lib/subscriptions/terms";
+import {
+  AccountRequiredBlock,
+  SubscriptionTermsBlock,
+} from "@/components/subscriptions/CheckoutAbo";
 
 export const dynamic = "force-dynamic";
 
@@ -56,11 +63,18 @@ export default async function PaymentPage({
   const address = readAddress(session.shipping_address)!;
   const shipping = snapshot.shipping;
   const mode = serverEnv().APP_INTEGRATIONS;
+  // Abo-Positionen (Paket Abo): Pflichtangaben, Konto-Pflicht, Button "Zahlungspflichtig abonnieren"
+  const isAbo = hasSubscriptionLines(snapshot);
+  const loggedIn = isAbo ? Boolean(await getCurrentCustomer()) : false;
+  const terms = isAbo
+    ? subscriptionTerms(snapshot, state.shippingRates, state.depositTaxRateBp)
+    : [];
+  const siteHost = publicEnv.siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   const intro = (
     <>
       <CheckoutProgress step={2} />
-      <CheckoutTitle title="Wie willst du zahlen?" />
+      <CheckoutTitle title="Wie willst du zahlen?" eyebrow={isAbo ? "Kasse · Abo" : "Kasse"} />
       <section
         aria-labelledby="h-lieferung"
         className="bg-cream-2 flex flex-col gap-1 rounded-[18px] px-4 py-3.5"
@@ -87,6 +101,7 @@ export default async function PaymentPage({
           </p>
         ) : null}
       </section>
+      {isAbo ? <AccountRequiredBlock email={session.email ?? ""} loggedIn={loggedIn} /> : null}
     </>
   );
 
@@ -110,7 +125,18 @@ export default async function PaymentPage({
           shownTotal={snapshot.totalCents}
           serverError={stale ? SERVER_ERRORS[params.fehler!] : null}
           intro={intro}
-          summary={<OrderSummary snapshot={snapshot} title="Bestellung prüfen" showDelivery />}
+          summary={
+            <OrderSummary
+              snapshot={snapshot}
+              title={isAbo ? "Erste Lieferung prüfen" : "Bestellung prüfen"}
+              showDelivery
+            />
+          }
+          subscription={
+            isAbo
+              ? { termsBlock: <SubscriptionTermsBlock terms={terms} siteHost={siteHost} /> }
+              : null
+          }
         />
       </div>
     </main>

@@ -5,11 +5,15 @@ import { LoginHero } from "@/components/account/LoginHero";
 import { Notice } from "@/components/account/ui";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getCurrentCustomer } from "@/lib/auth/session";
+import { prefillEmail } from "./prefill";
 
 /**
  * /account/konto-aktivieren: Für Kundinnen und Kunden aus dem alten Shopify-Shop. Passwörter
  * ließen sich nicht übernehmen, deshalb Anmeldung per Aktivierungslink (Briefing 10).
  * Gleicher Aufbau wie der Login (Figma 29:2781).
+ *
+ * ?email=… (Button der Massenmail "Konto aktivieren") belegt das Feld vor. Verschickt wird erst
+ * nach Klick auf "Aktivierungslink senden".
  */
 export const dynamic = "force-dynamic";
 
@@ -22,8 +26,13 @@ export const metadata: Metadata = {
   openGraph: { title: "Konto aktivieren | provibe", url: "/account/konto-aktivieren" },
 };
 
-export default async function ActivatePage() {
+export default async function ActivatePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (await getCurrentCustomer()) redirect("/account");
+  const email = prefillEmail((await searchParams).email);
 
   return (
     <SiteShell mainClassName="pv-acc pv-acc--login">
@@ -35,7 +44,7 @@ export default async function ActivatePage() {
         />
         <div className="pv-acc-login__card">
           <div className="flex flex-col gap-4">
-            <ActivationForm />
+            <ActivationForm defaultEmail={email} />
             <Notice tone="info" title="Warum muss ich mein Konto aktivieren?">
               Unser Shop läuft jetzt auf eigener Technik. Bestellungen und Adressen aus dem alten
               Shop haben wir übernommen, Passwörter aus Sicherheitsgründen nicht. Nach der Anmeldung

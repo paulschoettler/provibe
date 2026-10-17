@@ -111,6 +111,7 @@ export type Database = {
           status: string
           target_id: string
           target_type: string
+          token_hash: string | null
         }
         Insert: {
           automation_key: string
@@ -124,6 +125,7 @@ export type Database = {
           status?: string
           target_id: string
           target_type: string
+          token_hash?: string | null
         }
         Update: {
           automation_key?: string
@@ -137,6 +139,7 @@ export type Database = {
           status?: string
           target_id?: string
           target_type?: string
+          token_hash?: string | null
         }
         Relationships: [
           {
@@ -331,8 +334,12 @@ export type Database = {
           bounced_at: string | null
           campaign_id: string
           clicked_at: string | null
+          complained_at: string | null
           contact_id: string
+          created_at: string
+          delivered_at: string | null
           email: string
+          error: string | null
           opened_at: string | null
           provider_message_id: string | null
           sent_at: string | null
@@ -343,8 +350,12 @@ export type Database = {
           bounced_at?: string | null
           campaign_id: string
           clicked_at?: string | null
+          complained_at?: string | null
           contact_id: string
+          created_at?: string
+          delivered_at?: string | null
           email: string
+          error?: string | null
           opened_at?: string | null
           provider_message_id?: string | null
           sent_at?: string | null
@@ -355,8 +366,12 @@ export type Database = {
           bounced_at?: string | null
           campaign_id?: string
           clicked_at?: string | null
+          complained_at?: string | null
           contact_id?: string
+          created_at?: string
+          delivered_at?: string | null
           email?: string
+          error?: string | null
           opened_at?: string | null
           provider_message_id?: string | null
           sent_at?: string | null
@@ -385,21 +400,27 @@ export type Database = {
           added_at: string
           cart_id: string
           id: string
+          is_subscription: boolean
           quantity: number
+          subscription_interval_weeks: number | null
           variant_id: string
         }
         Insert: {
           added_at?: string
           cart_id: string
           id?: string
+          is_subscription?: boolean
           quantity: number
+          subscription_interval_weeks?: number | null
           variant_id: string
         }
         Update: {
           added_at?: string
           cart_id?: string
           id?: string
+          is_subscription?: boolean
           quantity?: number
+          subscription_interval_weeks?: number | null
           variant_id?: string
         }
         Relationships: [
@@ -988,6 +1009,9 @@ export type Database = {
           anonymized_at: string | null
           auth_user_id: string | null
           b2b_status: Database["public"]["Enums"]["b2b_status"]
+          blocked_at: string | null
+          blocked_by: string | null
+          blocked_reason: string | null
           company_name: string | null
           created_at: string
           customer_type: Database["public"]["Enums"]["customer_type"]
@@ -1016,6 +1040,9 @@ export type Database = {
           anonymized_at?: string | null
           auth_user_id?: string | null
           b2b_status?: Database["public"]["Enums"]["b2b_status"]
+          blocked_at?: string | null
+          blocked_by?: string | null
+          blocked_reason?: string | null
           company_name?: string | null
           created_at?: string
           customer_type?: Database["public"]["Enums"]["customer_type"]
@@ -1044,6 +1071,9 @@ export type Database = {
           anonymized_at?: string | null
           auth_user_id?: string | null
           b2b_status?: Database["public"]["Enums"]["b2b_status"]
+          blocked_at?: string | null
+          blocked_by?: string | null
+          blocked_reason?: string | null
           company_name?: string | null
           created_at?: string
           customer_type?: Database["public"]["Enums"]["customer_type"]
@@ -1371,6 +1401,119 @@ export type Database = {
         }
         Relationships: []
       }
+      import_run_items: {
+        Row: {
+          action: string
+          before: Json | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: number
+          run_id: string
+          source_line: number | null
+        }
+        Insert: {
+          action: string
+          before?: Json | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: never
+          run_id: string
+          source_line?: number | null
+        }
+        Update: {
+          action?: string
+          before?: Json | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: never
+          run_id?: string
+          source_line?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_run_items_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "import_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_runs: {
+        Row: {
+          created_at: string
+          created_count: number
+          error_count: number
+          extra_files: Json
+          file_name: string
+          file_sha256: string
+          finished_at: string | null
+          id: string
+          kind: string
+          options: Json
+          result: Json
+          rollback_result: Json | null
+          rolled_back_at: string | null
+          rows_total: number
+          skipped_count: number
+          started_at: string
+          started_by: string | null
+          status: string
+          unchanged_count: number
+          updated_at: string
+          updated_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_count?: number
+          error_count?: number
+          extra_files?: Json
+          file_name: string
+          file_sha256: string
+          finished_at?: string | null
+          id?: string
+          kind: string
+          options?: Json
+          result?: Json
+          rollback_result?: Json | null
+          rolled_back_at?: string | null
+          rows_total?: number
+          skipped_count?: number
+          started_at?: string
+          started_by?: string | null
+          status?: string
+          unchanged_count?: number
+          updated_at?: string
+          updated_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_count?: number
+          error_count?: number
+          extra_files?: Json
+          file_name?: string
+          file_sha256?: string
+          finished_at?: string | null
+          id?: string
+          kind?: string
+          options?: Json
+          result?: Json
+          rollback_result?: Json | null
+          rolled_back_at?: string | null
+          rows_total?: number
+          skipped_count?: number
+          started_at?: string
+          started_by?: string | null
+          status?: string
+          unchanged_count?: number
+          updated_at?: string
+          updated_count?: number
+        }
+        Relationships: []
+      }
       inventory_levels: {
         Row: {
           allow_backorder: boolean
@@ -1683,6 +1826,8 @@ export type Database = {
           effective_from: string | null
           id: string
           locale: string
+          published_at: string | null
+          published_by: string | null
           status: Database["public"]["Enums"]["publish_status"]
           title: string
           version: number
@@ -1696,6 +1841,8 @@ export type Database = {
           effective_from?: string | null
           id?: string
           locale?: string
+          published_at?: string | null
+          published_by?: string | null
           status?: Database["public"]["Enums"]["publish_status"]
           title: string
           version: number
@@ -1709,6 +1856,8 @@ export type Database = {
           effective_from?: string | null
           id?: string
           locale?: string
+          published_at?: string | null
+          published_by?: string | null
           status?: Database["public"]["Enums"]["publish_status"]
           title?: string
           version?: number
@@ -1875,6 +2024,7 @@ export type Database = {
           name: string
           preheader: string | null
           recipients_count: number
+          reply_to: string | null
           scheduled_at: string | null
           segment_id: string | null
           segment_snapshot: Json | null
@@ -1882,6 +2032,7 @@ export type Database = {
           stats: Json
           status: Database["public"]["Enums"]["campaign_status"]
           subject: string
+          test_sent_at: string | null
           updated_at: string
         }
         Insert: {
@@ -1894,6 +2045,7 @@ export type Database = {
           name: string
           preheader?: string | null
           recipients_count?: number
+          reply_to?: string | null
           scheduled_at?: string | null
           segment_id?: string | null
           segment_snapshot?: Json | null
@@ -1901,6 +2053,7 @@ export type Database = {
           stats?: Json
           status?: Database["public"]["Enums"]["campaign_status"]
           subject: string
+          test_sent_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -1913,6 +2066,7 @@ export type Database = {
           name?: string
           preheader?: string | null
           recipients_count?: number
+          reply_to?: string | null
           scheduled_at?: string | null
           segment_id?: string | null
           segment_snapshot?: Json | null
@@ -1920,6 +2074,7 @@ export type Database = {
           stats?: Json
           status?: Database["public"]["Enums"]["campaign_status"]
           subject?: string
+          test_sent_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1952,6 +2107,7 @@ export type Database = {
           status: Database["public"]["Enums"]["newsletter_status"]
           tags: string[]
           unsubscribe_reason: string | null
+          unsubscribe_token: string
           unsubscribed_at: string | null
           updated_at: string
         }
@@ -1974,6 +2130,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["newsletter_status"]
           tags?: string[]
           unsubscribe_reason?: string | null
+          unsubscribe_token?: string
           unsubscribed_at?: string | null
           updated_at?: string
         }
@@ -1996,6 +2153,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["newsletter_status"]
           tags?: string[]
           unsubscribe_reason?: string | null
+          unsubscribe_token?: string
           unsubscribed_at?: string | null
           updated_at?: string
         }
@@ -2425,6 +2583,7 @@ export type Database = {
           id: string
           noindex: boolean
           position: number
+          published_at: string | null
           show_in_sitemap: boolean
           status: Database["public"]["Enums"]["publish_status"]
           template: string
@@ -2436,6 +2595,7 @@ export type Database = {
           id?: string
           noindex?: boolean
           position?: number
+          published_at?: string | null
           show_in_sitemap?: boolean
           status?: Database["public"]["Enums"]["publish_status"]
           template?: string
@@ -2447,6 +2607,7 @@ export type Database = {
           id?: string
           noindex?: boolean
           position?: number
+          published_at?: string | null
           show_in_sitemap?: boolean
           status?: Database["public"]["Enums"]["publish_status"]
           template?: string
@@ -3080,25 +3241,37 @@ export type Database = {
           created_at: string
           created_by: string | null
           definition: Json
+          description: string | null
           id: string
+          last_count: number | null
+          last_counted_at: string | null
           name: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
           definition: Json
+          description?: string | null
           id?: string
+          last_count?: number | null
+          last_counted_at?: string | null
           name: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
           definition?: Json
+          description?: string | null
           id?: string
+          last_count?: number | null
+          last_counted_at?: string | null
           name?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -3328,6 +3501,38 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_recovery_codes: {
+        Row: {
+          code_hash: string
+          created_at: string
+          id: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          id?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_recovery_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "staff_users"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       staff_users: {
         Row: {
           created_at: string
@@ -3367,16 +3572,117 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_cancellation_requests: {
+        Row: {
+          confirmation_sent_at: string | null
+          created_at: string
+          customer_name: string
+          desired_date: string | null
+          email: string
+          id: string
+          ip_hash: string | null
+          kind: string
+          note: string | null
+          reason: string | null
+          received_at: string
+          status: string
+          subscription_ids: string[]
+          subscription_number: string | null
+          timing: string
+          updated_at: string
+        }
+        Insert: {
+          confirmation_sent_at?: string | null
+          created_at?: string
+          customer_name: string
+          desired_date?: string | null
+          email: string
+          id?: string
+          ip_hash?: string | null
+          kind: string
+          note?: string | null
+          reason?: string | null
+          received_at?: string
+          status?: string
+          subscription_ids?: string[]
+          subscription_number?: string | null
+          timing: string
+          updated_at?: string
+        }
+        Update: {
+          confirmation_sent_at?: string | null
+          created_at?: string
+          customer_name?: string
+          desired_date?: string | null
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          kind?: string
+          note?: string | null
+          reason?: string | null
+          received_at?: string
+          status?: string
+          subscription_ids?: string[]
+          subscription_number?: string | null
+          timing?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscription_events: {
+        Row: {
+          actor_id: string | null
+          actor_type: string
+          created_at: string
+          data: Json
+          id: number
+          kind: string
+          subscription_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_type?: string
+          created_at?: string
+          data?: Json
+          id?: never
+          kind: string
+          subscription_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_type?: string
+          created_at?: string
+          data?: Json
+          id?: never
+          kind?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_events_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_orders: {
         Row: {
+          created_at: string
+          kind: string
           order_id: string
           subscription_id: string
         }
         Insert: {
+          created_at?: string
+          kind?: string
           order_id: string
           subscription_id: string
         }
         Update: {
+          created_at?: string
+          kind?: string
           order_id?: string
           subscription_id?: string
         }
@@ -3399,6 +3705,8 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          cancel_effective_at: string | null
+          cancel_kind: string | null
           cancel_reason: string | null
           cancelled_at: string | null
           created_at: string
@@ -3408,11 +3716,25 @@ export type Database = {
           interval_count: number
           interval_unit: string
           last_order_at: string | null
+          last_payment_error: string | null
+          last_payment_failed_at: string | null
+          locked_price_cents: number | null
           next_order_at: string | null
+          next_retry_at: string | null
+          number: string
+          past_due_since: string | null
+          pause_reason: string | null
           paused_until: string | null
           payment_method_id: string | null
+          pending_payment_intent_id: string | null
+          price_change_effective_at: string | null
+          price_notice_sent_at: string | null
+          processing_started_at: string | null
           quantity: number
+          reminder_sent_for: string | null
+          retry_count: number
           shipping_address: Json | null
+          skip_next: boolean
           status: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -3420,6 +3742,8 @@ export type Database = {
           variant_id: string
         }
         Insert: {
+          cancel_effective_at?: string | null
+          cancel_kind?: string | null
           cancel_reason?: string | null
           cancelled_at?: string | null
           created_at?: string
@@ -3429,11 +3753,25 @@ export type Database = {
           interval_count?: number
           interval_unit?: string
           last_order_at?: string | null
+          last_payment_error?: string | null
+          last_payment_failed_at?: string | null
+          locked_price_cents?: number | null
           next_order_at?: string | null
+          next_retry_at?: string | null
+          number?: string
+          past_due_since?: string | null
+          pause_reason?: string | null
           paused_until?: string | null
           payment_method_id?: string | null
+          pending_payment_intent_id?: string | null
+          price_change_effective_at?: string | null
+          price_notice_sent_at?: string | null
+          processing_started_at?: string | null
           quantity?: number
+          reminder_sent_for?: string | null
+          retry_count?: number
           shipping_address?: Json | null
+          skip_next?: boolean
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -3441,6 +3779,8 @@ export type Database = {
           variant_id: string
         }
         Update: {
+          cancel_effective_at?: string | null
+          cancel_kind?: string | null
           cancel_reason?: string | null
           cancelled_at?: string | null
           created_at?: string
@@ -3450,11 +3790,25 @@ export type Database = {
           interval_count?: number
           interval_unit?: string
           last_order_at?: string | null
+          last_payment_error?: string | null
+          last_payment_failed_at?: string | null
+          locked_price_cents?: number | null
           next_order_at?: string | null
+          next_retry_at?: string | null
+          number?: string
+          past_due_since?: string | null
+          pause_reason?: string | null
           paused_until?: string | null
           payment_method_id?: string | null
+          pending_payment_intent_id?: string | null
+          price_change_effective_at?: string | null
+          price_notice_sent_at?: string | null
+          processing_started_at?: string | null
           quantity?: number
+          reminder_sent_for?: string | null
+          retry_count?: number
           shipping_address?: Json | null
+          skip_next?: boolean
           status?: Database["public"]["Enums"]["subscription_status"]
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -3512,6 +3866,51 @@ export type Database = {
           tax_class?: string
           valid_from?: string
           valid_to?: string | null
+        }
+        Relationships: []
+      }
+      tracking_events: {
+        Row: {
+          consent_state: string
+          consent_vendors: string[]
+          consent_version: string | null
+          created_at: string
+          currency: string | null
+          event_id: string
+          event_name: string
+          id: number
+          order_number_hash: string | null
+          sent_to: Json
+          source: string
+          value_cents: number | null
+        }
+        Insert: {
+          consent_state?: string
+          consent_vendors?: string[]
+          consent_version?: string | null
+          created_at?: string
+          currency?: string | null
+          event_id: string
+          event_name: string
+          id?: never
+          order_number_hash?: string | null
+          sent_to?: Json
+          source?: string
+          value_cents?: number | null
+        }
+        Update: {
+          consent_state?: string
+          consent_vendors?: string[]
+          consent_version?: string | null
+          created_at?: string
+          currency?: string | null
+          event_id?: string
+          event_name?: string
+          id?: never
+          order_number_hash?: string | null
+          sent_to?: Json
+          source?: string
+          value_cents?: number | null
         }
         Relationships: []
       }
@@ -3626,6 +4025,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_inventory: {
+        Args: {
+          p_actor?: string
+          p_allow_negative?: boolean
+          p_delta: number
+          p_note?: string
+          p_reason: Database["public"]["Enums"]["inventory_reason"]
+          p_variant_id: string
+        }
+        Returns: {
+          current_reserved: number
+          movement_id: number
+          new_on_hand: number
+        }[]
+      }
+      admin_inventory_overview: {
+        Args: never
+        Returns: {
+          allow_backorder: boolean
+          available: number
+          low_stock_threshold: number
+          on_hand: number
+          product_handle: string
+          product_id: string
+          product_kind: Database["public"]["Enums"]["product_kind"]
+          product_status: Database["public"]["Enums"]["product_status"]
+          product_title: string
+          reserved: number
+          sku: string
+          track_inventory: boolean
+          unit_count: number
+          updated_at: string
+          variant_active: boolean
+          variant_id: string
+          variant_title: string
+        }[]
+      }
       anonymize_customer: {
         Args: { p_customer_id: string }
         Returns: undefined
@@ -3666,6 +4102,33 @@ export type Database = {
         Args: { p_key: string; p_limit: number; p_window: string }
         Returns: boolean
       }
+      claim_due_jobs: {
+        Args: { p_kinds?: string[]; p_limit?: number; p_worker: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          finished_at: string | null
+          id: string
+          idempotency_key: string | null
+          kind: string
+          last_error: string | null
+          locked_at: string | null
+          locked_by: string | null
+          max_attempts: number
+          order_id: string | null
+          payload: Json
+          priority: number
+          run_at: string
+          status: Database["public"]["Enums"]["job_status"]
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       claim_guest_orders_for: {
         Args: { p_customer_id: string }
         Returns: number
@@ -3702,6 +4165,25 @@ export type Database = {
         Returns: undefined
       }
       complete_job: { Args: { p_id: string }; Returns: undefined }
+      crm_assert_segment_sql: { Args: { p_where: string }; Returns: undefined }
+      crm_segment_contact_ids: {
+        Args: { p_params?: Json; p_where: string }
+        Returns: string[]
+      }
+      crm_segment_count: {
+        Args: { p_params?: Json; p_where: string }
+        Returns: number
+      }
+      crm_segment_members: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_order?: string
+          p_params?: Json
+          p_where: string
+        }
+        Returns: string[]
+      }
       current_customer_id: { Args: never; Returns: string }
       current_legal_version: {
         Args: {
@@ -3717,6 +4199,8 @@ export type Database = {
           effective_from: string | null
           id: string
           locale: string
+          published_at: string | null
+          published_by: string | null
           status: Database["public"]["Enums"]["publish_status"]
           title: string
           version: number
@@ -3746,6 +4230,18 @@ export type Database = {
       }
       expire_reservations: { Args: never; Returns: number }
       fail_job: { Args: { p_error: string; p_id: string }; Returns: undefined }
+      fail_job_with_backoff: {
+        Args: { p_error: string; p_id: string }
+        Returns: Database["public"]["Enums"]["job_status"]
+      }
+      invite_staff: {
+        Args: {
+          p_actor?: string
+          p_email: string
+          p_role: Database["public"]["Enums"]["staff_role"]
+        }
+        Returns: string
+      }
       is_admin: { Args: never; Returns: boolean }
       is_staff: {
         Args: { p_roles?: Database["public"]["Enums"]["staff_role"][] }
@@ -3773,6 +4269,7 @@ export type Database = {
         Returns: undefined
       }
       next_order_number: { Args: never; Returns: string }
+      next_subscription_number: { Args: never; Returns: string }
       random_token: { Args: { p_bytes?: number }; Returns: string }
       release_reservations: {
         Args: { p_checkout_session_id: string }
@@ -3797,6 +4294,66 @@ export type Database = {
       }
       sha256_hex: { Args: { p_input: string }; Returns: string }
       slugify: { Args: { p_input: string }; Returns: string }
+      subscription_apply: {
+        Args: {
+          p_actor_id?: string
+          p_actor_type?: string
+          p_event_data?: Json
+          p_event_kind: string
+          p_expected: Database["public"]["Enums"]["subscription_status"][]
+          p_id: string
+          p_patch: Json
+        }
+        Returns: {
+          cancel_effective_at: string | null
+          cancel_kind: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          customer_id: string
+          discount_bp: number
+          id: string
+          interval_count: number
+          interval_unit: string
+          last_order_at: string | null
+          last_payment_error: string | null
+          last_payment_failed_at: string | null
+          locked_price_cents: number | null
+          next_order_at: string | null
+          next_retry_at: string | null
+          number: string
+          past_due_since: string | null
+          pause_reason: string | null
+          paused_until: string | null
+          payment_method_id: string | null
+          pending_payment_intent_id: string | null
+          price_change_effective_at: string | null
+          price_notice_sent_at: string | null
+          processing_started_at: string | null
+          quantity: number
+          reminder_sent_for: string | null
+          retry_count: number
+          shipping_address: Json | null
+          skip_next: boolean
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          variant_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      subscription_claim_due: {
+        Args: { p_limit?: number; p_now?: string }
+        Returns: string[]
+      }
+      subscription_lock: { Args: { p_id: string }; Returns: boolean }
+      subscription_release: { Args: { p_id: string }; Returns: undefined }
       variant_base_price_cents: {
         Args: { p_variant_id: string }
         Returns: number

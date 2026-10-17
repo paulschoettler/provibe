@@ -65,6 +65,7 @@ export function Footer({ quickLinks }: FooterProps) {
                   </SiteLink>
                 </li>
               ))}
+              {links.some((l) => l.url === "/abo-kuendigen") ? null : <li><SiteLink href="/abo-kuendigen" className="pv-footer-link">Vertrag kündigen</SiteLink></li>}
             </ul>
           </nav>
 

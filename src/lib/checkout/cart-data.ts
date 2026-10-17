@@ -1,6 +1,7 @@
 import "server-only";
 import { getCartToken, loadShippingRates, loadTaxRates } from "@/lib/cart/server";
 import type { UnitMeasure } from "@/lib/pricing";
+import { resolveSubscriptionLines } from "@/lib/subscriptions/cart";
 import { checkoutDb } from "./db";
 import type { CheckoutRawLine, ComponentSnapshot } from "./types";
 
@@ -145,7 +146,17 @@ export async function loadCheckoutLines(cartId: string): Promise<CheckoutRawLine
       components: bundle?.snapshot ?? null,
     });
   }
-  return lines;
+
+  // Abo-Positionen (Paket Abo): Intervall und Abo-Rabatt ergänzen, sonst Einmalkauf
+  const subscriptions = await resolveSubscriptionLines(
+    cartId,
+    lines.map((l) => ({ ...l, depositCentsPerUnit: l.depositCentsPerCan })),
+  );
+  if (subscriptions.size === 0) return lines;
+  return lines.map((l) => {
+    const info = subscriptions.get(l.cartItemId);
+    return info ? { ...l, subscription: info } : l;
+  });
 }
 
 interface BundleInfo {

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { formatEur } from "@/lib/money";
 import { lineAmounts } from "@/lib/checkout/order-view";
-import { depositLabel } from "@/lib/checkout/snapshot";
+import { depositLabel, subscriptionSavingsCents } from "@/lib/checkout/snapshot";
 import type { AmountsSnapshot, SnapshotLine } from "@/lib/checkout/types";
 import { AlertIcon, BagIcon, CheckIcon, ChevronDownIcon, InfoIcon } from "./icons";
 
@@ -39,10 +39,10 @@ export function CheckoutProgress({ step }: { step: 1 | 2 }) {
   );
 }
 
-export function CheckoutTitle({ title }: { title: string }) {
+export function CheckoutTitle({ title, eyebrow = "Kasse" }: { title: string; eyebrow?: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="co-eyebrow">Kasse</p>
+      <p className="co-eyebrow">{eyebrow}</p>
       <h1 className="text-wine text-[40px] leading-[1.08] font-semibold tracking-[-0.01em] lg:text-[56px] lg:leading-[1.05]">
         {title}
       </h1>
@@ -71,7 +71,10 @@ export function OrderLine({ line }: { line: SnapshotLine }) {
         ) : null}
       </div>
       <div className="min-w-0 flex-1 leading-[1.4]">
-        <p className="text-[15px] font-semibold">{line.productTitle}</p>
+        <p className="text-[15px] font-semibold">
+          {line.productTitle}
+          {line.subscription ? " im Abo" : ""}
+        </p>
         <p className="text-[13px]">{line.description}</p>
         <p className="text-[13px]">
           Menge {line.quantity}
@@ -126,6 +129,15 @@ export function OrderSummary({
   children?: React.ReactNode;
 }) {
   const Heading = headingLevel;
+  // Abo-Positionen (Paket Abo): Rabatt als eigene Zeile zeigen, die Summen bleiben unverändert
+  const aboSavings = subscriptionSavingsCents(snapshot);
+  const aboRates = new Set(
+    snapshot.lines.flatMap((l) => (l.subscription ? [l.subscription.discountBp] : [])),
+  );
+  const aboPercent =
+    aboRates.size === 1
+      ? `${([...aboRates][0] / 100).toLocaleString("de-DE", { maximumFractionDigits: 2 })} %`
+      : "";
   const shippingLabel = `Versand${snapshot.shipping ? ` (${snapshot.shipping.name})` : ""}`;
   const taxText = snapshot.taxLines
     .map(
@@ -145,12 +157,26 @@ export function OrderSummary({
       ) : null}
       <ul className="flex flex-col gap-3.5" aria-label="Artikel">
         {snapshot.lines.map((line) => (
-          <OrderLine key={line.variantId} line={line} />
+          <OrderLine
+            key={`${line.variantId}:${line.subscription ? "abo" : "einmal"}`}
+            line={line}
+          />
         ))}
       </ul>
       <hr className="border-aubergine/20" />
       <dl className="flex flex-col gap-2">
-        <Row label="Zwischensumme (ohne Pfand)">{formatEur(snapshot.subtotalCents)}</Row>
+        {aboSavings > 0 ? (
+          <>
+            <Row label="Warenwert (ohne Pfand)">
+              {formatEur(snapshot.subtotalCents + aboSavings)}
+            </Row>
+            <Row label={`Abo-Rabatt${aboPercent ? ` ${aboPercent}` : ""} (nur auf den Warenwert)`}>
+              <span className="text-plum font-semibold">−{formatEur(aboSavings)}</span>
+            </Row>
+          </>
+        ) : (
+          <Row label="Zwischensumme (ohne Pfand)">{formatEur(snapshot.subtotalCents)}</Row>
+        )}
         {snapshot.discountCents > 0 ? (
           <Row label={`Rabatt${snapshot.discountCode ? ` (${snapshot.discountCode})` : ""}`}>
             <span className="text-plum font-semibold">−{formatEur(snapshot.discountCents)}</span>

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { publicEnv } from "@/lib/env/public";
 import type { ShippingRateRule, UnitMeasure } from "@/lib/pricing";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { resolveSubscriptionLines } from "@/lib/subscriptions/cart";
 import { buildCartView, type CartRawLine } from "./mapping";
 import { CART_COOKIE, EMPTY_CART, type CartView } from "./types";
 
@@ -112,6 +113,7 @@ export async function loadCartById(cartId: string, updatedAt: string | null): Pr
   const variantById = new Map(variants.map((v) => [v.id, v]));
 
   const rawLines: CartRawLine[] = [];
+  const kindByLine = new Map<string, string>();
   for (const item of items) {
     const variant = variantById.get(item.variant_id);
     if (!variant || !variant.is_active) continue;
@@ -142,12 +144,30 @@ export async function loadCartById(cartId: string, updatedAt: string | null): Pr
       imageUrl: IMAGE_BY_HANDLE[product.handle] ?? imageByProduct.get(product.id) ?? null,
       productUrl: `/products/${product.handle}`,
     });
+    kindByLine.set(item.id, product.kind);
   }
+
+  // Abo-Positionen (Paket Abo): Intervall und Abo-Rabatt, still als Einmalkauf ohne Migration
+  const subscriptions = await resolveSubscriptionLines(
+    cartId,
+    rawLines.map((l) => ({
+      ...l,
+      cartItemId: l.id,
+      productKind: kindByLine.get(l.id) ?? "",
+    })),
+  );
+  const lines =
+    subscriptions.size === 0
+      ? rawLines
+      : rawLines.map((l) => {
+          const info = subscriptions.get(l.id);
+          return info ? { ...l, subscription: info } : l;
+        });
 
   return buildCartView({
     cartId,
     updatedAt,
-    lines: rawLines,
+    lines,
     shippingRates,
     depositTaxRateBp: taxRates.get("standard") ?? DEFAULT_TAX_RATE_BP,
   });

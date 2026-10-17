@@ -7,6 +7,13 @@ import { addToCartForm } from "@/lib/cart/actions";
 import { MAX_LINE_QUANTITY } from "@/lib/cart/types";
 import type { ProductType, VariantView } from "@/lib/catalog/products";
 import { formatEur } from "@/lib/money";
+import type { SubscriptionOffer } from "@/lib/subscriptions/offer";
+import {
+  AboPriceBlock,
+  PurchaseTypeChoice,
+  SubscriptionIntervalPicker,
+  SubscriptionNote,
+} from "@/components/subscriptions/PurchaseParts";
 import { CartLineIcon, CheckIcon, ClockIcon, MinusIcon, PlusIcon } from "./icons";
 
 /**
@@ -19,6 +26,11 @@ import { CartLineIcon, CheckIcon, ClockIcon, MinusIcon, PlusIcon } from "./icons
  * Standardvariante. Pfand steht immer getrennt neben dem Preis (§ 7 PAngV, H22). Mit
  * JavaScript aktualisiert sich der Preisblock bei der Auswahl, und der Button nutzt
  * useCart().addLine (Drawer öffnet sich). Alle Beträge kommen fertig gerechnet vom Server.
+ *
+ * Abo (Paket Abo, Figma 58:4 / 58:391): Bei Sorten und Mixed wählt "Kaufart" zwischen "Einmal
+ * kaufen" (vorgewählt) und "Im Abo sparen" mit Intervall. Das Angebot (Rabatt, Preis je
+ * Lieferung, Grundpreis) rechnet der Server beim Rendern (subscription). Ohne JavaScript schickt
+ * das Formular purchaseType und intervalWeeks an addToCartForm.
  */
 export function ProductPurchase({
   productTitle,
@@ -28,6 +40,7 @@ export function ProductPurchase({
   optionName,
   bundleCans,
   deliveryTimeText,
+  subscription = null,
 }: {
   productTitle: string;
   type: ProductType;
@@ -37,10 +50,14 @@ export function ProductPurchase({
   /** Bundles: Anzahl Dosen und Pfand je Dose für die Pfandzeile */
   bundleCans?: { count: number; depositPerCanCents: number } | null;
   deliveryTimeText: string | null;
+  /** Abo-Angebot (nur Sorten und Mixed), serverseitig berechnet; null ohne Abo */
+  subscription?: SubscriptionOffer | null;
 }) {
   const { addLine } = useCart();
   const [selectedId, setSelectedId] = useState(defaultVariantId);
   const [quantity, setQuantity] = useState(1);
+  const [purchaseType, setPurchaseType] = useState<"once" | "abo">("once");
+  const [intervalWeeks, setIntervalWeeks] = useState(subscription?.defaultInterval ?? 4);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const uid = useId();
@@ -48,6 +65,8 @@ export function ProductPurchase({
   const isDrink = type === "sorte" || type === "mixed";
   const isSize = optionName === "Größe";
   const legend = isSize ? (type === "bundle" ? "Shirt-Größe" : "Größe") : "Packgröße";
+  const aboOffer = isDrink && subscription ? (subscription.variants[selected.id] ?? null) : null;
+  const isAbo = purchaseType === "abo" && aboOffer !== null;
 
   return (
     <form
@@ -57,10 +76,19 @@ export function ProductPurchase({
         event.preventDefault();
         setMessage(null);
         startTransition(async () => {
-          const result = await addLine(selected.id, quantity);
+          const result = await addLine(
+            selected.id,
+            quantity,
+            isAbo ? { subscriptionIntervalWeeks: intervalWeeks } : undefined,
+          );
           setMessage(
             result.ok
-              ? { ok: true, text: `${productTitle} liegt im Warenkorb.` }
+              ? {
+                  ok: true,
+                  text: isAbo
+                    ? `${productTitle} liegt als Abo im Warenkorb.`
+                    : `${productTitle} liegt im Warenkorb.`,
+                }
               : { ok: false, text: result.error },
           );
         });
@@ -144,8 +172,38 @@ export function ProductPurchase({
         <input type="hidden" name="variantId" value={selected.id} />
       )}
 
+      {isDrink && subscription && aboOffer ? (
+        <PurchaseTypeChoice
+          uid={uid}
+          value={purchaseType}
+          onChange={setPurchaseType}
+          onceGoodsCents={selected.goodsPriceCents}
+          onceBasePriceText={selected.basePriceText}
+          offer={aboOffer}
+        >
+          <SubscriptionIntervalPicker
+            uid={uid}
+            intervals={subscription.intervals}
+            defaultInterval={subscription.defaultInterval}
+            value={intervalWeeks}
+            onChange={setIntervalWeeks}
+            today={subscription.today}
+          />
+        </PurchaseTypeChoice>
+      ) : null}
+
+      {isAbo && aboOffer && subscription ? (
+        <AboPriceBlock
+          offer={aboOffer}
+          unitCount={selected.unitCount}
+          depositPerUnitCents={selected.depositPerUnitCents}
+          shippingPriceCents={subscription.shippingPriceCents}
+          freeShippingFromCents={subscription.freeShippingFromCents}
+        />
+      ) : null}
+
       {/* Preisblock: Gesamtpreis, Pfand getrennt, Grundpreis (PAngV), MwSt. und Versand */}
-      <div className="flex flex-col gap-1" aria-live="polite">
+      <div className={isAbo ? "hidden" : "flex flex-col gap-1"} aria-live="polite">
         <p className="flex flex-wrap items-end gap-x-3">
           <span className="text-[40px] leading-none font-bold tracking-[-0.01em] lg:text-[44px]">
             {formatEur(selected.goodsPriceCents)}
@@ -248,9 +306,10 @@ export function ProductPurchase({
             aria-describedby={message && !message.ok ? `${uid}-meldung` : undefined}
           >
             <CartLineIcon className="h-[18px] w-[18px] shrink-0" />
-            {selected.available ? "In den Warenkorb" : "Ausverkauft"}
+            {!selected.available ? "Ausverkauft" : isAbo ? "Abo starten" : "In den Warenkorb"}
           </button>
         </div>
+        {isAbo ? <SubscriptionNote /> : null}
         {message ? (
           <p
             id={`${uid}-meldung`}

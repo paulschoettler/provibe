@@ -235,3 +235,35 @@ describe("buildCartView", () => {
     expect(view.lines.reduce((s, l) => s + l.lineDepositCents, 0)).toBe(view.totals?.depositCents);
   });
 });
+
+describe("Abo-Positionen (Paket Abo)", () => {
+  it("Abo-Preis je Lieferung, Einmalpreis zum Vergleich, Pfand und Grundpreis ohne Pfand", () => {
+    const view = buildCartView({
+      cartId: "c",
+      updatedAt: null,
+      lines: [pack({ subscription: { intervalWeeks: 4, discountBp: 1000 } })],
+      shippingRates: [dhl],
+    });
+    const line = view.lines[0];
+    expect(line.unitPriceCents).toBe(2146);
+    expect(line.lineGoodsCents).toBe(2146);
+    expect(line.lineDepositCents).toBe(225);
+    expect(line.basePriceText).toBe("7,23 € / l");
+    expect(line.subscription).toEqual({
+      intervalWeeks: 4,
+      discountBp: 1000,
+      listUnitPriceCents: 2385,
+    });
+    expect(view.totals?.totalCents).toBe(2146 + 225 + 490);
+  });
+  it("Einmalkauf bleibt unverändert", () => {
+    const view = buildCartView({
+      cartId: "c",
+      updatedAt: null,
+      lines: [pack()],
+      shippingRates: [dhl],
+    });
+    expect(view.lines[0].unitPriceCents).toBe(2385);
+    expect(view.lines[0].subscription).toBeUndefined();
+  });
+});

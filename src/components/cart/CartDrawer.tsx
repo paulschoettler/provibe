@@ -9,7 +9,7 @@ import type { CartLineView } from "@/lib/cart/types";
 import { MAX_LINE_QUANTITY } from "@/lib/cart/types";
 import { useCart } from "./cart-context";
 import { useCartError } from "./CartProvider";
-import { CartSummary, DepositNote, FreeShippingHint } from "./cart-parts";
+import { CartSummary, DepositNote, FreeShippingHint, SubscriptionLineNote } from "./cart-parts";
 
 /** Hilfsfunktion für die typisierten Routen von Next: /checkout und /collections gibt es noch nicht. */
 const ROUTE = (path: string) => path as Route;
@@ -197,6 +197,7 @@ function DrawerLine({
               {line.productTitle}
             </Link>
             <p className="text-aubergine/70 text-[14px]">{line.variantTitle}</p>
+            <SubscriptionLineNote subscription={line.subscription} quantity={line.quantity} />
           </div>
           <p className="shrink-0 text-[16px] font-semibold">{formatEur(line.lineGoodsCents)}</p>
         </div>
