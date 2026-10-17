@@ -55,8 +55,13 @@ const NEIGHBOR_SCALE_STACKED = 0.74;
 export const NEIGHBOR_OPACITY_ZOOM = 0.4;
 /** Kippung der Nachbardosen um die z-Achse, Oberkante nach außen. */
 export const CAN_TILT_Z_DEG = 11.5;
-/** Zusätzliche y-Drehung der Nachbardosen, damit das Etikett lesbar bleibt. */
-export const CAN_YAW_DEG = 45;
+/**
+ * y-Drehung der Nachbardosen zur Kamera hin, damit Schriftzug und Früchte frontal
+ * lesbar bleiben (nicht die Nährwerttabelle). Bei 120 Grad Ringwinkel wirken davon
+ * sin(120°) = 0,87, also rund 15 Grad: So schräg sieht die Kamera eine Nachbardose
+ * auf Desktop-Breiten an. Vorzeichen je Seite setzt CanScene.
+ */
+export const CAN_YAW_DEG = 17;
 
 export interface HeroGeometry {
   /** Schmales Layout: kleinere Modelle laden. */

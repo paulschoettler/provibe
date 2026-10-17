@@ -60,6 +60,10 @@ Die Site ist mit dem Repo verbunden. Solange kein `NETLIFY_AUTH_TOKEN` vorliegt,
 
 Außerdem: **Site configuration**, **Build & deploy**, **Deploy Previews**: entweder deaktivieren oder so lassen (sie laufen dank `netlify.toml` mit Mock-Integrationen und ohne Production-Secrets). Bitte schick mir die Netlify-Site-URL, dann trage ich sie in `.env.example` und `docs` ein.
 
+### 3a. Netlify und Git-Autor (seit 17.10.2026)
+
+Netlify baut private Repos nur noch, wenn der Autor des Commits ein verifiziertes Teammitglied ist ("Unrecognized Git contributor"). Commits mit dem Autor "Claude" werden blockiert, auch manuelle Builds per API und CLI. Deshalb committet die Entwicklungsumgebung im Repo mit deiner Identität (`git config user.name "Paul Schöttler"`, `git config user.email "info@abimanufaktur.de"`), die Mitarbeit von Claude steht weiterhin als Co-Authored-By-Zeile in jeder Commit-Nachricht. Netlify prüft dabei nicht die E-Mail, sondern ob das GitHub-Konto des Autors mit einem Mitglied des Netlify-Teams verknüpft ist. Im Team ist nur Celines Konto (GitHub celinegrimm) verknüpft. Übergangslösung seit 17.10.2026: Das Repo ist öffentlich, dafür gilt die Regel nicht. Sobald Celine zustimmt, committet die Umgebung unter `celinegrimm@users.noreply.github.com` und das Repo kann wieder privat werden.
+
 ### 4. Später, jeweils erst wenn die Phase beginnt
 
 | Phase          | Zugang                                                                                                                           | Was ich genau brauche                                                                                                                                                          |
