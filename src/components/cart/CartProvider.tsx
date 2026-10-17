@@ -50,6 +50,8 @@ export function CartProvider({
   useEffect(() => {
     if (hydrated.current || initialCart.id) return;
     hydrated.current = true;
+    // Das Backoffice hat keinen Warenkorb: dort keine Server Action auslösen
+    if (window.location.pathname.startsWith("/admin")) return;
     startTransition(async () => {
       const fresh = await readCart();
       if (!fresh.id) return;

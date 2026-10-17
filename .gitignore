@@ -47,3 +47,6 @@ Thumbs.db
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Typprüfung ohne .next/dev (parallele Dev-Server)
+tsconfig.check.json
