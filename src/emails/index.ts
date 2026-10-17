@@ -33,7 +33,7 @@ const SAMPLE_PRODUCT: ProductCardData = {
   title: "Peach",
   line: "Eistee mit 15 g Protein · 0,33 l",
   priceLine: "9 Dosen 26,10 €",
-  detailLine: "inkl. 2,25 € Pfand · Grundpreis 8,03 € / l (ohne Pfand)",
+  detailLine: "zzgl. 2,25 € Pfand · Grundpreis 8,03 € / l (ohne Pfand)",
   imageUrl: null,
   url: "/products/peach",
 };
