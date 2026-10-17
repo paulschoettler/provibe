@@ -20,6 +20,9 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: "dashboard", exact: true },
   { href: "/admin/bestellungen", label: "Bestellungen", icon: "bestellungen" },
+  // Figma 79:2395 "Seitenleiste (mit Abos)": direkt unter Bestellungen. Alle Rollen sehen den
+  // Punkt (Fulfillment sieht Lieferplan und Historie ohne Beträge, die Seiten prüfen selbst).
+  { href: "/admin/abos", label: "Abos", icon: "abo" },
   { href: "/admin/produkte", label: "Produkte", icon: "produkte" },
   { href: "/admin/kollektionen", label: "Kollektionen", icon: "kollektionen" },
   { href: "/admin/bestand", label: "Bestand", icon: "bestand" },

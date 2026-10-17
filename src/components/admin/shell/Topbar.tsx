@@ -24,11 +24,14 @@ export function Topbar({
   items,
   user,
   openOrders,
+  aboAlerts = 0,
   quickActions,
 }: {
   items: NavLink[];
   user: ShellUser;
   openOrders: number;
+  /** überfällige Abos plus ungeklärte Kündigungen (countSubscriptionAlerts().total) */
+  aboAlerts?: number;
   quickActions: QuickAction[];
 }) {
   const pathname = usePathname() ?? "/admin";
@@ -50,8 +53,21 @@ export function Topbar({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const bellCount = openOrders + aboAlerts;
   const bellLabel =
-    openOrders > 0 ? `${openOrders} offene Bestellungen` : "Keine offenen Bestellungen";
+    bellCount === 0
+      ? "Keine offenen Bestellungen oder Abo-Hinweise"
+      : [
+          openOrders > 0 ? `${openOrders} offene Bestellungen` : null,
+          aboAlerts > 0 ? `${aboAlerts} Abo-Hinweise` : null,
+        ]
+          .filter(Boolean)
+          .join(", ");
+  // Ohne offene Bestellungen führt die Glocke zu den überfälligen Abos
+  const bellHref =
+    openOrders === 0 && aboAlerts > 0
+      ? "/admin/abos?status=offen"
+      : "/admin/bestellungen?status=offen";
 
   return (
     <header className="border-admin-rahmen bg-admin-karte sticky top-0 z-40 flex h-14 items-center gap-1 border-b px-1 lg:gap-4 lg:px-6">
@@ -92,15 +108,15 @@ export function Topbar({
           <Icon name="suche" size={22} />
         </Link>
         <Link
-          href="/admin/bestellungen?status=offen"
+          href={bellHref}
           aria-label={bellLabel}
           title={bellLabel}
           className={cx(iconButtonClasses("ghost", "lg"), "relative lg:size-9")}
         >
           <Icon name="glocke" size={20} />
-          {openOrders > 0 ? (
+          {bellCount > 0 ? (
             <span className="bg-admin-akzent text-admin-auf-akzent absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold lg:top-0.5 lg:right-0.5">
-              {openOrders > 99 ? "99+" : openOrders}
+              {bellCount > 99 ? "99+" : bellCount}
             </span>
           ) : null}
         </Link>

@@ -385,9 +385,7 @@ export async function startSetupAction(
 
 /* ---------- Offene Zahlung bestätigen (3-D Secure) ---------- */
 
-export async function confirmPaymentAction(
-  formData: FormData,
-): Promise<{
+export async function confirmPaymentAction(formData: FormData): Promise<{
   status: "confirmed" | "client_action" | "nothing_pending" | "error";
   clientSecret?: string;
 }> {

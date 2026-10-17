@@ -13,7 +13,6 @@ export interface NavLink {
 /** Weitere Seitentitel für die Kopfzeile, die nicht in der Navigation stehen */
 export const EXTRA_TITLES: Record<string, string> = {
   "/admin/suche": "Suche",
-  "/admin/abos": "Abos",
 };
 
 export function isActive(pathname: string, item: Pick<NavLink, "href" | "exact">): boolean {

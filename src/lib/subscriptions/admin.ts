@@ -17,7 +17,8 @@ import type {
 } from "./types";
 
 /**
- * Serverfunktionen für das Backoffice /admin/abos (Oberfläche folgt in einer späteren Welle).
+ * Serverfunktionen für das Backoffice /admin/abos (Oberfläche: src/app/admin/(shell)/abos,
+ * Lesehelfer in admin-queries.ts, Server Actions in admin-actions.ts).
  * Aufrufer prüfen vorher die Rolle (requireStaff, Schreiben ab "support" für Pausieren und
  * Überspringen, Rabatt und Einstellungen nur Owner/Admin über PERMISSIONS.editSettings) und
  * übergeben die Staff-Sitzung; jede schreibende Aktion landet im Audit-Log.
@@ -49,14 +50,33 @@ export interface AdminSubscriptionListItem {
   revenueCents: number;
   deliveries: number;
   createdAt: string;
+  /** Dosenbild der Sorte (nur Liste, optional) */
+  imageUrl?: string | null;
+  pausedUntil?: string | null;
+  pastDueSince?: string | null;
+  cancelledAt?: string | null;
+  /** Kündigung erklärt, wirksam zu diesem Zeitpunkt (auch bei noch laufendem Abo) */
+  cancelEffectiveAt?: string | null;
+  skipNext?: boolean;
+  /** Letzte Abo-Bestellung mit Zahlungsstatus (bezahlt, offen, fehlgeschlagen) */
+  lastPayment?: { at: string; status: string; orderNumber: string } | null;
 }
 
 export interface ListSubscriptionsInput {
   status?: SubscriptionStatus | "all";
-  /** Abo-Nummer, E-Mail oder Name */
+  /** Abo-Nummer, E-Mail oder Name (Vorname, Nachname oder beides) */
   search?: string;
+  /** nur Abos dieses Produkts (alle Packgrößen) */
+  productId?: string;
+  /** nur Abos mit diesem Intervall in Wochen */
+  intervalWeeks?: number;
   limit?: number;
   offset?: number;
+}
+
+/** Suchbegriff für PostgREST-Filter entschärfen (Komma, Klammern und Platzhalter entfernen). */
+function safeTerm(term: string): string {
+  return term.replace(/[%,()*\\:"']/g, "").trim();
 }
 
 export async function listSubscriptions(
@@ -72,18 +92,33 @@ export async function listSubscriptions(
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
   if (input.status && input.status !== "all") query = query.eq("status", input.status);
+  if (input.intervalWeeks && Number.isInteger(input.intervalWeeks)) {
+    query = query.eq("interval_count", input.intervalWeeks);
+  }
+  if (input.productId && /^[0-9a-f-]{36}$/i.test(input.productId)) {
+    const { data: variantRows } = await db
+      .from("product_variants")
+      .select("id")
+      .eq("product_id", input.productId);
+    const variantIds = ((variantRows ?? []) as { id: string }[]).map((v) => v.id);
+    if (variantIds.length === 0) return { items: [], total: 0 };
+    query = query.in("variant_id", variantIds);
+  }
   const search = input.search?.trim();
   if (search) {
-    if (/^abo-?\d+$/i.test(search) || /^\d{4,}$/.test(search)) {
-      query = query.eq("number", `ABO-${search.replace(/\D/g, "")}`);
+    if (/^abo[-\s]?\d+$/i.test(search) || /^\d{4,}$/.test(search)) {
+      query = query.eq("number", `ABO-${Number(search.replace(/\D/g, ""))}`);
     } else {
-      const { data: customers } = await db
-        .from("customers")
-        .select("id")
-        .or(
-          `email.ilike.%${search.replace(/[%,()]/g, "")}%,last_name.ilike.%${search.replace(/[%,()]/g, "")}%`,
-        )
-        .limit(200);
+      // Jeder Begriff muss in E-Mail, Vor- oder Nachname vorkommen ("Paul Schöttler" findet beide Felder)
+      const terms = search.split(/\s+/).map(safeTerm).filter(Boolean).slice(0, 4);
+      if (terms.length === 0) return { items: [], total: 0 };
+      let customerQuery = db.from("customers").select("id").limit(200);
+      for (const term of terms) {
+        customerQuery = customerQuery.or(
+          `email.ilike.%${term}%,first_name.ilike.%${term}%,last_name.ilike.%${term}%`,
+        );
+      }
+      const { data: customers } = await customerQuery;
       const ids = ((customers ?? []) as { id: string }[]).map((c) => c.id);
       if (ids.length === 0) return { items: [], total: 0 };
       query = query.in("customer_id", ids);
@@ -105,7 +140,7 @@ export async function listSubscriptions(
     const variant = variants.get(row.variant_id);
     const quote = variant ? quoteDelivery(row, variant, pricing) : null;
     const next = effectiveNextDelivery(row);
-    const rev = revenue.get(row.id) ?? { cents: 0, count: 0 };
+    const rev = revenue.get(row.id) ?? { cents: 0, count: 0, last: null };
     return {
       id: row.id,
       number: row.number,
@@ -123,28 +158,53 @@ export async function listSubscriptions(
       revenueCents: rev.cents,
       deliveries: rev.count,
       createdAt: row.created_at,
+      imageUrl: quote?.line.imageUrl ?? null,
+      pausedUntil: row.paused_until,
+      pastDueSince: row.past_due_since,
+      cancelledAt: row.cancelled_at,
+      cancelEffectiveAt: row.cancel_effective_at,
+      skipNext: row.skip_next,
+      lastPayment: rev.last,
     };
   });
   return { items, total: count ?? items.length };
 }
 
-async function revenueBySubscription(
-  ids: string[],
-): Promise<Map<string, { cents: number; count: number }>> {
-  const out = new Map<string, { cents: number; count: number }>();
+interface RevenueEntry {
+  cents: number;
+  count: number;
+  last: { at: string; status: string; orderNumber: string } | null;
+}
+
+async function revenueBySubscription(ids: string[]): Promise<Map<string, RevenueEntry>> {
+  const out = new Map<string, RevenueEntry>();
   if (ids.length === 0) return out;
   const { data } = await aboDb()
     .from("subscription_orders")
-    .select("subscription_id, orders (total_cents, payment_status)")
+    .select("subscription_id, orders (order_number, placed_at, total_cents, payment_status)")
     .in("subscription_id", ids);
   for (const r of (data ?? []) as unknown as {
     subscription_id: string;
-    orders: { total_cents: number; payment_status: string } | null;
+    orders: {
+      order_number: string;
+      placed_at: string;
+      total_cents: number;
+      payment_status: string;
+    } | null;
   }[]) {
-    if (!r.orders || !["paid", "partially_refunded"].includes(r.orders.payment_status)) continue;
-    const entry = out.get(r.subscription_id) ?? { cents: 0, count: 0 };
-    entry.cents += r.orders.total_cents;
-    entry.count += 1;
+    if (!r.orders) continue;
+    const entry = out.get(r.subscription_id) ?? { cents: 0, count: 0, last: null };
+    if (!entry.last || r.orders.placed_at > entry.last.at) {
+      entry.last = {
+        at: r.orders.placed_at,
+        status: r.orders.payment_status,
+        orderNumber: r.orders.order_number,
+      };
+    }
+    if (["paid", "partially_refunded"].includes(r.orders.payment_status)) {
+      entry.cents += r.orders.total_cents;
+      entry.count += 1;
+    }
     out.set(r.subscription_id, entry);
   }
   return out;
@@ -385,11 +445,15 @@ export async function adminCancel(
   return result.row;
 }
 
-/** Rabatt eines bestehenden Abos ändern (Basispunkte, 0 bis 5000). */
+/**
+ * Rabatt eines bestehenden Abos ändern (Basispunkte, 0 bis 5000). options.reason (intern) landet
+ * im Audit-Log.
+ */
 export async function adminSetDiscount(
   actor: StaffActor,
   id: string,
   discountBp: number,
+  options: { reason?: string | null } = {},
 ): Promise<SubscriptionRow> {
   const row = await requireRow(id);
   const updated = await setDiscount(row, discountBp, staffActor(actor));
@@ -398,7 +462,10 @@ export async function adminSetDiscount(
     entityType: "subscription",
     entityId: id,
     before: { discount_bp: row.discount_bp },
-    after: { discount_bp: updated.discount_bp },
+    after: {
+      discount_bp: updated.discount_bp,
+      ...(options.reason ? { reason: options.reason.slice(0, 500) } : {}),
+    },
   });
   return updated;
 }
@@ -406,11 +473,13 @@ export async function adminSetDiscount(
 /**
  * Neuen Standardrabatt ausdrücklich auf bestehende Abos anwenden (Plan B: sonst gilt eine
  * Änderung nur für neue Abos). Optional nur für ein Produkt. Gibt die Anzahl geänderter Abos zurück.
+ * filter.onlyRaise: nur Abos, deren Rabatt dadurch steigt (der Preis sinkt); eine Senkung des
+ * Rabatts wäre eine Preiserhöhung und braucht eine Ankündigung (I17, H28).
  */
 export async function adminApplyDiscountToExisting(
   actor: StaffActor,
   discountBp: number,
-  filter: { productId?: string } = {},
+  filter: { productId?: string; onlyRaise?: boolean } = {},
 ): Promise<number> {
   const db = aboDb();
   let ids: string[] | null = null;
@@ -428,6 +497,7 @@ export async function adminApplyDiscountToExisting(
   let changed = 0;
   for (const row of (data ?? []) as SubscriptionRow[]) {
     if (row.discount_bp === discountBp) continue;
+    if (filter.onlyRaise && row.discount_bp > discountBp) continue;
     await setDiscount(row, discountBp, staffActor(actor));
     changed += 1;
   }
@@ -435,7 +505,12 @@ export async function adminApplyDiscountToExisting(
     action: "subscription.apply_discount_existing",
     entityType: "subscription",
     entityId: null,
-    after: { discount_bp: discountBp, product_id: filter.productId ?? null, changed },
+    after: {
+      discount_bp: discountBp,
+      product_id: filter.productId ?? null,
+      only_raise: filter.onlyRaise ?? false,
+      changed,
+    },
   });
   return changed;
 }
