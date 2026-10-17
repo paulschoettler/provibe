@@ -65,7 +65,13 @@ export function Footer({ quickLinks }: FooterProps) {
                   </SiteLink>
                 </li>
               ))}
-              {links.some((l) => l.url === "/abo-kuendigen") ? null : <li><SiteLink href="/abo-kuendigen" className="pv-footer-link">Vertrag kündigen</SiteLink></li>}
+              {links.some((l) => l.url === "/abo-kuendigen") ? null : (
+                <li>
+                  <SiteLink href="/abo-kuendigen" className="pv-footer-link">
+                    Vertrag kündigen
+                  </SiteLink>
+                </li>
+              )}
             </ul>
           </nav>
 
@@ -78,10 +84,21 @@ export function Footer({ quickLinks }: FooterProps) {
 
         <div className="pv-footer-pay">
           <h2 className="pv-footer-heading">Zahlarten</h2>
-          <ul className="pv-pay-list">
+          {/* Offizielle Zeichen, unverändert auf weißen Plättchen (docs/zahlarten-logos.md) */}
+          <ul className="pv-pay-list pv-pay-logos">
             {PAYMENT_METHODS.map((method) => (
-              <li key={method} className="pv-pay-badge">
-                {method}
+              <li
+                key={method.label}
+                className={method.wordmark ? "pv-pay-plate pv-pay-plate--wordmark" : "pv-pay-plate"}
+              >
+                <Image
+                  src={method.src}
+                  alt={method.label}
+                  width={Math.round((method.width / method.height) * 24)}
+                  height={24}
+                  unoptimized
+                  className="pv-pay-logo"
+                />
               </li>
             ))}
           </ul>

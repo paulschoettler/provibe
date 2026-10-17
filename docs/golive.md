@@ -13,6 +13,7 @@ Stand: 17.10.2026. Wird bis zum Go-live gepflegt. Punkte mit **Auftraggeber** br
 - **Auftraggeber: Rechtsfragen an den Anwalt** (docs/fragen.md): I17 Abo-Klauseln und Preisankündigung, H22 Pfand getrennt vom Preis, H28 Kündigung ohne Login für alle Abos einer Adresse, H29 Echtheitshinweis bei Bewertungen, H27 Peach-Text mit Schwarztee. Bis zur Antwort bleiben Preisankündigung und Bewertungsanfrage aus.
 - Abo-Betrieb: Die täglichen Datenbank-Jobs (pg_cron `subscription_run_due` 05:41 UTC, `subscription_reminder` 07:53 UTC) legen nur Jobs an; die Netlify Scheduled Function `jobs-run` muss auf der Live-Site aktiv sein (`JOBS_RUNNER_SECRET` gesetzt). Vor dem Go-live einen Abo-Lauf mit Stripe-Testkarte durchspielen (Abbuchung, abgelehnte Karte, 3-D Secure).
 - **Auftraggeber: Shopify-Exporte** (docs/import.md): Kunden, Bestellungen, Rabattcodes; für den Newsletter zusätzlich eine Quelle mit Einwilligungszeitpunkt (Shopify-Admin-Token nur mit read_customers oder Matrixify-Export), sonst wird niemand versandfähig (D3). Vorab ein Testexport mit wenigen Zeilen (C9). Bitte sagen, ob es Zeiträume ohne 0,25 € Pfand im Preis gab.
+- Zahlarten im Footer: Maestro nur zeigen, wenn Stripe es annimmt (H31); Mindestgrößen der Apple-Pay- und Google-Pay-Zeichen gegen die aktuellen Richtlinien prüfen (`docs/zahlarten-logos.md`).
 - Lieferungen aus Phase 1: Gewichte je Variante (für DHL), EANs, Etikett-Texte (LMIV-Abgleich), LUCID-Nummer fürs Impressum, Shopify-Exporte (Kunden, Bestellungen, Rabattcodes, Newsletter) für den Import.
 
 ## Technische Prüfungen vor dem DNS-Umzug

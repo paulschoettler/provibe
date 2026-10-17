@@ -6780,3 +6780,53 @@ html[data-js] .pv-abo-js-hide {
   display: none;
 }
 /* Ende Admin Katalog */
+/* Zahlarten */
+/* Offizielle Zeichen im Footer: weiße Plättchen mit dezentem Rahmen, damit die Markenfarben
+   auf Wine lesbar bleiben. Einheitliche Höhe, Breite folgt dem Seitenverhältnis (keine
+   Verzerrung), Abstand zwischen den Plättchen als Schutzraum. */
+.pv-pay-logos {
+  margin-top: 16px;
+  gap: 8px;
+  align-items: center;
+}
+.pv-pay-plate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 3px;
+  background: #ffffff;
+  border: 1px solid rgb(0 0 0 / 0.08);
+  border-radius: 7px;
+}
+.pv-pay-logo {
+  display: block;
+  width: auto;
+  height: 24px;
+}
+.pv-pay-plate--wordmark {
+  padding-inline: 8px;
+}
+.pv-pay-plate--wordmark .pv-pay-logo {
+  height: 15px;
+}
+@media (min-width: 861px) {
+  .pv-pay-logos {
+    gap: 10px;
+  }
+  .pv-pay-plate {
+    height: 36px;
+    border-radius: 8px;
+  }
+  .pv-pay-logo {
+    height: 28px;
+  }
+  .pv-pay-plate--wordmark {
+    padding-inline: 10px;
+  }
+  .pv-pay-plate--wordmark .pv-pay-logo {
+    height: 18px;
+  }
+}
+/* Ende Zahlarten */
