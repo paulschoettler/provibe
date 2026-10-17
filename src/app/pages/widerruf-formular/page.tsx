@@ -6,6 +6,8 @@ import { Notice } from "@/components/forms";
 import { SiteLink } from "@/components/layout/SiteLink";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getShopSettings } from "@/lib/content/settings";
+import { getPage } from "@/lib/content/pages";
+import { ogImages } from "@/lib/seo/og";
 
 /**
  * Elektronische Widerrufsfunktion "Vertrag widerrufen" (Briefing 5, dauerhaft erreichbar,
@@ -17,16 +19,21 @@ export const revalidate = 3600;
 const DESCRIPTION =
   "Vertrag widerrufen: Erklär deinen Widerruf online und bekomm sofort eine Eingangsbestätigung per E-Mail. Die Widerrufsfrist beträgt 14 Tage ab Erhalt der Ware.";
 
-export const metadata: Metadata = {
-  title: "Vertrag widerrufen",
-  description: DESCRIPTION,
-  alternates: { canonical: "/pages/widerruf-formular" },
-  openGraph: {
-    title: "Vertrag widerrufen | provibe",
-    description: DESCRIPTION,
-    url: "/pages/widerruf-formular",
-  },
-};
+/** SEO-Felder kommen aus dem Backoffice (Seite "widerruf-formular"), die Texte hier sind der Rückfall. */
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage("widerruf-formular");
+  return {
+    title: page?.seoTitle ?? "Vertrag widerrufen",
+    description: page?.seoDescription ?? DESCRIPTION,
+    alternates: { canonical: "/pages/widerruf-formular" },
+    openGraph: {
+      title: "Vertrag widerrufen | provibe",
+      description: page?.seoDescription ?? DESCRIPTION,
+      url: "/pages/widerruf-formular",
+      images: ogImages(page?.ogImagePath, "Widerruf bei provibe"),
+    },
+  };
+}
 
 export default async function WiderrufFormularPage() {
   const { legalEntity, contact } = await getShopSettings();

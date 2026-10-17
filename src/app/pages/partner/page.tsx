@@ -9,6 +9,7 @@ import { PageMotion } from "@/components/motion/PageMotion";
 import { capitalize, htmlNodes, type HtmlNode } from "@/lib/content/html";
 import { getPage } from "@/lib/content/pages";
 import { getShopSettings } from "@/lib/content/settings";
+import { ogImages } from "@/lib/seo/og";
 
 /** Partnerseite (B2B): Text aus pages (Handle partner), Formular schreibt in leads. */
 export const revalidate = 3600;
@@ -26,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Partner | provibe",
       description: page?.seoDescription ?? DESCRIPTION,
       url: "/pages/partner",
+      images: ogImages(page?.ogImagePath, "provibe für Partner"),
     },
   };
 }

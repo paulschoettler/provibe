@@ -9,6 +9,7 @@ import { breadcrumbLd, itemListLd, JsonLd } from "@/components/catalog/JsonLd";
 import { PriceFootnote } from "@/components/catalog/parts";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { TrackCollectionView } from "@/components/tracking/views";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/og";
 import {
   getCollection,
   getShippingInfo,
@@ -48,7 +49,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: c.seoTitle ?? c.title,
     description,
     alternates: { canonical: c.url },
-    openGraph: { title: `${c.seoTitle ?? c.title} | provibe`, description, url: c.url },
+    openGraph: {
+      title: `${c.seoTitle ?? c.title} | provibe`,
+      description,
+      url: c.url,
+      images: [DEFAULT_OG_IMAGE],
+    },
   };
 }
 

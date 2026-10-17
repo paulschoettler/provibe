@@ -7,6 +7,7 @@ import { ArrowRightIcon } from "@/components/catalog/icons";
 import { breadcrumbLd, JsonLd } from "@/components/catalog/JsonLd";
 import { Eyebrow } from "@/components/catalog/parts";
 import { listCollections, listProducts } from "@/lib/catalog/products";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/og";
 
 /** Kollektionsübersicht: statisch, stündlich oder per revalidateTag("catalog") erneuert. */
 export const revalidate = 3600;
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "Alle Kollektionen von provibe: Eistee mit 15 g Protein, Founder Bundles und Merch auf einen Blick.",
   alternates: { canonical: "/collections" },
-  openGraph: { title: "Kollektionen | provibe", url: "/collections" },
+  openGraph: { title: "Kollektionen | provibe", url: "/collections", images: [DEFAULT_OG_IMAGE] },
 };
 
 /**

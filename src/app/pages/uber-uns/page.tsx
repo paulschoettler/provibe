@@ -13,6 +13,7 @@ import { PageMotion } from "@/components/motion/PageMotion";
 import { htmlNodes } from "@/lib/content/html";
 import { getPage } from "@/lib/content/pages";
 import { getShopSettings } from "@/lib/content/settings";
+import { ogImages } from "@/lib/seo/og";
 
 /** Story-Seite: Inhalt aus pages/page_translations (Handle uber-uns), statisch, stündlich erneuert. */
 export const revalidate = 3600;
@@ -30,14 +31,12 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Über uns | provibe",
       description: page?.seoDescription ?? DESCRIPTION,
       url: "/pages/uber-uns",
-      images: [
-        {
-          url: "/images/story-bag.jpg",
-          width: 1600,
-          height: 1063,
-          alt: "Celine mit provibe im Kofferraum",
-        },
-      ],
+      images: ogImages(page?.ogImagePath, "Celine Grimm, Gründerin von provibe", {
+        url: "/images/story-bag.jpg",
+        width: 1600,
+        height: 1063,
+        alt: "Celine mit provibe im Kofferraum",
+      }),
     },
   };
 }

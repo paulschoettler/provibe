@@ -10,24 +10,35 @@ import { Eyebrow, PriceFootnote, SectionHead } from "@/components/catalog/parts"
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { PageMotion } from "@/components/motion/PageMotion";
 import { getShippingInfo, listCollections, listProducts } from "@/lib/catalog/products";
+import { getPage } from "@/lib/content/pages";
+import { ogImages } from "@/lib/seo/og";
 
 /** Katalogdaten: statisch bauen, stündlich oder per revalidateTag("catalog") erneuern. */
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: "Shop: Eistee mit 15 g Protein",
-  description:
-    "Such dir deinen Vibe: provibe Eistee mit 15 g Protein in Wildberry, Raspberry Lime und Peach, der Mix aus allen dreien, Founder Bundles und Merch.",
-  alternates: { canonical: "/pages/shop" },
-  openGraph: {
-    title: "Shop | provibe",
-    description: "Eistee mit 15 g Protein, ohne Zucker. Alle Sorten, Bundles und Merch.",
-    url: "/pages/shop",
-    images: [
-      { url: "/images/bundle-3.jpg", width: 1400, height: 924, alt: "provibe Founder Bundle" },
-    ],
-  },
-};
+const DESCRIPTION =
+  "Such dir deinen Vibe: provibe Eistee mit 15 g Protein in Wildberry, Raspberry Lime und Peach, der Mix aus allen dreien, Founder Bundles und Merch.";
+
+/** SEO-Felder kommen aus dem Backoffice (Seite "shop"), die Texte hier sind der Rückfall. */
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage("shop");
+  return {
+    title: page?.seoTitle ?? "Shop: Eistee mit 15 g Protein",
+    description: page?.seoDescription ?? DESCRIPTION,
+    alternates: { canonical: "/pages/shop" },
+    openGraph: {
+      title: "Shop | provibe",
+      description: page?.seoDescription ?? DESCRIPTION,
+      url: "/pages/shop",
+      images: ogImages(page?.ogImagePath, "provibe Shop", {
+        url: "/images/bundle-3.jpg",
+        width: 1400,
+        height: 924,
+        alt: "provibe Founder Bundle",
+      }),
+    },
+  };
+}
 
 /**
  * Shop-Übersicht (Figma 24:1764 mobil, 26:2199 Desktop): Hero-Band, Kollektionskarten,

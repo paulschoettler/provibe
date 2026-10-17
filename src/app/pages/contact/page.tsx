@@ -11,6 +11,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { htmlNodes } from "@/lib/content/html";
 import { getPage } from "@/lib/content/pages";
 import { getShopSettings } from "@/lib/content/settings";
+import { ogImages } from "@/lib/seo/og";
 
 /** Kontaktseite: Text aus pages (Handle contact), Formular schreibt in contact_messages. */
 export const revalidate = 3600;
@@ -28,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Kontakt | provibe",
       description: page?.seoDescription ?? DESCRIPTION,
       url: "/pages/contact",
+      images: ogImages(page?.ogImagePath, "Kontakt zu provibe"),
     },
   };
 }

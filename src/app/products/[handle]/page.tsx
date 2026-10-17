@@ -26,6 +26,7 @@ import { formatEur } from "@/lib/money";
 import { reviewsLd } from "@/lib/reviews/ld";
 import { getProductReviews } from "@/lib/reviews/queries";
 import { getSubscriptionOffer } from "@/lib/subscriptions/offer";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/og";
 
 /**
  * Produktseite mit vier Darstellungen nach Produkttyp (Figma Sorte 32:1166 / 35:10340,
@@ -67,7 +68,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
               alt: image.alt || product.title,
             },
           ]
-        : undefined,
+        : [DEFAULT_OG_IMAGE],
     },
   };
 }

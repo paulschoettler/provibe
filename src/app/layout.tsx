@@ -7,6 +7,7 @@ import { BRAND_COLORS } from "@/lib/brand/tokens";
 // CI-Tokens zuerst (lädt über @import einmal das Adobe-Kit sne6rux), dann die Site-Styles
 import "../../brand/provibe-ci/tokens.css";
 import "./globals.css";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo/og";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   description:
     "provibe ist erfrischender Eistee mit 15 g Protein, ohne Zucker, ready to drink. Wildberry, Raspberry Lime und Peach.",
   robots: { index: false, follow: false },
-  openGraph: { locale: "de_DE", siteName: "provibe", type: "website" },
+  openGraph: { locale: "de_DE", siteName: "provibe", type: "website", images: [DEFAULT_OG_IMAGE] },
 };
 
 export const viewport: Viewport = {
