@@ -56,13 +56,19 @@ export function Drawer({
   const open = trigger ? openState : Boolean(openProp);
   const titleId = useId();
   const trap = useFocusTrap(ref);
+  // Wechsel von "serverseitig offen" zu showModal(): das close() dabei feuert ein asynchrones
+  // close-Event, das sonst als Schließen durch die Person gilt und zu closeHref navigiert.
+  const reopening = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (open) {
       // Serverseitig mit open gerendert: erst schließen, dann modal öffnen
-      if (el.open && !el.matches(":modal")) el.close();
+      if (el.open && !el.matches(":modal")) {
+        reopening.current = true;
+        el.close();
+      }
       if (!el.open) el.showModal();
     } else if (el.open) {
       el.close();
@@ -116,6 +122,10 @@ export function Drawer({
         open={!trigger && open ? true : undefined}
         aria-labelledby={titleId}
         onClose={() => {
+          if (reopening.current) {
+            reopening.current = false;
+            return;
+          }
           if (trigger) setOpenState(false);
           else if (closeHref && openProp) router.replace(closeHref, { scroll: false });
         }}
