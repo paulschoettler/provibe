@@ -2,6 +2,7 @@ import "server-only";
 import { ensureInvoice } from "@/lib/admin/invoices/invoices";
 import { sendRefundMail, sendShippingMail } from "@/lib/admin/orders/notifications";
 import { CHECKOUT_JOB_KINDS, runCheckoutJob } from "@/lib/checkout/jobs";
+import { CRM_JOB_KINDS, isCrmJobKind, runCrmJob } from "@/lib/admin/automations/jobs";
 import type { ClaimedJob } from "./core";
 
 /**
@@ -15,7 +16,11 @@ export const ADMIN_JOB_KINDS = [
 ] as const;
 export type AdminJobKind = (typeof ADMIN_JOB_KINDS)[number];
 
-export const KNOWN_JOB_KINDS: readonly string[] = [...CHECKOUT_JOB_KINDS, ...ADMIN_JOB_KINDS];
+export const KNOWN_JOB_KINDS: readonly string[] = [
+  ...CHECKOUT_JOB_KINDS,
+  ...ADMIN_JOB_KINDS,
+  ...CRM_JOB_KINDS,
+];
 
 function requireString(payload: Record<string, unknown>, key: string, kind: string): string {
   const value = payload[key];
@@ -28,6 +33,9 @@ function requireString(payload: Record<string, unknown>, key: string, kind: stri
 export async function dispatchJob(job: Pick<ClaimedJob, "kind" | "payload">): Promise<void> {
   if ((CHECKOUT_JOB_KINDS as readonly string[]).includes(job.kind)) {
     return runCheckoutJob(job);
+  }
+  if (isCrmJobKind(job.kind)) {
+    return runCrmJob(job);
   }
   const payload = (job.payload ?? {}) as Record<string, unknown>;
   switch (job.kind as AdminJobKind) {

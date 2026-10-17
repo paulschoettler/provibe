@@ -15,7 +15,11 @@ export async function proxy(request: NextRequest) {
   const user = process.env.SITE_PROTECT_USER;
   const password = process.env.SITE_PROTECT_PASSWORD;
 
-  const isExempt = pathname.startsWith("/api/webhooks/") || pathname === "/api/health";
+  const isExempt =
+    pathname.startsWith("/api/webhooks/") ||
+    pathname === "/api/health" ||
+    pathname === "/api/jobs/run" ||
+    pathname === "/api/newsletter/unsubscribe";
 
   if (user && password && !isExempt) {
     const header = request.headers.get("authorization") ?? "";
