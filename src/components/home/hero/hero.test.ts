@@ -11,7 +11,7 @@ describe("heroWords", () => {
       front: "LIME",
     });
     expect(heroWords("peach", "Peach")).toMatchObject({
-      back: "JUICY",
+      back: "EISTEE",
       front: "PEACH",
       outline: true,
     });

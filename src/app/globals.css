@@ -252,7 +252,7 @@ body {
 .pv-headerbar {
   position: relative;
   z-index: 50;
-  background: var(--pv-cream);
+  background: var(--pv-white);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--pv-ui-hairline);
   transition: box-shadow 0.25s ease;
@@ -371,7 +371,7 @@ html[data-scrolled] .pv-headerbar {
   display: flex;
   flex-direction: column;
   padding: 16px 24px calc(28px + env(safe-area-inset-bottom));
-  background: var(--pv-cream);
+  background: var(--pv-white);
   box-shadow: -20px 0 60px var(--pv-ui-shadow-strong);
   overflow-y: auto;
   animation: pv-drawer-in 0.26s ease;
@@ -1095,6 +1095,10 @@ html[data-tier="3d"] .finale-back {
   z-index: -1;
 }
 html[data-tier="3d"] .finale-can[data-canvas-ready] .finale-can__img {
+  visibility: hidden;
+}
+/* Dasselbe im Finale: kein PNG in der Ladephase, nur ohne WebGL (siehe .pv-cans). */
+html[data-js]:not([data-tier="static"]) .finale-can__img {
   visibility: hidden;
 }
 
@@ -1832,6 +1836,14 @@ html[data-tier="3d"] #pv-hero[data-canvas-ready="true"] .pv-cans {
   opacity: 0;
   visibility: hidden;
 }
+/* Mit JavaScript gibt es keinen Ladeplatzhalter (Feedback vom 17.10.2026): Die PNGs bleiben
+   von der ersten Zeichnung an unsichtbar (data-js setzt das Inline-Skript vor dem ersten Bild)
+   und erscheinen nur, wenn die Fähigkeitsprüfung auf "static" fällt (kein WebGL, Kontextverlust).
+   Bis die 3D-Dose steht, zeigt der Hero Wort und Sticker ohne Dose. */
+html[data-js]:not([data-tier="static"]) .pv-cans {
+  opacity: 0;
+  visibility: hidden;
+}
 .pv-can {
   position: absolute;
   left: 50%;
@@ -2442,24 +2454,9 @@ html[data-js]:not([data-flat]) .pv-stage:not([data-facts="true"]) .pv-facts {
 }
 
 .pv-facts__text {
+  margin: 0;
   font-size: 13px;
   line-height: 1.45;
-}
-.pv-facts__inline {
-  float: left;
-  margin: 0 0.3em 0 0;
-  font: inherit;
-  font-weight: var(--pv-fw-bold);
-}
-.pv-ingredients p {
-  margin: 0;
-}
-.pv-ingredients strong,
-.pv-allergens strong {
-  font-weight: var(--pv-fw-bold);
-}
-.pv-allergens {
-  margin: 0;
 }
 .pv-facts__label {
   margin: 0 0 6px;
@@ -3037,6 +3034,41 @@ html:not([data-flat]) #pv-hero[data-layout="vignette"] .pv-arrow--next {
   }
   .pv-nutrition__row[data-highlight="true"] dd {
     color: var(--pv-white);
+  }
+}
+
+/* Flache Desktop-Fenster (Laptop, bis 780 px hoch): Das Zutatenpanel passt ohne inneren
+   Scroll, weil Typografie und Abstände enger stehen und die Fläche höher werden darf.
+   Steht hinter dem Desktop-Block, damit es dessen Werte überschreibt. */
+@media (min-width: 1024px) and (max-height: 780px) {
+  .pv-facts {
+    max-height: min(86svh, 720px);
+  }
+  .pv-facts__scroll {
+    padding: 22px 26px 20px;
+  }
+  .pv-facts__item {
+    gap: 11px;
+  }
+  .pv-facts__title {
+    font-size: clamp(32px, 3.2vw, 42px);
+  }
+  .pv-facts__notes {
+    margin-top: -6px;
+    font-size: 15px;
+  }
+  .pv-facts__text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .pv-facts__label {
+    margin-bottom: 6px;
+  }
+  .pv-nutrition {
+    gap: 6px;
+  }
+  .pv-nutrition__row[data-featured="true"] {
+    padding: 8px 10px;
   }
 }
 /* Niedrige Querformate (etwa 1024 × 768): vordere Zeile kleiner, damit sie

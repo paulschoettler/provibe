@@ -212,20 +212,10 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
                     </ul>
                   ) : null}
 
-                  {flavor.ingredientsHtml || flavor.allergens ? (
-                    <div className="pv-facts__text pv-rise">
-                      {flavor.ingredientsHtml ? (
-                        <div className="pv-ingredients">
-                          <h3 className="pv-facts__inline">Zutaten:</h3>
-                          <div dangerouslySetInnerHTML={{ __html: flavor.ingredientsHtml }} />
-                        </div>
-                      ) : null}
-                      {flavor.allergens ? (
-                        <p className="pv-allergens">
-                          <strong>Allergene:</strong> {flavor.allergens}
-                        </p>
-                      ) : null}
-                    </div>
+                  {/* Kurzfassung der Beschreibung statt Zutatenliste; Zutaten und Allergene
+                      stehen auf der Produktseite ("Alle Details"). */}
+                  {flavor.shortDescription ? (
+                    <p className="pv-facts__text pv-rise">{flavor.shortDescription}</p>
                   ) : null}
 
                   {rows.length > 0 ? (

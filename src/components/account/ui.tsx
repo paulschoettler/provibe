@@ -15,9 +15,9 @@ export const BTN_OUTLINE =
 export const LINK_PLUM =
   "font-bold text-pv-wildberry underline decoration-[1.5px] underline-offset-4 hover:text-pv-wildberry";
 /** Karte auf Creme (Figma: Cream-2, Radius 26, Schatten/Karte) */
-export const CARD = "rounded-card bg-pv-cream shadow-[0_12px_32px_-6px_var(--pv-ui-shadow-color)]";
+export const CARD = "rounded-card bg-pv-white shadow-[0_12px_32px_-6px_var(--pv-ui-shadow-color)]";
 /** Flache Karte ohne Schatten (Adressen, Zahlart) */
-export const CARD_FLAT = "rounded-[22px] bg-pv-cream";
+export const CARD_FLAT = "rounded-[22px] bg-pv-white";
 
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (

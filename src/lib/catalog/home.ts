@@ -2,6 +2,7 @@ import { supabaseAnon } from "@/lib/supabase/server";
 import { calculateBasePrice, formatBasePrice, type UnitMeasure } from "@/lib/pricing";
 import type { Database } from "@/lib/supabase/database.types";
 import { listProducts } from "./products";
+import { shortDescription } from "./short-description";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 type TranslationRow = Database["public"]["Tables"]["product_translations"]["Row"];
@@ -22,6 +23,8 @@ export interface HomeFlavor {
   palette: FlavorPalette;
   ingredientsHtml: string | null;
   allergens: string | null;
+  /** Ein bis zwei Sätze aus der Beschreibung für die Zutatenkarte im Hero */
+  shortDescription: string | null;
   nutrition: Record<string, string | number> | null;
   badges: string[];
   /** 9er-Pack: Variante, Preis, Pfand, Grundpreis */
@@ -155,6 +158,7 @@ export async function getHomeData(locale = "de"): Promise<HomeData> {
       palette,
       ingredientsHtml: t.ingredients_html,
       allergens: t.allergens,
+      shortDescription: shortDescription(t.description_html),
       nutrition: (t.nutrition as Record<string, string | number> | null) ?? null,
       badges,
       pack: {

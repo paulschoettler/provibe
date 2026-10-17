@@ -29,8 +29,6 @@ const REMOTE_VIDEO_URL: string =
   "https://ajscwnbgaijknmdrtihn.supabase.co/storage/v1/object/public/product-media/videos/about_video.mp4";
 const POSTER = "/images/team/celine.jpg";
 
-const VIDEO_FACTS = ["26 Sekunden", "Startet stumm", "Ton per Tipp"];
-
 function videoSources(): VideoSource[] {
   const list: VideoSource[] = [];
   if (REMOTE_VIDEO_URL) {
@@ -85,19 +83,8 @@ export function FounderVideo({ founder }: { founder: string }) {
           </h2>
           <p className="pv-lead" data-pv-reveal="">
             Ein kurzer Blick hinter die Dose: wie aus der Idee im Studium ein Eistee mit 15 g
-            Protein wurde. Das Video läuft stumm los, den Ton schaltest du mit einem Tipp an.
+            Protein wurde.
           </p>
-          <ul className="flex flex-wrap gap-2" aria-label="Kurz zum Video" data-pv-stagger="">
-            {VIDEO_FACTS.map((fact, i) => (
-              <li
-                key={fact}
-                className={`pv-pill ${i === 2 ? "pv-pill--pink" : ""}`}
-                data-pv-reveal="pop"
-              >
-                {fact}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

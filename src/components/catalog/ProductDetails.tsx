@@ -108,7 +108,7 @@ export function LmivSections({ product }: { product: ProductDetail }) {
       </h2>
       <div className="mt-2">
         {hasIngredients ? (
-          <Accordion title={isBundle ? "Zutaten der Sorten" : "Zutaten"} open>
+          <Accordion title={isBundle ? "Zutaten der Sorten" : "Zutaten"}>
             <div className="pvc-richtext max-w-[780px]">
               {isBundle ? (
                 product.componentFoods.map((f) => (
@@ -132,7 +132,7 @@ export function LmivSections({ product }: { product: ProductDetail }) {
         ) : null}
 
         {product.nutrition ? (
-          <Accordion title={`Nährwerte je ${product.nutrition.per}`} open>
+          <Accordion title={`Nährwerte je ${product.nutrition.per}`}>
             <div className="grid gap-6 lg:grid-cols-[minmax(0,600px)_1fr] lg:gap-10">
               <NutritionTableView
                 table={product.nutrition}
@@ -152,7 +152,7 @@ export function LmivSections({ product }: { product: ProductDetail }) {
         ) : null}
 
         {product.foodBusinessOperator || product.storageInstructions ? (
-          <Accordion title="Lagerung und Hersteller" open>
+          <Accordion title="Lagerung und Hersteller">
             <div className="flex flex-col gap-2">
               {product.foodName ? <Fact label="Bezeichnung">{product.foodName}</Fact> : null}
               {product.netContentText ? (
@@ -186,8 +186,8 @@ export function FaqSection({ faq }: { faq: { q: string; a: string }[] }) {
       <h2 id="fragen" className="pvc-h2 mt-3 mb-2">
         Gut zu wissen
       </h2>
-      {faq.map((f, i) => (
-        <Accordion key={f.q} title={f.q} open={i === 0}>
+      {faq.map((f) => (
+        <Accordion key={f.q} title={f.q}>
           <p className="max-w-[780px]">{f.a}</p>
         </Accordion>
       ))}

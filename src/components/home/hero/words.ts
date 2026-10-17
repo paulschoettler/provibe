@@ -19,7 +19,7 @@ export interface HeroWords {
 const WORDS: Record<string, HeroWords> = {
   wildberry: { back: "WILD", front: "BERRY", outline: false },
   "raspberry-lime": { back: "RASPBERRY", front: "LIME", outline: true },
-  peach: { back: "JUICY", front: "PEACH", outline: true },
+  peach: { back: "EISTEE", front: "PEACH", outline: true },
 };
 
 /** Wortpaar je Sorte. Unbekannte Sorten teilen den Kurznamen am Leerzeichen. */
