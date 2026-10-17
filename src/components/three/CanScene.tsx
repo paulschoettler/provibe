@@ -52,12 +52,56 @@ const RING_EASE = "power3.inOut";
  */
 const CAN_BASE_ROTATION_Y = (120 * Math.PI) / 180;
 /**
- * Oberfläche der Dosen: matt statt glänzend. Die Werte wirken auf alle Sorten
- * gleich, weil sie dieselbe Metal/Roughness-Textur teilen (siehe normalizeCan).
- * Stellschrauben für die Abnahme.
+ * Oberfläche der Dosen: matt lackiertes Aluminium mit samtiger Haut, wie die
+ * echten Dosen (Fotos vom 17.10.2026). Der bedruckte Körper ist ein stumpfer
+ * Lack ohne Metallanteil, nur Deckel und Boden bleiben blankes, leicht
+ * angerautes Aluminium. Die Werte gelten für alle Sorten, weil die drei Modelle
+ * dasselbe Mesh und UV-Layout teilen. Stellschrauben für die Abnahme.
  */
-const CAN_ROUGHNESS_SCALE = 3.8;
-const CAN_ENV_INTENSITY = 0.7;
+const CAN_BODY_ROUGHNESS = 0.85;
+const CAN_LID_ROUGHNESS = 0.45;
+/**
+ * Grenze im UV-Layout zwischen Körper (v darunter) und Deckel plus Boden
+ * (v darüber), abgelesen aus der Metal/Roughness-Textur der Quelle.
+ */
+const CAN_UV_LID_SPLIT = 0.565;
+/**
+ * Stärke des Umgebungslichts. Liegt an der Szene (Canvas-Prop scene), nicht am
+ * Material: three überschreibt material.envMapIntensity mit
+ * scene.environmentIntensity, sobald die Umgebung über scene.environment kommt.
+ * Zusammen mit den Lichtern in Scene so abgestimmt, dass eine freie
+ * Etikettfläche im Bild die Farbe der Textur trifft (gemessen am Wildberry-Rot,
+ * Headless-Chromium mit ACES wie in der Canvas).
+ */
+const CAN_ENV_INTENSITY = 0.25;
+
+/**
+ * Eine 1 × 256 Pixel große Metal/Roughness-Textur, die die der Modelle ersetzt:
+ * Grün ist Rauheit, Blau ist Metalness, je Zeile nach UV-v. Die Quelle beschreibt
+ * blankes Aluminium (Metalness 1, Rauheit um 0,17) für die ganze Dose, deshalb
+ * reicht Nachregeln der Faktoren nicht, um Körper und Deckel zu trennen. Eine
+ * Instanz für alle Dosen, sie lebt so lange wie das Modul.
+ */
+let surfaceTexture: THREE.DataTexture | null = null;
+function getSurfaceTexture(): THREE.DataTexture {
+  if (surfaceTexture) return surfaceTexture;
+  const rows = 256;
+  const data = new Uint8Array(rows * 4);
+  for (let row = 0; row < rows; row += 1) {
+    const v = (row + 0.5) / rows;
+    const body = v < CAN_UV_LID_SPLIT;
+    data[row * 4] = 0;
+    data[row * 4 + 1] = Math.round(255 * (body ? CAN_BODY_ROUGHNESS : CAN_LID_ROUGHNESS));
+    data[row * 4 + 2] = body ? 0 : 255;
+    data[row * 4 + 3] = 255;
+  }
+  const texture = new THREE.DataTexture(data, 1, rows, THREE.RGBAFormat);
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
+  texture.needsUpdate = true;
+  surfaceTexture = texture;
+  return texture;
+}
 
 /** Lineare Mischung, damit wir nicht für jede Zeile THREE.MathUtils bemühen. */
 function mix(from: number, to: number, t: number): number {
@@ -114,15 +158,13 @@ function normalizeCan(source: THREE.Object3D): THREE.Group {
       standard.side = THREE.FrontSide;
       standard.needsUpdate = true;
       if (typeof standard.roughness === "number") {
-        // Mattes Finish (Feedback vom 17.10.2026). Die Metal/Roughness-Textur
-        // der Quelle liefert Metalness 1 und Roughness um 0,17, also glänzendes
-        // Aluminium. three multipliziert den Faktor mit dem Texturwert und
-        // begrenzt erst das Ergebnis auf 1, deshalb hebt der Faktor die Spanne
-        // der Textur auf etwa 0,5 bis 0,75 und erhält dabei ihre leichte
-        // Fleckigkeit. Metalness bleibt bei 1, damit Deckel und Falz weiter
-        // wie Aluminium lesen, nur ohne harte Spiegelung.
-        standard.roughness = CAN_ROUGHNESS_SCALE;
-        standard.envMapIntensity = CAN_ENV_INTENSITY;
+        // Mattes Finish: eigene Bandtextur statt der glänzenden aus der Quelle,
+        // Faktoren auf 1, damit die Texturwerte unverändert durchgehen.
+        const surface = getSurfaceTexture();
+        standard.roughnessMap = surface;
+        standard.metalnessMap = surface;
+        standard.roughness = 1;
+        standard.metalness = 1;
       }
       return standard;
     });
@@ -467,10 +509,11 @@ function Scene({ flavors, mobileModels }: SceneProps) {
   return (
     <>
       <LocalEnvironment />
-      <ambientLight intensity={0.85} />
-      <directionalLight position={[3.2, 4.5, 5]} intensity={2.4} />
-      <directionalLight position={[-4, 2.2, -3.5]} intensity={1.7} color="#ffe9f2" />
-      <directionalLight position={[0, -3, 3]} intensity={0.55} />
+      {/* Lichter auf das matte Material abgestimmt, siehe CAN_ENV_INTENSITY. */}
+      <ambientLight intensity={0.25} />
+      <directionalLight position={[3.2, 4.5, 5]} intensity={1.1} />
+      <directionalLight position={[-4, 2.2, -3.5]} intensity={0.5} color="#ffe9f2" />
+      <directionalLight position={[0, -3, 3]} intensity={0.2} />
 
       <group ref={ringRef}>
         {flavors.map((flavor, index) => (
@@ -554,6 +597,7 @@ export default function CanScene({ flavors }: { flavors: HomeFlavor[] }) {
         dpr={[1, maxDpr]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         camera={{ fov: CAMERA_FOV, near: 0.1, far: 60, position: [0, 0, CAMERA_BASE_Z] }}
+        scene={{ environmentIntensity: CAN_ENV_INTENSITY }}
         onCreated={({ gl }) => {
           gl.domElement.addEventListener(
             "webglcontextlost",
