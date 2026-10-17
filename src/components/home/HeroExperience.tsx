@@ -17,7 +17,8 @@ import { HERO_DRAG_END_EVENT, HERO_DRAG_EVENT, type HeroDragDetail } from "./her
  *   Sektion schreiben, damit die PNGs exakt dort stehen, wo CanScene rendert.
  * - ScrollTrigger mit scrub 0,8 über #pv-hero: schreibt --seq und store.seqProgress.
  * - Sortenwechsel per Pfeilen, Punkten, Tastatur, Wischen und Ziehen mit der Maus.
- * - Farbwelt (--flavor-*) auf dem <html>-Element weich überblenden.
+ * - Farbwelt (--flavor-*) auf dem <html>-Element weich überblenden. Verlauf,
+ *   Blobs, Riesentypo und Nährwertkacheln hängen an diesen Variablen.
  * - Nur die aktive Sorte sichtbar und fokussierbar halten.
  *
  * Zustände stehen grundsätzlich als data-Attribute an DOM-Knoten, nie als Klassen
@@ -84,14 +85,19 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       style.setProperty("--pv-neighbor-x", `${geometry.neighborCenterFraction * half}px`);
       style.setProperty("--pv-neighbor-scale", geometry.neighborScreenScale.toFixed(4));
 
-      // Pfeile stehen immer neben der aktiven Dose, im Hero weit außen, im
-      // gezoomten Zustand dicht an der Dose, damit sie den Text nicht überdecken.
-      const arrowHalf = geometry.isSide ? 26 : 22;
-      const edge = geometry.isSide ? width * 0.04 : 10;
+      // Pfeile stehen immer neben der aktiven Dose, im Hero weit außen (Richtung A:
+      // 76 px ab 1024 px Breite, sonst 56 px, Abstand zum Rand 4 Prozent bzw. 12 px).
+      // Im Seitenlayout rücken sie im gezoomten Zustand an die Dose, damit sie
+      // nicht über dem Zutatenpanel liegen; gestapelt bleiben sie am Rand.
+      const arrowHalf = width >= 1024 ? 38 : 28;
+      const edge = geometry.isSide ? width * 0.04 : 12;
       const heroRadius = Math.max(120, half - edge - arrowHalf);
-      const zoomRadius = geometry.activeHalfFractionZoom * half + arrowHalf + 14;
+      const zoomRadius = geometry.activeHalfFractionZoom * half + arrowHalf + 28;
       style.setProperty("--pv-arrow-r0", `${heroRadius}px`);
-      style.setProperty("--pv-arrow-r1", `${Math.min(heroRadius, zoomRadius)}px`);
+      style.setProperty(
+        "--pv-arrow-r1",
+        `${geometry.isSide ? Math.min(heroRadius, zoomRadius) : heroRadius}px`,
+      );
 
       lastWidth = width;
       lastHeight = height;
@@ -119,7 +125,8 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
     const setSeq = (value: number) => {
       section.style.setProperty("--seq", value.toFixed(4));
       stage.dataset.seqPast = value >= HERO_TEXT_GONE ? "true" : "false";
-      stage.dataset.facts = value >= 0.45 ? "true" : "false";
+      // Ab 0,4 beginnt das Panel einzublenden, ab dann ist es bedienbar.
+      stage.dataset.facts = value >= 0.4 ? "true" : "false";
       store.getState().setSeqProgress(value);
     };
 
@@ -157,6 +164,8 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
     const count = flavors.length;
 
     const applyFlavor = (index: number, duration: number) => {
+      // Blob-Formen im Hintergrund wechseln je Sorte ihre Lage (CSS-Übergang).
+      section.dataset.flavorIndex = String(index);
       for (const node of flavorNodes) {
         const own = Number(node.dataset.pvFlavor);
         node.dataset.active = own === index ? "true" : "false";

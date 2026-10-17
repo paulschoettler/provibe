@@ -31,10 +31,10 @@ export const MOBILE_MAX_WIDTH = 768;
  */
 export const SIDE_MIN_WIDTH = 900;
 export const SIDE_MIN_ASPECT = 1.25;
-/** Breite des Zutatenblocks im Seitenlayout, identisch zu globals.css. */
-const FACTS_WIDTH_VW = 0.42;
-const FACTS_MAX_PX = 480;
-const FACTS_RIGHT_VW = 0.05;
+/** Breite des Zutatenpanels im Seitenlayout, identisch zu globals.css (Richtung A: 560 px bei 1440). */
+const FACTS_WIDTH_VW = 0.39;
+const FACTS_MAX_PX = 560;
+const FACTS_RIGHT_VW = 0.042;
 /**
  * Radius der Dose geteilt durch ihre Höhe (aus der Bounding Box der GLB: 1,98 zu 3,96).
  * Die sichtbare Silhouette entsteht an der vorderen Kante, also einen Radius näher
@@ -51,6 +51,10 @@ const NEIGHBOR_ANGLE = (2 * Math.PI) / 3;
  */
 const NEIGHBOR_SCALE_SIDE = 0.86;
 const NEIGHBOR_SCALE_STACKED = 0.74;
+/** Höhe der gezoomten Dose im gestapelten Layout als Anteil der Bildhöhe. */
+const STACKED_ZOOM_HEIGHT = 0.33;
+/** Senkrechter Mittelpunkt der gezoomten Dose im gestapelten Layout (von oben). */
+const STACKED_ZOOM_CENTER = 0.235;
 /** Deckkraft der Nachbardosen im gezoomten Zustand (Feedback 7: dezent sichtbar). */
 export const NEIGHBOR_OPACITY_ZOOM = 0.4;
 /** Kippung der Nachbardosen um die z-Achse, Oberkante nach außen. */
@@ -133,8 +137,12 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
   // Steht der Zutatenblock unter der Dose, begrenzt die Bildbreite die Dosenhöhe:
   // je schmaler der Bildschirm, desto kleiner die Dose, sonst haben die
   // Nachbardosen daneben keinen Platz mehr.
-  const canHeightFraction = isSide ? 0.7 : clamp(0.3 + 0.35 * aspect, 0.4, 0.58);
-  const canCenterYFraction = isSide ? 0.03 : 0.04;
+  // Richtung A: im Seitenlayout etwas kleiner als früher (0,64 statt 0,7), damit
+  // die Riesentypo über und unter der Dose Platz hat und das Wellenband frei bleibt.
+  const canHeightFraction = isSide ? 0.64 : clamp(0.3 + 0.35 * aspect, 0.4, 0.58);
+  // Gestapelt steht die Dose etwas höher (Richtung A), damit unter ihr Platz für
+  // die vordere Typozeile und das Wellenband bleibt.
+  const canCenterYFraction = isSide ? 0.03 : 0.09;
 
   // canHeight = f * sichtbare Höhe an der Vorderkante der Dose, also an
   // (activeDistance - Radius). Der Radius hängt selbst von canHeight ab, deshalb
@@ -174,7 +182,9 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
   // die ganze Dose bleibt sichtbar. Im Seitenlayout heißt das Zoom nach vorn mit
   // Versatz nach links (Zutaten rechts daneben). Steht der Zutatenblock unter der
   // Dose, tritt sie leicht zurück und wandert nach oben.
-  const seqScale = isSide ? 1.15 : 0.84;
+  // Gestapelt (Richtung A, Mobil 2 Zutaten): Die gezoomte Dose ist ein Drittel der
+  // Bildhöhe hoch und steht oben, das Zutatenpanel beginnt bei rund 42 Prozent.
+  const seqScale = isSide ? 1.12 : clamp(STACKED_ZOOM_HEIGHT / canHeightFraction, 0.55, 1);
   const zoomZ = ringRadiusZ + canRadius + activeFront / seqScale;
   const activeAxisZoom = zoomZ - ringRadiusZ;
   const neighborAxisZoom = zoomZ + 0.5 * ringRadiusZ;
@@ -205,7 +215,8 @@ export function heroGeometry(width: number, height: number): HeroGeometry {
     seqShiftXFraction = seqShiftX / halfAt(activeAxisZoom) / 2;
   }
 
-  const seqShiftYFraction = isSide ? -0.02 : -0.165;
+  // Gestapelt: Mittelpunkt der gezoomten Dose auf 23,5 Prozent der Bildhöhe.
+  const seqShiftYFraction = isSide ? -0.02 : STACKED_ZOOM_CENTER - (0.5 - canCenterYFraction);
   const seqShiftY = -seqShiftYFraction * visibleHeightAt(activeAxisZoom);
 
   return {

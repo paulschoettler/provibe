@@ -49,6 +49,7 @@ export default async function HomePage() {
           shortName: f.shortName,
           variantId: f.pack.variantId,
           unitCount: f.pack.unitCount,
+          imageUrl: f.imageUrl,
         }))}
       />
     </>
