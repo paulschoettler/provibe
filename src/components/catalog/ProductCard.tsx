@@ -56,6 +56,7 @@ export function ProductCard({
   return (
     <article
       className={`pvc-card pvc-card--${layout} pvc-card--${type}`}
+      data-pv-tilt=""
       style={
         {
           "--pvc-blob": BLOB_COLOR[product.handle] ?? product.palette.via,

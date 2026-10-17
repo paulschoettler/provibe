@@ -5,7 +5,7 @@ import type { ShippingInfo } from "@/lib/catalog/products";
 import { formatEur } from "@/lib/money";
 
 /**
- * Kleine gemeinsame Bausteine der Katalogseiten: Eyebrow (Plum mit Magenta-Punkt),
+ * Kleine gemeinsame Bausteine der Katalogseiten: Eyebrow (Plum, ohne Punkt),
  * Brotkrumen, Seitenband mit Welle, Fußnote zu Preisen. Alles Server-Komponenten.
  */
 
@@ -22,7 +22,6 @@ export function Eyebrow({
 }) {
   return (
     <Tag id={id} className={`pvc-eyebrow ${className}`}>
-      <span className="pvc-eyebrow-dot" aria-hidden="true" />
       {children}
     </Tag>
   );
@@ -132,7 +131,10 @@ export function SectionHead({
 }) {
   const H = level === 1 ? "h1" : "h2";
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-8">
+    <div
+      className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 md:mb-8"
+      data-pv-reveal=""
+    >
       <div>
         <Eyebrow>{eyebrow}</Eyebrow>
         <H id={id} className="pvc-h2 mt-3">

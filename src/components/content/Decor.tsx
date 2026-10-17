@@ -46,11 +46,14 @@ export function FruitSticker({
   className = "",
   rotate = 0,
   style,
+  parallax,
 }: {
   kind: keyof typeof STICKERS;
   className?: string;
   rotate?: number;
   style?: CSSProperties;
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
 }) {
   const s = STICKERS[kind];
   return (
@@ -63,6 +66,7 @@ export function FruitSticker({
       unoptimized
       className={`pv-sticker-img ${className}`}
       style={{ ["--pv-rot" as string]: `${rotate}deg`, ...style }}
+      data-pv-parallax={parallax}
     />
   );
 }
@@ -86,10 +90,13 @@ export function Blob({
   name,
   className = "",
   style,
+  parallax,
 }: {
   name: BlobName;
   className?: string;
   style?: CSSProperties;
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
 }) {
   const b = BLOBS[name];
   return (
@@ -102,6 +109,7 @@ export function Blob({
       unoptimized
       className={`pv-blob ${className}`}
       style={style}
+      data-pv-parallax={parallax}
     />
   );
 }

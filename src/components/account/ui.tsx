@@ -22,9 +22,8 @@ export const CARD_FLAT = "rounded-[22px] bg-cream-2";
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <p
-      className={`text-plum flex items-center gap-2 text-[13px] leading-[1.2] font-semibold tracking-[0.24em] uppercase ${className}`}
+      className={`text-plum flex items-center text-[13px] leading-[1.2] font-semibold tracking-[0.24em] uppercase ${className}`}
     >
-      <span className="bg-magenta size-2 rounded-full" aria-hidden="true" />
       {children}
     </p>
   );

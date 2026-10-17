@@ -49,7 +49,7 @@ export function CollectionGrid({
 }) {
   const cards = collectionCards(collections, products);
   return (
-    <ul className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4" data-pv-stagger="">
       {cards.map((card) => (
         <li key={card.href} className="flex">
           <CollectionCard {...card} headingLevel={headingLevel} />
