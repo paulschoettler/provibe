@@ -52,14 +52,18 @@ const RING_EASE = "power3.inOut";
  */
 const CAN_BASE_ROTATION_Y = (120 * Math.PI) / 180;
 /**
- * Oberfläche der Dosen: matt lackiertes Aluminium mit samtiger Haut, wie die
- * echten Dosen (Fotos vom 17.10.2026). Der bedruckte Körper ist ein stumpfer
- * Lack ohne Metallanteil, nur Deckel und Boden bleiben blankes, leicht
- * angerautes Aluminium. Die Werte gelten für alle Sorten, weil die drei Modelle
- * dasselbe Mesh und UV-Layout teilen. Stellschrauben für die Abnahme.
+ * Oberfläche der Dosen: seidenmatt lackiertes Aluminium, wie die echten Dosen
+ * (Fotos vom 17.10.2026). Der bedruckte Körper reflektiert die Umgebung als
+ * weiche, breite Lichtkante, ohne wie Chrom zu spiegeln. Ein kleiner
+ * Metallanteil lässt das Aluminium unter der Druckfarbe durchscheinen. Deckel
+ * und Boden bleiben blankes, leicht angerautes Aluminium. Die Werte gelten für
+ * alle Sorten, weil die drei Modelle dasselbe Mesh und UV-Layout teilen.
+ * Stellschrauben für die Abnahme (Abgleich 2 vom 17.10.2026: der erste, ganz
+ * stumpfe Lack mit Rauheit 0,85 wirkte künstlich).
  */
-const CAN_BODY_ROUGHNESS = 0.85;
-const CAN_LID_ROUGHNESS = 0.45;
+const CAN_BODY_ROUGHNESS = 0.4;
+const CAN_BODY_METALNESS = 0.15;
+const CAN_LID_ROUGHNESS = 0.4;
 /**
  * Grenze im UV-Layout zwischen Körper (v darunter) und Deckel plus Boden
  * (v darüber), abgelesen aus der Metal/Roughness-Textur der Quelle.
@@ -73,7 +77,7 @@ const CAN_UV_LID_SPLIT = 0.565;
  * Etikettfläche im Bild die Farbe der Textur trifft (gemessen am Wildberry-Rot,
  * Headless-Chromium mit ACES wie in der Canvas).
  */
-const CAN_ENV_INTENSITY = 0.25;
+const CAN_ENV_INTENSITY = 0.4;
 
 /**
  * Eine 1 × 256 Pixel große Metal/Roughness-Textur, die die der Modelle ersetzt:
@@ -92,7 +96,7 @@ function getSurfaceTexture(): THREE.DataTexture {
     const body = v < CAN_UV_LID_SPLIT;
     data[row * 4] = 0;
     data[row * 4 + 1] = Math.round(255 * (body ? CAN_BODY_ROUGHNESS : CAN_LID_ROUGHNESS));
-    data[row * 4 + 2] = body ? 0 : 255;
+    data[row * 4 + 2] = Math.round(255 * (body ? CAN_BODY_METALNESS : 1));
     data[row * 4 + 3] = 255;
   }
   const texture = new THREE.DataTexture(data, 1, rows, THREE.RGBAFormat);
@@ -510,10 +514,10 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     <>
       <LocalEnvironment />
       {/* Lichter auf das matte Material abgestimmt, siehe CAN_ENV_INTENSITY. */}
-      <ambientLight intensity={0.25} />
-      <directionalLight position={[3.2, 4.5, 5]} intensity={1.1} />
-      <directionalLight position={[-4, 2.2, -3.5]} intensity={0.5} color="#ffe9f2" />
-      <directionalLight position={[0, -3, 3]} intensity={0.2} />
+      <ambientLight intensity={0.2} />
+      <directionalLight position={[3.2, 4.5, 5]} intensity={0.95} />
+      <directionalLight position={[-4, 2.2, -3.5]} intensity={0.4} color="#ffe9f2" />
+      <directionalLight position={[0, -3, 3]} intensity={0.18} />
 
       <group ref={ringRef}>
         {flavors.map((flavor, index) => (
