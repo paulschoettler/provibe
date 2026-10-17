@@ -32,10 +32,12 @@ interface InlineSvgProps {
   name: BrandSvgName;
   className?: string;
   style?: CSSProperties;
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
 }
 
 /** Inline-SVG im Server-HTML; Füllung über currentColor, damit CSS die Farbe setzt. */
-function InlineSvg({ name, className, style }: InlineSvgProps) {
+function InlineSvg({ name, className, style, parallax }: InlineSvgProps) {
   const svg = brandSvg(name);
   return (
     <svg
@@ -44,6 +46,7 @@ function InlineSvg({ name, className, style }: InlineSvgProps) {
       fill="currentColor"
       className={className}
       style={style}
+      data-pv-parallax={parallax}
       aria-hidden="true"
       focusable="false"
       dangerouslySetInnerHTML={{ __html: svg.inner }}
@@ -58,18 +61,22 @@ export function FruitIcon({
   flip = false,
   className = "",
   style,
+  parallax,
 }: {
   name: FruitIconName;
   tone?: FruitTone;
   flip?: boolean;
   className?: string;
   style?: CSSProperties;
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
 }) {
   return (
     <InlineSvg
       name={name}
       className={`${TONE_CLASS[tone]} ${className}`.trim()}
       style={flip ? { scale: "-1 1", ...style } : style}
+      parallax={parallax}
     />
   );
 }

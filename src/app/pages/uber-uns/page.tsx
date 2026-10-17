@@ -3,11 +3,13 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { FruitSticker } from "@/components/brand/FruitSticker";
 import { Blob, Eyebrow, ProteinSticker, WaveCut } from "@/components/content/Decor";
+import { FounderVideo } from "@/components/content/FounderVideo";
 import { JsonLd, absoluteUrl } from "@/components/content/JsonLd";
 import { Accordion } from "@/components/forms";
 import { SiteLink } from "@/components/layout/SiteLink";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { WaveDivider } from "@/components/layout/WaveDivider";
+import { PageMotion } from "@/components/motion/PageMotion";
 import { htmlNodes } from "@/lib/content/html";
 import { getPage } from "@/lib/content/pages";
 import { getShopSettings } from "@/lib/content/settings";
@@ -66,6 +68,15 @@ function storyBlocks(bodyHtml: string): StoryBlock[] {
   return blocks;
 }
 
+/**
+ * Zitat neben dem Porträt: wörtlich aus dem Block "Unsere Vision" des alten Shops
+ * (docs/quelltexte/pages_uber_uns.md), nicht erfunden.
+ */
+const FOUNDER_QUOTE =
+  "Ich möchte es mit provibe schaffen, ausgewogene Ernährung im Alltag leicht und lecker zu machen.";
+/** Kurzfakten als Pills, ebenfalls aus den Story-Texten abgeleitet. */
+const FOUNDER_FACTS = ["Idee aus dem Studium", "15 g Protein", "Ohne Zucker"];
+
 /** Bilder und Deko je Block nach Figma (23:1054 / 23:1261). */
 const BLOCK_MEDIA = [
   {
@@ -78,6 +89,7 @@ const BLOCK_MEDIA = [
       <FruitSticker
         kind="erdbeere"
         rotate={8}
+        parallax={18}
         className="top-[-28px] right-[-10px] w-[76px] lg:w-[104px]"
       />
     ),
@@ -100,6 +112,7 @@ const BLOCK_MEDIA = [
       <FruitSticker
         kind="pfirsich-blatt-gross"
         rotate={0}
+        parallax={18}
         className="top-[-26px] right-[-14px] w-[84px] lg:w-[112px]"
       />
     ),
@@ -165,6 +178,7 @@ export default async function UberUnsPage() {
   return (
     <SiteShell>
       <JsonLd data={jsonLd} />
+      <PageMotion />
 
       {/* Hero im Wildberry-Verlauf mit Blobs, Stickern und Welle */}
       <section
@@ -173,10 +187,12 @@ export default async function UberUnsPage() {
       >
         <Blob
           name="hero-1"
+          parallax={36}
           className="top-[-70px] left-[-120px] w-[280px] lg:top-[-140px] lg:left-[-180px] lg:w-[620px]"
         />
         <Blob
           name="hero-2"
+          parallax={-28}
           className="top-[170px] left-[60%] w-[240px] lg:top-[-40px] lg:right-[-100px] lg:left-auto lg:w-[480px]"
         />
         <FruitSticker
@@ -204,6 +220,72 @@ export default async function UberUnsPage() {
       </section>
       <WaveCut />
 
+      {/* Die Gründerin: Porträt mit organischer Maske, Sticker, Bildunterschrift und Zitat */}
+      <section className="pv-founder" aria-labelledby="gruenderin-titel">
+        <div className="pv-container pv-founder-grid">
+          <figure className="pv-founder-figure" data-pv-reveal="">
+            <Blob name="bild-b" parallax={22} className="pv-founder-blob" />
+            <Blob name="zitat" parallax={-16} className="pv-founder-blob-2" />
+            <div className="pv-founder-frame">
+              <Image
+                src="/images/team/celine.jpg"
+                alt={`${founder}, Gründerin von provibe`}
+                width={2000}
+                height={2000}
+                sizes="(min-width: 861px) 500px, min(calc(100vw - 72px), 400px)"
+                className="pv-founder-photo"
+                data-pv-zoom=""
+                preload
+              />
+            </div>
+            <span className="pv-founder-badge" aria-hidden="true">
+              Gründerin
+            </span>
+            <FruitSticker
+              kind="pfirsich-blatt-gross"
+              rotate={-12}
+              parallax={-20}
+              className="right-[-4px] bottom-[64px] w-[72px] lg:right-[-18px] lg:bottom-[86px] lg:w-[100px]"
+            />
+            <figcaption className="pv-founder-caption">{founder}, Gründerin von provibe</figcaption>
+          </figure>
+          <div className="pv-founder-copy">
+            <Eyebrow>Die Gründerin</Eyebrow>
+            <h2 id="gruenderin-titel" className="pv-h2" data-pv-reveal="">
+              Hinter provibe steht {firstName}.
+            </h2>
+            <blockquote className="pv-founder-quote" data-pv-reveal="">
+              <svg
+                className="pv-founder-quote-mark"
+                viewBox="0 0 64 48"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M0 48V30C0 14 8 4 24 0l3 7c-8 3-12 9-12 17h11v24zm37 0V30c0-16 8-26 24-30l3 7c-8 3-12 9-12 17h11v24z"
+                  fill="currentColor"
+                />
+              </svg>
+              <p>{FOUNDER_QUOTE}</p>
+              <footer>{founder}</footer>
+            </blockquote>
+            <ul className="flex flex-wrap gap-2" aria-label="Kurz zu provibe" data-pv-stagger="">
+              {FOUNDER_FACTS.map((fact, i) => (
+                <li
+                  key={fact}
+                  className={`pv-pill ${i === 1 ? "pv-pill--pink" : ""}`}
+                  data-pv-reveal="pop"
+                >
+                  {fact}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <FounderVideo founder={founder} />
+
       {/* Drei Blöcke: Idee, Entwicklung, Vision; Zitatband nach dem zweiten */}
       {blocks.map((block, i) => {
         const media = BLOCK_MEDIA[i % BLOCK_MEDIA.length];
@@ -214,24 +296,27 @@ export default async function UberUnsPage() {
               className={`pv-container pv-story-block ${reverse ? "pv-story-block--reverse" : ""}`}
               aria-labelledby={`block-${i}`}
             >
-              <div className="pv-story-media">
+              <div className="pv-story-media" data-pv-reveal="">
                 <Blob
                   name={media.blob}
+                  parallax={24}
                   className={reverse ? "left-[10%] lg:left-[16%]" : "left-[-6%]"}
                 />
-                <Image
-                  src={media.src}
-                  alt={media.alt}
-                  width={media.width}
-                  height={media.height}
-                  sizes="(min-width: 861px) 560px, calc(100vw - 32px)"
-                  className="pv-story-photo"
-                  priority={i === 0}
-                />
+                <div className="pv-story-frame">
+                  <Image
+                    src={media.src}
+                    alt={media.alt}
+                    width={media.width}
+                    height={media.height}
+                    sizes="(min-width: 861px) 560px, calc(100vw - 32px)"
+                    className="pv-story-photo"
+                    data-pv-zoom=""
+                  />
+                </div>
                 {media.sticker}
               </div>
-              <div className="flex flex-col gap-2">
-                <p className="pv-story-num" aria-hidden="true">
+              <div className="flex flex-col gap-2" data-pv-reveal="">
+                <p className="pv-story-num" aria-hidden="true" data-pv-reveal="pop">
                   {block.number}
                 </p>
                 <h2 id={`block-${i}`} className="pv-h2">
@@ -246,10 +331,11 @@ export default async function UberUnsPage() {
                 <WaveDivider shape="soft" fill="var(--pv-lime-raspberry)" position="top" />
                 <Blob
                   name="zitat"
+                  parallax={30}
                   className="top-[60px] right-[-30px] w-[160px] lg:top-[80px] lg:right-[-20px] lg:w-[300px]"
                 />
                 <div className="pv-container">
-                  <blockquote>
+                  <blockquote data-pv-reveal="">
                     <span className="pv-story-quote-mark" aria-hidden="true">
                       „
                     </span>
@@ -270,6 +356,7 @@ export default async function UberUnsPage() {
       <section
         className="pv-container py-10 lg:max-w-[760px] lg:py-16"
         aria-labelledby="fakten-titel"
+        data-pv-reveal=""
       >
         <Eyebrow>Kurz gefragt</Eyebrow>
         <h2 id="fakten-titel" className="pv-h2 mt-3 mb-4">
@@ -287,8 +374,8 @@ export default async function UberUnsPage() {
         className="pv-container pv-before-footer flex flex-col items-center gap-[14px] pt-6 text-center"
         aria-labelledby="sorten-titel"
       >
-        <div className="pv-cans-trio" aria-hidden="true">
-          <Blob name="dosen" className="top-[3.5%] left-[6%] !h-[93%] w-[88%]" />
+        <div className="pv-cans-trio" aria-hidden="true" data-pv-reveal="">
+          <Blob name="dosen" parallax={16} className="top-[3.5%] left-[6%] !h-[93%] w-[88%]" />
           <Image
             src="/images/cans/raspberry-lime.png"
             alt=""

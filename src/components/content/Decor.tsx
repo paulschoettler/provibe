@@ -53,10 +53,13 @@ export function Blob({
   name,
   className = "",
   style,
+  parallax,
 }: {
   name: BlobName;
   className?: string;
   style?: CSSProperties;
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
 }) {
   const b = BLOBS[name];
   return (
@@ -69,6 +72,7 @@ export function Blob({
       unoptimized
       className={`pv-blob ${className}`}
       style={style}
+      data-pv-parallax={parallax}
     />
   );
 }

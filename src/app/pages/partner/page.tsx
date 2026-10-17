@@ -5,6 +5,7 @@ import { Blob, Eyebrow, InhaltIcon, ProteinSticker, WaveCut } from "@/components
 import { JsonLd, breadcrumbJsonLd } from "@/components/content/JsonLd";
 import { PartnerForm } from "@/components/content/PartnerForm";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { PageMotion } from "@/components/motion/PageMotion";
 import { capitalize, htmlNodes, type HtmlNode } from "@/lib/content/html";
 import { getPage } from "@/lib/content/pages";
 import { getShopSettings } from "@/lib/content/settings";
@@ -103,6 +104,7 @@ export default async function PartnerPage() {
           { name: "Partner", path: "/pages/partner" },
         ])}
       />
+      <PageMotion />
 
       {/* Hero im Peach-Verlauf */}
       <section
@@ -111,10 +113,12 @@ export default async function PartnerPage() {
       >
         <Blob
           name="partner-1"
+          parallax={34}
           className="top-[-60px] right-[-70px] w-[260px] lg:top-[-20px] lg:right-[-40px] lg:w-[520px]"
         />
         <Blob
           name="partner-2"
+          parallax={-26}
           className="top-[300px] left-[-90px] w-[200px] lg:top-[300px] lg:left-[-120px] lg:w-[320px]"
         />
         <div className="pv-container relative z-[1] grid items-center gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10">
@@ -126,7 +130,10 @@ export default async function PartnerPage() {
             <p className="pv-body" dangerouslySetInnerHTML={{ __html: c.introHtml }} />
             <ul className="flex flex-wrap gap-2" aria-label="Für wen provibe passt">
               {PILLS.map((p) => (
-                <li key={p.label} className={`pv-pill ${p.pink ? "pv-pill--pink" : ""}`}>
+                <li
+                  key={p.label}
+                  className={`pv-pill pv-pill--lift ${p.pink ? "pv-pill--pink" : ""}`}
+                >
                   {p.label}
                 </li>
               ))}
@@ -180,13 +187,14 @@ export default async function PartnerPage() {
         aria-labelledby="vorteile-titel"
       >
         <Eyebrow>Darum provibe</Eyebrow>
-        <h2 id="vorteile-titel" className="pv-h2">
+        <h2 id="vorteile-titel" className="pv-h2" data-pv-reveal="">
           Deine Vorteile
         </h2>
-        <ul className="grid w-full gap-4 lg:grid-cols-3">
+        <ul className="grid w-full gap-4 lg:grid-cols-3" data-pv-stagger="">
           {benefits.map((b) => (
-            <li key={b.title} className="pv-benefit-card">
+            <li key={b.title} className="pv-benefit-card" data-pv-tilt="">
               <span
+                data-pv-reveal="pop"
                 className="pv-benefit-sticker"
                 style={{ background: b.bg, ["--pv-rot" as string]: `${b.rot}deg` }}
                 aria-hidden="true"
@@ -201,47 +209,51 @@ export default async function PartnerPage() {
           ))}
         </ul>
         {claim ? (
-          <p className="pv-claim-sticker mt-2 lg:mt-6 lg:px-6 lg:text-[18px]">
+          <p className="pv-claim-sticker mt-2 lg:mt-6 lg:px-6 lg:text-[18px]" data-pv-reveal="pop">
             {capitalize(claim)}.
           </p>
         ) : null}
       </section>
 
-      {/* Anfrage mit Formular */}
-      <section
-        id="anfrage"
-        className="pv-container pv-before-footer relative grid scroll-mt-28 gap-6 pt-6 lg:grid-cols-[1fr_1.45fr] lg:gap-16 lg:pt-12"
-        aria-labelledby="anfrage-titel"
-      >
-        <Blob
-          name="partner-3"
-          className="top-[-20px] left-[60%] w-[220px] lg:top-[80px] lg:left-[-140px] lg:w-[300px]"
-        />
-        <div className="relative z-[1] flex flex-col gap-4">
-          <Eyebrow>Anfrage</Eyebrow>
-          <h2 id="anfrage-titel" className="pv-h2">
-            {c.askTitle}
-          </h2>
-          <p className="pv-body !text-[16px]" dangerouslySetInnerHTML={{ __html: c.askHtml }} />
-          <div className="pv-channel">
-            <span className="pv-icon-circle !bg-pv-lime-raspberry" aria-hidden="true">
-              <InhaltIcon name="mail" />
-            </span>
-            <span>
-              <span className="pv-channel-label">Lieber per E-Mail?</span>
-              <a href={`mailto:${partnerMail}`} className="pv-channel-value !text-[17px]">
-                {partnerMail}
-              </a>
-            </span>
+      {/* Anfrage mit Formular. Die Hülle schneidet waagerecht erst am Bildschirmrand ab, damit
+          der Blob nicht am Container endet, mobil aber keinen seitlichen Überlauf erzeugt. */}
+      <div className="overflow-x-clip">
+        <section
+          id="anfrage"
+          className="pv-container pv-before-footer relative grid scroll-mt-28 gap-6 pt-6 lg:grid-cols-[1fr_1.45fr] lg:gap-16 lg:pt-12"
+          aria-labelledby="anfrage-titel"
+        >
+          <Blob
+            name="partner-3"
+            parallax={28}
+            className="top-[-20px] left-[60%] w-[220px] lg:top-[80px] lg:left-[-140px] lg:w-[300px]"
+          />
+          <div className="relative z-[1] flex flex-col gap-4" data-pv-reveal="">
+            <Eyebrow>Anfrage</Eyebrow>
+            <h2 id="anfrage-titel" className="pv-h2">
+              {c.askTitle}
+            </h2>
+            <p className="pv-body !text-[16px]" dangerouslySetInnerHTML={{ __html: c.askHtml }} />
+            <div className="pv-channel">
+              <span className="pv-icon-circle !bg-pv-lime-raspberry" aria-hidden="true">
+                <InhaltIcon name="mail" />
+              </span>
+              <span>
+                <span className="pv-channel-label">Lieber per E-Mail?</span>
+                <a href={`mailto:${partnerMail}`} className="pv-channel-value !text-[17px]">
+                  {partnerMail}
+                </a>
+              </span>
+            </div>
+            {c.networkText ? (
+              <p className="text-pv-wildberry m-0 text-[15px] leading-[1.55]">{c.networkText}</p>
+            ) : null}
           </div>
-          {c.networkText ? (
-            <p className="text-pv-wildberry m-0 text-[15px] leading-[1.55]">{c.networkText}</p>
-          ) : null}
-        </div>
-        <div className="relative z-[1]">
-          <PartnerForm />
-        </div>
-      </section>
+          <div className="relative z-[1]" data-pv-reveal="">
+            <PartnerForm />
+          </div>
+        </section>
+      </div>
     </SiteShell>
   );
 }

@@ -14,6 +14,7 @@ export function FruitSticker({
   tone = "lime-raspberry",
   flip,
   style,
+  parallax,
 }: {
   kind: FruitIconName;
   className?: string;
@@ -21,6 +22,8 @@ export function FruitSticker({
   tone?: FruitTone;
   flip?: boolean;
   style?: CSSProperties;
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
 }) {
   return (
     <FruitIcon
@@ -29,6 +32,7 @@ export function FruitSticker({
       flip={flip}
       className={`pv-sticker-img ${className}`}
       style={{ ["--pv-rot" as string]: `${rotate}deg`, ...style }}
+      parallax={parallax}
     />
   );
 }

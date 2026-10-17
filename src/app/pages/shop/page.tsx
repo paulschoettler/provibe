@@ -8,6 +8,7 @@ import { ArrowRightIcon, Blob } from "@/components/catalog/icons";
 import { breadcrumbLd, itemListLd, JsonLd } from "@/components/catalog/JsonLd";
 import { Eyebrow, PriceFootnote, SectionHead } from "@/components/catalog/parts";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import { PageMotion } from "@/components/motion/PageMotion";
 import { getShippingInfo, listCollections, listProducts } from "@/lib/catalog/products";
 
 /** Katalogdaten: statisch bauen, stündlich oder per revalidateTag("catalog") erneuern. */
@@ -50,11 +51,12 @@ export default async function ShopPage() {
           itemListLd("Alle Produkte", products),
         ]}
       />
+      <PageMotion />
 
       {/* Hero-Band */}
       <section className="pvc-hero" aria-labelledby="shop-titel">
-        <Blob className="pvc-hero-blob top-[-12%] right-[-8%] h-[70%] w-[60%]" />
-        <Blob className="pvc-hero-blob bottom-[8%] left-[-18%] h-[60%] w-[55%]" />
+        <Blob className="pvc-hero-blob top-[-12%] right-[-8%] h-[70%] w-[60%]" parallax={40} />
+        <Blob className="pvc-hero-blob bottom-[8%] left-[-18%] h-[60%] w-[55%]" parallax={-30} />
         <div className="relative z-[1] mx-auto grid w-full max-w-[1200px] items-center gap-6 px-4 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:gap-10">
           <div className="text-center lg:text-left">
             <Eyebrow className="text-pv-wildberry justify-center lg:justify-start">
@@ -145,7 +147,7 @@ export default async function ShopPage() {
             </p>
           }
         />
-        <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-6">
+        <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-6" data-pv-stagger="">
           {products.map((product, i) => (
             <li key={product.id} className="flex">
               <ProductCard product={product} layout="grid" priority={i < 2} />

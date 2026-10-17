@@ -127,11 +127,18 @@ export function CloseLineIcon({ className = "h-5 w-5" }: IconProps) {
 }
 
 /** Organische Fläche hinter Dosen (Figma "Blob"), Farbe über currentColor, deckend (CI: keine Transparenzen). */
-export function Blob({ className = "" }: IconProps) {
+export function Blob({
+  className = "",
+  parallax,
+}: IconProps & {
+  /** Versatz in px für den Scroll-Parallax (src/components/motion), ohne Angabe kein Effekt */
+  parallax?: number;
+}) {
   return (
     <svg
       viewBox="0 0 229.6 224"
       className={className}
+      data-pv-parallax={parallax}
       aria-hidden="true"
       focusable="false"
       preserveAspectRatio="none"

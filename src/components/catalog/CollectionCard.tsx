@@ -32,7 +32,7 @@ export function CollectionCard({
 }) {
   const H = headingLevel === 2 ? "h2" : "h3";
   return (
-    <article className={`pvc-coll ${BG[motif]}`}>
+    <article className={`pvc-coll ${BG[motif]}`} data-pv-tilt="">
       <div className="pvc-coll-motif" aria-hidden="true">
         <Motif motif={motif} />
       </div>
@@ -77,6 +77,7 @@ function Motif({ motif }: { motif: CollectionMotif }) {
           height={924}
           sizes="(min-width: 1024px) 240px, 45vw"
           className="pvc-coll-photo"
+          data-pv-zoom=""
         />
       );
     default:
