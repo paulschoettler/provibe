@@ -369,16 +369,25 @@ async function chargeAndOrder(
     ...(quote.clearNotice ? { clear_notice: "1" } : {}),
   };
   const payments = integrations().payments;
-  const result = await payments.chargeOffSession({
-    amountCents: snapshot.totalCents,
-    currency: "eur",
-    providerCustomerId: paymentMethod.stripe_customer_id,
-    paymentMethodId: paymentMethod.stripe_payment_method_id,
-    description: `provibe Abo ${row.number}`,
-    metadata,
-    // je Termin, Versuch und Zahlungsmittel eindeutig (neues Zahlungsmittel = neuer Versuch)
-    idempotencyKey: `subscription:${row.id}:${row.next_order_at ?? "jetzt"}:${attempt}:${paymentMethod.id}`,
-  });
+  let result: Awaited<ReturnType<typeof payments.chargeOffSession>>;
+  try {
+    result = await payments.chargeOffSession({
+      amountCents: snapshot.totalCents,
+      currency: "eur",
+      providerCustomerId: paymentMethod.stripe_customer_id,
+      paymentMethodId: paymentMethod.stripe_payment_method_id,
+      description: `provibe Abo ${row.number}`,
+      metadata,
+      // je Termin, Versuch und Zahlungsmittel eindeutig (neues Zahlungsmittel = neuer Versuch)
+      idempotencyKey: `subscription:${row.id}:${row.next_order_at ?? "jetzt"}:${attempt}:${paymentMethod.id}`,
+    });
+  } catch (err) {
+    // Ausnahme des Anbieters (Netz, unbekanntes Zahlungsmittel): Reservierung nicht stehen lassen.
+    // Der Job-Runner wiederholt den Lauf über seinen Backoff.
+    await db.rpc("release_reservations", { p_checkout_session_id: sessionId });
+    await db.from("checkout_sessions").update({ status: "failed" }).eq("id", sessionId);
+    throw err;
+  }
   if (result.intentId) {
     await db
       .from("checkout_sessions")
