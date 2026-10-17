@@ -32,7 +32,6 @@ import { DerivedBadge } from "@/components/admin/orders/OrderBadges";
 import { OrderItems } from "@/components/admin/orders/OrderItems";
 import { MONEY_EVENT_KINDS, OrderTimeline } from "@/components/admin/orders/OrderTimeline";
 import { RefundDialog } from "@/components/admin/orders/RefundDialog";
-import { RemountOnError } from "@/components/admin/orders/RemountOnError";
 import { ActionForm, ActionFormMessage, FormMessage } from "@/components/admin/ui/ActionForm";
 import { Badge } from "@/components/admin/ui/Badge";
 import { buttonClasses } from "@/components/admin/ui/Button";
@@ -248,22 +247,20 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             >
               <ActionForm action={resendMailAction} closeDialogOnSuccess hideMessage>
                 <input type="hidden" name="orderId" value={order.id} />
-                <RemountOnError>
-                  <DialogBody>
-                    <ActionFormMessage />
-                    <RadioCards
-                      name="kind"
-                      legend="Welche Mail?"
-                      defaultValue={resendOptions[0]}
-                      options={resendOptions.map((k) => ({ value: k, label: RESEND_KINDS[k] }))}
-                    />
-                    <p className="text-admin-text-2 text-[13px]">
-                      {mocks.email
-                        ? "Testmodus: Die Mail geht an den Mock-Anbieter und erscheint im Verlauf."
-                        : "Bis zum Go-live gehen Mails nur an Adressen auf der Allowlist."}
-                    </p>
-                  </DialogBody>
-                </RemountOnError>
+                <DialogBody>
+                  <ActionFormMessage />
+                  <RadioCards
+                    name="kind"
+                    legend="Welche Mail?"
+                    defaultValue={resendOptions[0]}
+                    options={resendOptions.map((k) => ({ value: k, label: RESEND_KINDS[k] }))}
+                  />
+                  <p className="text-admin-text-2 text-[13px]">
+                    {mocks.email
+                      ? "Testmodus: Die Mail geht an den Mock-Anbieter und erscheint im Verlauf."
+                      : "Bis zum Go-live gehen Mails nur an Adressen auf der Allowlist."}
+                  </p>
+                </DialogBody>
                 <DialogFooter>
                   <DialogClose />
                   <SubmitButton icon="emails">Senden</SubmitButton>
@@ -341,35 +338,33 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             >
               <ActionForm action={cancelOrderAction} closeDialogOnSuccess hideMessage>
                 <input type="hidden" name="orderId" value={order.id} />
-                <RemountOnError>
-                  <DialogBody>
-                    <ActionFormMessage />
-                    <Select
-                      name="reasonKey"
-                      label="Grund"
-                      placeholder="Bitte wählen"
-                      options={CANCEL_REASONS}
-                      required
-                    />
-                    <Textarea
-                      name="reasonText"
-                      label="Beschreibung (bei anderem Grund Pflicht)"
-                      rows={2}
-                    />
-                    <Checkbox
-                      name="restock"
-                      label="Bestand zurückbuchen"
-                      defaultChecked
-                      description="Noch nicht versendete Ware geht zurück in den Bestand."
-                    />
-                    {seeMoney && ["paid", "partially_refunded"].includes(order.paymentStatus) ? (
-                      <FormMessage tone="warning" className="mb-0">
-                        Die Bestellung ist bezahlt. Das Storno erstattet kein Geld; erstatte danach
-                        über &quot;Erstatten&quot;.
-                      </FormMessage>
-                    ) : null}
-                  </DialogBody>
-                </RemountOnError>
+                <DialogBody>
+                  <ActionFormMessage />
+                  <Select
+                    name="reasonKey"
+                    label="Grund"
+                    placeholder="Bitte wählen"
+                    options={CANCEL_REASONS}
+                    required
+                  />
+                  <Textarea
+                    name="reasonText"
+                    label="Beschreibung (bei anderem Grund Pflicht)"
+                    rows={2}
+                  />
+                  <Checkbox
+                    name="restock"
+                    label="Bestand zurückbuchen"
+                    defaultChecked
+                    description="Noch nicht versendete Ware geht zurück in den Bestand."
+                  />
+                  {seeMoney && ["paid", "partially_refunded"].includes(order.paymentStatus) ? (
+                    <FormMessage tone="warning" className="mb-0">
+                      Die Bestellung ist bezahlt. Das Storno erstattet kein Geld; erstatte danach
+                      über &quot;Erstatten&quot;.
+                    </FormMessage>
+                  ) : null}
+                </DialogBody>
                 <DialogFooter>
                   <DialogClose>Abbrechen</DialogClose>
                   <SubmitButton variant="danger" icon="stornieren" pendingLabel="Wird storniert …">
@@ -477,29 +472,27 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <div className="mt-4 flex flex-col gap-3">
                 <ActionForm action={addShipmentAction} className="flex flex-col gap-3">
                   <input type="hidden" name="orderId" value={order.id} />
-                  <RemountOnError>
-                    <div className="grid gap-3 md:grid-cols-[180px_1fr]">
-                      <Select
-                        name="carrier"
-                        label="Versanddienst"
-                        defaultValue="dhl"
-                        options={Object.entries(CARRIERS).map(([value, label]) => ({
-                          value,
-                          label,
-                        }))}
-                      />
-                      <Field
-                        name="trackingNumber"
-                        label="Trackingnummer"
-                        autoComplete="off"
-                        placeholder="zum Beispiel 00340434161094000000"
-                        defaultValue={
-                          outbound.find((s) => s.status === "label_created")?.trackingNumber ?? ""
-                        }
-                        hint="Versandmail geht automatisch raus, sobald du speicherst."
-                      />
-                    </div>
-                  </RemountOnError>
+                  <div className="grid gap-3 md:grid-cols-[180px_1fr]">
+                    <Select
+                      name="carrier"
+                      label="Versanddienst"
+                      defaultValue="dhl"
+                      options={Object.entries(CARRIERS).map(([value, label]) => ({
+                        value,
+                        label,
+                      }))}
+                    />
+                    <Field
+                      name="trackingNumber"
+                      label="Trackingnummer"
+                      autoComplete="off"
+                      placeholder="zum Beispiel 00340434161094000000"
+                      defaultValue={
+                        outbound.find((s) => s.status === "label_created")?.trackingNumber ?? ""
+                      }
+                      hint="Versandmail geht automatisch raus, sobald du speicherst."
+                    />
+                  </div>
                   <Checkbox
                     name="notify"
                     label="Kunden per Versandmail informieren"
@@ -519,36 +512,34 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                   >
                     <ActionForm action={createLabelAction} closeDialogOnSuccess hideMessage>
                       <input type="hidden" name="orderId" value={order.id} />
-                      <RemountOnError>
-                        <DialogBody>
-                          <ActionFormMessage />
-                          <RadioCards
-                            name="product"
-                            legend="Produkt"
-                            defaultValue="V01PAK"
-                            options={Object.entries(DHL_PRODUCTS).map(([value, label]) => ({
-                              value,
-                              label,
-                            }))}
-                          />
-                          <Field
-                            name="weightKg"
-                            label="Paketgewicht"
-                            suffix="kg"
-                            inputMode="decimal"
-                            defaultValue={(weightGrams / 1000).toLocaleString("de-DE", {
-                              maximumFractionDigits: 3,
-                            })}
-                            hint="Vorschlag aus den Positionen. Bitte nach dem Wiegen anpassen."
-                          />
-                          <Checkbox name="withReturnLabel" label="Retourenlabel beilegen" />
-                          <p className="text-admin-text-2 text-[13px]">
-                            Die Bestellung geht auf &quot;In Bearbeitung&quot;. Versendet ist sie,
-                            sobald du die Sendungsnummer mit &quot;Tracking speichern&quot;
-                            bestätigst.
-                          </p>
-                        </DialogBody>
-                      </RemountOnError>
+                      <DialogBody>
+                        <ActionFormMessage />
+                        <RadioCards
+                          name="product"
+                          legend="Produkt"
+                          defaultValue="V01PAK"
+                          options={Object.entries(DHL_PRODUCTS).map(([value, label]) => ({
+                            value,
+                            label,
+                          }))}
+                        />
+                        <Field
+                          name="weightKg"
+                          label="Paketgewicht"
+                          suffix="kg"
+                          inputMode="decimal"
+                          defaultValue={(weightGrams / 1000).toLocaleString("de-DE", {
+                            maximumFractionDigits: 3,
+                          })}
+                          hint="Vorschlag aus den Positionen. Bitte nach dem Wiegen anpassen."
+                        />
+                        <Checkbox name="withReturnLabel" label="Retourenlabel beilegen" />
+                        <p className="text-admin-text-2 text-[13px]">
+                          Die Bestellung geht auf &quot;In Bearbeitung&quot;. Versendet ist sie,
+                          sobald du die Sendungsnummer mit &quot;Tracking speichern&quot;
+                          bestätigst.
+                        </p>
+                      </DialogBody>
                       <DialogFooter>
                         <DialogClose />
                         <SubmitButton icon="lkw" pendingLabel="Wird erstellt …">
@@ -757,15 +748,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     resetOnSuccess={false}
                   >
                     <input type="hidden" name="orderId" value={order.id} />
-                    <RemountOnError>
-                      <DialogBody>
-                        <ActionFormMessage />
-                        <AddressEditor
-                          shipping={order.shippingAddress}
-                          billing={order.billingAddress}
-                        />
-                      </DialogBody>
-                    </RemountOnError>
+                    <DialogBody>
+                      <ActionFormMessage />
+                      <AddressEditor
+                        shipping={order.shippingAddress}
+                        billing={order.billingAddress}
+                      />
+                    </DialogBody>
                     <DialogFooter>
                       <DialogClose />
                       <SubmitButton pendingLabel="Wird gespeichert …">Speichern</SubmitButton>

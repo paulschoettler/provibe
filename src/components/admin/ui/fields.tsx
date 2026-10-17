@@ -1,7 +1,8 @@
 "use client";
 
 import { useId, type ComponentProps, type ReactNode } from "react";
-import { useActionFormState } from "./ActionForm";
+import { useActionFormRestore, useActionFormState, type ActionFormRestore } from "./ActionForm";
+import type { ActionState } from "./action-state";
 import { cx } from "./cx";
 import { Icon } from "./Icon";
 
@@ -10,6 +11,12 @@ import { Icon } from "./Icon";
  * Feld 40 px (mobil 44 px), Radius 8, Fokus 2 px Magenta, Fehler 2 px Rot mit Icon und Text.
  * Innerhalb von <ActionForm> kommen Fehler und zurückgegebene Werte automatisch aus dem
  * Ergebnis der Server Action (über name). Außerhalb per error/defaultValue setzen.
+ *
+ * Auswahlfelder (Select, Checkbox, CheckboxBox, Switch, RadioCards) hängen sich nach jedem
+ * Ergebnis neu ein (key aus dem Ergebniszähler des ActionForm), weil React sie beim
+ * automatischen Zurücksetzen sonst auf den Wert vom ersten Rendern stellt. Nach einem Fehler
+ * gilt values[name] aus dem Ergebnis, ohne values der abgeschickte Wert; kontrollierte Felder
+ * (value oder checked gesetzt) zeigen nach dem Neu-Einhängen ihren Zustand.
  */
 
 interface FieldBase {
@@ -30,6 +37,43 @@ function useFieldState(name: string, error?: string, defaultValue?: unknown) {
       ? state.values[name]
       : defaultValue;
   return { error: err, value };
+}
+
+/**
+ * Abgeschickte Werte eines Auswahlfelds nach einem Fehler: zuerst values[name] aus dem Ergebnis
+ * (Mehrfachwerte als Liste oder kommagetrennt), sonst die zuletzt abgeschickten Eingaben.
+ * undefined, wenn nichts wiederherzustellen ist (kein Fehler, ohne JavaScript ohne values).
+ */
+function restoredChoices(
+  state: ActionState,
+  restore: ActionFormRestore,
+  name: string | undefined,
+): string[] | undefined {
+  if (!name || state.status !== "error") return undefined;
+  const values = state.values as Record<string, string | string[] | undefined> | undefined;
+  if (values && name in values) {
+    const v = values[name];
+    if (Array.isArray(v)) return v;
+    return v === undefined ? [] : [v, ...v.split(",")];
+  }
+  if (restore.submitted) return restore.submitted[name] ?? [];
+  return undefined;
+}
+
+const CHECKED_WORDS = ["on", "true", "1", "yes", "ja"];
+
+function restoredChecked(
+  state: ActionState,
+  restore: ActionFormRestore,
+  name: string | undefined,
+  value: unknown,
+): boolean | undefined {
+  const list = restoredChoices(state, restore, name);
+  if (!list) return undefined;
+  if (value === undefined || value === null || value === "on") {
+    return list.some((v) => CHECKED_WORDS.includes(v));
+  }
+  return list.includes(String(value));
 }
 
 export const inputClasses = (invalid?: boolean, extra?: string) =>
@@ -203,12 +247,17 @@ export function Select({
   options,
   placeholder,
   defaultValue,
+  value,
   required,
   ...rest
 }: SelectProps) {
   const autoId = useId();
   const fieldId = id ?? `f-${name}-${autoId}`;
   const s = useFieldState(name, error, defaultValue);
+  const restore = useActionFormRestore();
+  const state = useActionFormState();
+  const restored = restoredChoices(state, restore, name)?.[0];
+  const controlled = value !== undefined;
   return (
     <FieldShell
       id={fieldId}
@@ -221,9 +270,12 @@ export function Select({
     >
       <div className="relative">
         <select
+          key={restore.version}
           id={fieldId}
           name={name}
-          defaultValue={s.value as string | undefined}
+          {...(controlled
+            ? { value }
+            : { defaultValue: (restored ?? s.value) as string | undefined })}
           required={required}
           aria-invalid={s.error ? true : undefined}
           aria-describedby={describedBy(fieldId, hint, s.error)}
@@ -314,6 +366,7 @@ export function Checkbox({
   const autoId = useId();
   const fieldId = id ?? `f-${name}-${autoId}`;
   const s = useFieldState(name, error);
+  // Wiederherstellung und Neu-Einhängen übernimmt CheckboxBox
   return (
     <div className={cx("flex flex-col gap-1", className)}>
       <label
@@ -340,11 +393,20 @@ export function Checkbox({
 }
 
 /** Nur das Kästchen (Tabellenauswahl): echtes <input type="checkbox"> mit eigener Optik. */
-export function CheckboxBox({ className, ...rest }: Omit<ComponentProps<"input">, "type">) {
+export function CheckboxBox({
+  className,
+  checked,
+  defaultChecked,
+  ...rest
+}: Omit<ComponentProps<"input">, "type">) {
+  const checkedProps = useRestoredCheckedProps(rest.name, rest.value, checked, defaultChecked);
   return (
     <span className={cx("relative inline-flex size-[18px] shrink-0", className)}>
       <input
+        key={checkedProps.key}
         type="checkbox"
+        checked={checkedProps.checked}
+        defaultChecked={checkedProps.defaultChecked}
         className="peer border-admin-rahmen-stark bg-admin-karte checked:border-admin-akzent checked:bg-admin-akzent indeterminate:border-admin-akzent indeterminate:bg-admin-akzent aria-invalid:border-admin-rot size-[18px] cursor-pointer appearance-none rounded-[4px] border-[1.5px]"
         {...rest}
       />
@@ -356,6 +418,23 @@ export function CheckboxBox({ className, ...rest }: Omit<ComponentProps<"input">
       </span>
     </span>
   );
+}
+
+/**
+ * checked/defaultChecked für Kästchen und Schalter: kontrolliert unverändert, sonst nach einem
+ * Fehler der abgeschickte Zustand. key wechselt mit jedem Action-Ergebnis (Neu-Einhängen).
+ */
+function useRestoredCheckedProps(
+  name: string | undefined,
+  value: unknown,
+  checked: boolean | undefined,
+  defaultChecked: boolean | undefined,
+) {
+  const state = useActionFormState();
+  const restore = useActionFormRestore();
+  if (checked !== undefined) return { key: restore.version, checked, defaultChecked: undefined };
+  const restored = restoredChecked(state, restore, name, value);
+  return { key: restore.version, checked: undefined, defaultChecked: restored ?? defaultChecked };
 }
 
 /* --- Schalter --------------------------------------------------------------------------------- */
@@ -372,11 +451,14 @@ export function Switch({
   hideLabel,
   className,
   id,
+  checked,
+  defaultChecked,
   ...rest
 }: SwitchProps) {
   const autoId = useId();
   const fieldId = id ?? `f-${name}-${autoId}`;
   const s = useFieldState(name, error);
+  const checkedProps = useRestoredCheckedProps(name, rest.value, checked, defaultChecked);
   return (
     <div className={cx("flex flex-col gap-1", className)}>
       <label
@@ -391,10 +473,13 @@ export function Switch({
         </span>
         <span className="relative inline-flex h-6 w-10 shrink-0">
           <input
+            key={checkedProps.key}
             id={fieldId}
             name={name}
             type="checkbox"
             role="switch"
+            checked={checkedProps.checked}
+            defaultChecked={checkedProps.defaultChecked}
             aria-describedby={describedBy(fieldId, hint, s.error)}
             className="peer bg-admin-rahmen-stark checked:bg-admin-akzent h-6 w-10 cursor-pointer appearance-none rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             {...rest}
@@ -434,6 +519,9 @@ export function RadioCards({
 }) {
   const autoId = useId();
   const s = useFieldState(name, error, defaultValue);
+  const state = useActionFormState();
+  const restore = useActionFormRestore();
+  const selected = restoredChoices(state, restore, name)?.[0] ?? s.value;
   const groupId = `g-${name}-${autoId}`;
   return (
     <fieldset
@@ -447,11 +535,12 @@ export function RadioCards({
           className="rounded-admin-feld border-admin-rahmen-stark has-checked:border-admin-akzent has-checked:bg-admin-akzent-hell flex cursor-pointer items-start gap-3 border p-3 has-checked:border-2 has-disabled:cursor-not-allowed has-disabled:opacity-60"
         >
           <input
+            key={restore.version}
             type="radio"
             name={name}
             value={o.value}
             disabled={o.disabled}
-            defaultChecked={s.value === o.value}
+            defaultChecked={selected === o.value}
             className="border-admin-rahmen-stark bg-admin-karte checked:border-admin-akzent mt-0.5 size-[18px] shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] checked:border-[5px]"
           />
           <span className="min-w-0">

@@ -48,8 +48,8 @@ export function StateError({
 
 /**
  * Erfolgsmeldung mit Hinweisen (ActionState.message bei status ok), zum Beispiel fehlende Gewichte.
- * Nach einem Fehler bleibt die Speichern-Leiste sichtbar (React setzt das Formular nach der Action
- * zurück, die Leiste hält es dann für unverändert) und der Fokus springt aufs erste fehlerhafte Feld.
+ * Nach einem Fehler springt der Fokus aufs erste fehlerhafte Feld. Dass die Speichern-Leiste nach
+ * einem Fehler sichtbar bleibt, regelt die SaveBar selbst (wartet auf das Erfolgsereignis).
  */
 export function StateNotice() {
   const state = useActionFormState();
@@ -59,7 +59,6 @@ export function StateNotice() {
     const form = ref.current?.closest("form");
     if (!form) return;
     const t = setTimeout(() => {
-      form.dispatchEvent(new Event("input", { bubbles: true }));
       form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
     }, 80);
     return () => clearTimeout(t);

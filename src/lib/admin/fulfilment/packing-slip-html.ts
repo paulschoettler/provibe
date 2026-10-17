@@ -4,6 +4,10 @@ import { escapeHtml, type LegalEntity } from "@/lib/checkout/emails";
  * Lieferschein als druckfertiges HTML (A4, Druck-CSS), ohne PDF-Bibliothek: Der Browser druckt
  * oder speichert als PDF. Bewusst ohne Preise (Packliste fürs Lager), dafür mit SKU und
  * Bundle-Inhalt, damit beim Packen nichts fehlt. Reine Funktion, getestet.
+ *
+ * Datensparsam: keine E-Mail und keine Telefonnummer der Kundin. Der Zettel liegt im Paket und
+ * wird vom Lager gedruckt (Rolle Fulfillment); DHL bekommt E-Mail und Telefon für die
+ * Paketankündigung ausschließlich über die Label-Schnittstelle (shipments.ts), nicht über Papier.
  */
 
 export interface PackingSlipItem {
@@ -19,7 +23,6 @@ export interface PackingSlipData {
   placedAt: string;
   shippingAddressLines: string[];
   billingAddressLines: string[] | null;
-  email: string;
   shippingName: string | null;
   items: PackingSlipItem[];
   customerNote: string | null;
@@ -89,7 +92,7 @@ ${
     ? `<p class="muted" style="margin-top:20px">Rechnungsadresse: ${data.billingAddressLines.map(e).join(", ")}</p>`
     : ""
 }
-<footer>Kontakt bei Fragen: ${e(data.entity?.email ?? "hello@provibe-drinks.de")} · Bestellung ${e(data.orderNumber)} · ${e(data.email)}</footer>
+<footer>Kontakt bei Fragen: ${e(data.entity?.email ?? "hello@provibe-drinks.de")} · Bestellung ${e(data.orderNumber)}</footer>
 </main>`;
 }
 

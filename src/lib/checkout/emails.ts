@@ -21,6 +21,28 @@ export interface LegalEntity {
   managing_director?: string;
 }
 
+/** Optionen für den Versand der Bestellbestätigung (siehe post-order.ts). */
+export interface OrderConfirmationSendOptions {
+  /**
+   * Erneut senden (Backoffice "Mail erneut senden"): Der Idempotenz-Schlüssel bekommt einen
+   * Zeitstempel, sonst verwirft Resend einen zweiten Versand innerhalb von 24 Stunden still.
+   */
+  force?: boolean;
+}
+
+/**
+ * Idempotenz-Schlüssel der Bestellbestätigung. Ohne force stabil je Bestellung (Job-Retries
+ * senden nie doppelt), mit force eindeutig je Aufruf.
+ */
+export function orderConfirmationIdempotencyKey(
+  orderId: string,
+  options: OrderConfirmationSendOptions = {},
+  now: number = Date.now(),
+): string {
+  const base = `order_confirmation:${orderId}`;
+  return options.force ? `${base}:erneut:${now}` : base;
+}
+
 export interface RenderedEmail {
   subject: string;
   html: string;

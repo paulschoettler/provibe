@@ -10,8 +10,10 @@ import { asJson, checkoutDb } from "./db";
 import {
   internalNotificationEmail,
   orderConfirmationEmail,
+  orderConfirmationIdempotencyKey,
   paymentConfirmationEmail,
   type LegalEntity,
+  type OrderConfirmationSendOptions,
 } from "./emails";
 import { legalVersionsByIds } from "./legal";
 import { loadOrderView } from "./orders";
@@ -78,7 +80,10 @@ async function sendLogged(
   }
 }
 
-export async function sendOrderConfirmation(orderId: string): Promise<void> {
+export async function sendOrderConfirmation(
+  orderId: string,
+  options: OrderConfirmationSendOptions = {},
+): Promise<void> {
   const order = await requireOrder(orderId);
   const versions = await legalVersionsByIds(order.legalVersionIds);
   const { data: docs } = await checkoutDb()
@@ -105,7 +110,7 @@ export async function sendOrderConfirmation(orderId: string): Promise<void> {
       text: mail.text,
       category: "transactional",
       template: "order_confirmation",
-      idempotencyKey: `order_confirmation:${order.id}`,
+      idempotencyKey: orderConfirmationIdempotencyKey(order.id, options),
     },
     { orderId, event: true },
   );

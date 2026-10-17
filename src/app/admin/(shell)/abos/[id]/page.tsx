@@ -43,6 +43,7 @@ import {
   percentFromBp,
 } from "@/components/admin/subscriptions/labels";
 import { SubscriptionActions } from "@/components/admin/subscriptions/SubscriptionActions";
+import { SubscriptionNotes } from "@/components/admin/subscriptions/SubscriptionNotes";
 
 export const metadata: Metadata = { title: "Abo" };
 
@@ -533,6 +534,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
               </p>
             </Card>
           ) : null}
+          {canOperate ? <SubscriptionNotes subscriptionId={row.id} names={names} /> : null}
           {canOperate ? (
             <Card title="Zahlungsmittel">
               {detail.paymentMethod ? (

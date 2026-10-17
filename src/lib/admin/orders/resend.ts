@@ -52,7 +52,7 @@ export async function resendOrderMail(
 
   let reference: string | null = null;
   if (kind === "order_confirmation") {
-    await sendOrderConfirmation(orderId);
+    await sendOrderConfirmation(orderId, { force: true });
   } else if (kind === "shipping_confirmation") {
     const { data: shipment } = await db
       .from("shipments")

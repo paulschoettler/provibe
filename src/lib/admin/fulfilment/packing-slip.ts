@@ -57,7 +57,7 @@ async function loadPackingSlipData(orderId: string): Promise<PackingSlipData> {
     db
       .from("orders")
       .select(
-        "id, order_number, placed_at, email, shipping_address, billing_address, shipping_rate_name, customer_note, is_test",
+        "id, order_number, placed_at, shipping_address, billing_address, shipping_rate_name, customer_note, is_test",
       )
       .eq("id", orderId)
       .maybeSingle(),
@@ -77,7 +77,6 @@ async function loadPackingSlipData(orderId: string): Promise<PackingSlipData> {
     placedAt: order.placed_at,
     shippingAddressLines: shipping ? formatAddressLines(shipping) : [],
     billingAddressLines: billing ? formatAddressLines(billing) : null,
-    email: order.email,
     shippingName: order.shipping_rate_name,
     items: (items ?? []).map((i) => ({
       title: i.product_title,

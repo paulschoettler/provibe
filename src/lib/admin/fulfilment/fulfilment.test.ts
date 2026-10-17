@@ -45,7 +45,6 @@ describe("Lieferschein", () => {
       "Deutschland",
     ],
     billingAddressLines: null,
-    email: "test-orders@provibe-drinks.de",
     shippingName: "DHL Paket",
     items: [
       {
@@ -78,6 +77,12 @@ describe("Lieferschein", () => {
     expect(html).toContain("2 × Wildberry, Dose");
     expect(html).toContain("3 Artikel");
     expect(html).toContain("@page { size: A4");
+    // Datensparsam: keine Kunden-E-Mail, keine Telefonnummer, nur die Kontaktadresse des Shops.
+    expect(html).not.toContain("test-orders@provibe-drinks.de");
+    expect(html).not.toMatch(/Telefon|Tel\./);
+    expect(html).toContain(
+      "Kontakt bei Fragen: hello@provibe-drinks.de · Bestellung PV-10001</footer>",
+    );
     expect(html).toContain("TESTBESTELLUNG");
     expect(html).toContain("Bitte beim Nachbarn abgeben");
     expect(html).not.toMatch(/€/);
@@ -178,7 +183,6 @@ describe("Lieferscheine im Sammeldruck", () => {
     placedAt: "2026-10-17T12:31:00Z",
     shippingAddressLines: ["Test Kunde", "Musterstraße 1", "86150 Augsburg"],
     billingAddressLines: null,
-    email: "test-orders@provibe-drinks.de",
     shippingName: "DHL Paket",
     items: [
       { title: "Peach", variantTitle: "9 Dosen", sku: "PV-PE-9", quantity: 1, components: null },
