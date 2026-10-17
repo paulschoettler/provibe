@@ -168,3 +168,13 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **H3. Bestand.** Laut Antwort C5 läuft die Bestandsführung erst ab dem Import. Migration `20260921160000_inventory_unlimited_until_import` schaltet `track_inventory` bis dahin ab, sonst wäre jede Variante mit Bestand 0 im Warenkorb ausverkauft. Keine Aktion nötig, nur zur Kenntnis.
 
 **Antworten vom 17.10.2026 (H und Arbeitsweise):** Stripe und Resend bleiben Mock, Erinnerung vor dem Go-live in `docs/golive.md`. Admin-Zugänge: hello@provibe-drinks.de als Owner, mail@paulschoettler.de als Admin. Alle Unterseiten werden nach den Figma-Screens ohne weitere Rückfrage gebaut. Kundenkonto und Abo: Plan in `docs/konto-und-abo-plan.md`, Konto wird gebaut, Abo wartet auf Freigabe des Plans.
+
+**H4. Gründerin auf der Story-Seite.** Darf Celine mit Vornamen und Foto auf "Über uns" erscheinen? Annahme: ja, Vorname und ein Porträt, sobald eines vorliegt; bis dahin Text ohne Foto.
+
+**H5. Widerruf: Frist, Eingangsbestätigung, Rücksendeadresse.** Das Formular nennt 14 Tage ab Erhalt und verspricht eine Eingangsbestätigung per E-Mail. Welche Rücksendeadresse gilt (Kurt-Viermetz-Straße 1a oder Bei St Ursula 16a)? Annahme: Kurt-Viermetz-Straße 1a wie im Impressum, bis du etwas anderes sagst.
+
+**H6. Postfächer.** Widerruf nennt support@, Kontakt und Impressum hello@. Annahme: beide bleiben und werden abgerufen.
+
+**H7. FAQ und Pre-Sale-Hinweis.** Drei FAQ-Antworten (Versand, Pfand, Protein) sind aus Repo-Daten neu formuliert. Der Pre-Sale-Hinweis (6 bis 8 Wochen) fehlt. Annahme: Pre-Sale ist vorbei, der Hinweis entfällt; FAQ-Texte bitte beim Abnahmedurchgang gegenlesen.
+
+**H8. LUCID.** Die Registrierungsnummer fehlt weiterhin im Impressum. Platzhalter bleibt leer, bis sie vorliegt.
