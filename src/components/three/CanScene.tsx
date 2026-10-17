@@ -56,6 +56,8 @@ const CAN_BASE_ROTATION_Y = CAN_FRONT_ROTATION_Y;
  * Dose (rund 90 Grad Grunddrehung) kippte sie dann zur Kamera statt zur Seite.
  */
 const CAN_EULER_ORDER: THREE.EulerOrder = "ZYX";
+/** Blickrichtung einer Dose ohne Drehung: lokale +z-Achse, also zur Kamera. */
+const FORWARD = new THREE.Vector3(0, 0, 1);
 
 /** Lineare Mischung, damit wir nicht für jede Zeile THREE.MathUtils bemühen. */
 function mix(from: number, to: number, t: number): number {
@@ -94,6 +96,13 @@ function range(value: number, from: number, to: number): number {
 
 /** Finale-Dosen in Zeichenreihenfolge, wie in LogoZoom.tsx (Raspberry Lime vorn). */
 const FINALE_CAN_SLUGS = ["wildberry", "peach", "raspberry-lime"] as const;
+/**
+ * Blickwinkel von oben auf die Finale-Dosen, wie auf den PNG-Produktfotos: Der
+ * Deckel ist als schmale Ellipse zu sehen. Ohne diese Neigung stünde die Oberkante
+ * über der Bildmitte auf Augenhöhe oder darüber, der Deckel verschwände und die
+ * Dose wirkte oben waagerecht abgeschnitten (Feedback vom 17.10.2026).
+ */
+const FINALE_VIEW_TILT = 8 * DEG;
 
 interface FinaleCanPose {
   x: number;
@@ -350,6 +359,16 @@ function Scene({ flavors, mobileModels }: SceneProps) {
   const footerOpacity = useRef<number[]>([]);
   const footerFrames = useRef<number[]>([]);
   const footerAnchors = useRef<Array<HTMLElement | null>>([]);
+  /** Wiederverwendete Rechenobjekte für die Ausrichtung der Finale-Dosen. */
+  const finalePose = useMemo(
+    () => ({
+      euler: new THREE.Euler(),
+      local: new THREE.Quaternion(),
+      look: new THREE.Quaternion(),
+      ray: new THREE.Vector3(),
+    }),
+    [],
+  );
 
   // Fällt die Szene weg, sind die PNG-Platzhalter wieder die Dosen.
   useEffect(() => {
@@ -477,10 +496,24 @@ function Scene({ flavors, mobileModels }: SceneProps) {
       }
       group.visible = pose.opacity > 0.01;
       group.position.set(pose.x, pose.y, 0);
-      group.rotation.order = CAN_EULER_ORDER;
-      group.rotation.z = -pose.rotate * DEG;
-      // Im Flug drehen sich die Dosen zur Bildmitte, am Ziel stehen sie frontal.
-      group.rotation.y = CAN_BASE_ROTATION_Y - pose.turn * 1.2 * DEG;
+      // Erst um die eigene Achse (im Flug zur Bildmitte, am Ziel frontal), dann
+      // mit dem Deckel zur Kamera neigen, dann in der Bildebene kippen wie CSS rotate.
+      finalePose.euler.set(
+        FINALE_VIEW_TILT,
+        CAN_BASE_ROTATION_Y - pose.turn * 1.2 * DEG,
+        -pose.rotate * DEG,
+        "ZXY",
+      );
+      finalePose.local.setFromEuler(finalePose.euler);
+      // Die Dosen stehen weit außerhalb der Bildmitte, die perspektivische Kamera
+      // sähe sie dort schräg von unten (beim Herausscrollen mit sichtbarem Boden)
+      // oder von oben. Deshalb zeigt ihre Vorderseite immer genau zur Kamera: Jede
+      // Dose sieht an jeder Bildposition so aus wie in der Bildmitte.
+      finalePose.ray
+        .set(state.camera.position.x - pose.x, state.camera.position.y - pose.y, distance)
+        .normalize();
+      finalePose.look.setFromUnitVectors(FORWARD, finalePose.ray);
+      group.quaternion.multiplyQuaternions(finalePose.look, finalePose.local);
       group.scale.setScalar(pose.height);
       if (group.children.length === 0) footerOpacity.current[index] = -1;
       if (Math.abs((footerOpacity.current[index] ?? -1) - pose.opacity) > 0.004) {
