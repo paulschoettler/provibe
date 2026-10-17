@@ -169,7 +169,12 @@ export async function deleteSegment(id: string, actor: StaffSession): Promise<vo
     .eq("id", segmentId)
     .maybeSingle();
   if (!old) return;
-  // Kampagnen behalten ihren segment_snapshot, segment_id wird per FK auf null gesetzt
+  // Nur löschen, wenn keine Kampagne auf das Segment zeigt (auch versendete als Nachweis)
+  const usage = (await segmentCampaignUsage()).get(segmentId);
+  if (usage)
+    throw new Error(
+      `Das Segment wird von ${usage.count === 1 ? "der Kampagne" : `${usage.count} Kampagnen, zum Beispiel`} „${usage.names[0]}“ genutzt und lässt sich nicht löschen`,
+    );
   const { error } = await db.from("saved_segments").delete().eq("id", segmentId);
   if (error) throw dbError("Segment löschen", error);
   await writeAudit(actor, {
@@ -351,4 +356,59 @@ export async function allSendableContactIds(): Promise<string[]> {
     if (!data || data.length < pageSize) break;
   }
   return ids;
+}
+
+/** Kampagnen je Segment (für Löschschutz und Anzeige in der Segmentliste). */
+export async function segmentCampaignUsage(): Promise<
+  Map<string, { count: number; names: string[] }>
+> {
+  const { data, error } = await crmDb()
+    .from("newsletter_campaigns")
+    .select("segment_id, name")
+    .not("segment_id", "is", null);
+  if (error) throw dbError("Kampagnen laden", error);
+  const map = new Map<string, { count: number; names: string[] }>();
+  for (const c of data ?? []) {
+    if (!c.segment_id) continue;
+    const entry = map.get(c.segment_id) ?? { count: 0, names: [] };
+    entry.count++;
+    entry.names.push(c.name);
+    map.set(c.segment_id, entry);
+  }
+  return map;
+}
+
+/** Erste Treffer eines (ungespeicherten) Regelwerks für die Vorschau im Editor. */
+export async function previewSegmentMembers(
+  rules: SegmentRules,
+  limit = 20,
+): Promise<SegmentMember[]> {
+  const ids = await segmentMemberIds(rules, { limit: Math.min(Math.max(limit, 1), 100) });
+  if (ids.length === 0) return [];
+  const { data, error } = await crmDb()
+    .from("customers")
+    .select("id, email, first_name, last_name, orders_count, total_spent_cents, last_order_at")
+    .in("id", ids);
+  if (error) throw dbError("Kunden laden", error);
+  const byId = new Map((data ?? []).map((c) => [c.id, c]));
+  return ids
+    .map((id) => byId.get(id))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+    .map((c) => ({
+      id: c.id,
+      email: c.email,
+      firstName: c.first_name,
+      lastName: c.last_name,
+      ordersCount: c.orders_count,
+      totalSpentCents: Number(c.total_spent_cents),
+      lastOrderAt: c.last_order_at,
+    }));
+}
+
+/** Produkte für die Bedingung "Hat Produkt gekauft" (Handle und deutscher Titel). */
+export async function segmentProductOptions(): Promise<{ value: string; label: string }[]> {
+  const labels = await productLabels();
+  return Object.entries(labels)
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label, "de"));
 }

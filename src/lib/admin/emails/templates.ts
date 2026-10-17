@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { StaffSession } from "@/lib/admin/auth";
 import { writeAudit } from "@/lib/admin/audit";
 import { crmDb, dbError } from "@/lib/admin/customers/crm-db";
-import { assertPermission, parseInput } from "@/lib/admin/customers/guard";
+import { ValidationError, assertPermission, parseInput } from "@/lib/admin/customers/guard";
 import { isCrmTemplateKey, renderCrmTemplate, type RenderedMail } from "@/emails";
 import {
   internalNotificationEmail,
@@ -15,6 +15,10 @@ import type { Json } from "@/lib/supabase/database.types";
 import { refundEmail, shippingEmail } from "@/lib/admin/orders/emails";
 import { imageBaseUrl, loadImprint, siteUrl } from "./context";
 import { sampleOrderView } from "./preview-fixtures";
+import { SUBJECT_MAX, overrideSubject } from "./subject";
+import { canSendTo } from "./policy";
+import { sendTrackedEmail, type EmailStatus } from "./send";
+import { serverEnv } from "@/lib/env/server";
 
 /**
  * Vorlagenübersicht fürs Backoffice (/admin/emails). Inhalt der Vorlagen liegt im Code:
@@ -59,7 +63,14 @@ export interface EmailTemplateRow {
   previewable: boolean;
   /** Nur Werbe-Vorlagen des CRM lassen sich abschalten, Pflichtmails nicht */
   toggleable: boolean;
+  /** Betreff im Backoffice änderbar: nur Werbe-Vorlagen der Automationen (Rest kommt aus dem Code) */
+  subjectEditable: boolean;
   sentLast30Days: number;
+}
+
+/** Vorlagen, deren Betreff aus email_templates.subject_template gelesen wird. */
+export function isSubjectEditable(key: string, category: string): boolean {
+  return templateSource(key) === "crm" && category === "marketing" && key !== "newsletter_campaign";
 }
 
 export async function listEmailTemplates(): Promise<EmailTemplateRow[]> {
@@ -96,6 +107,7 @@ export async function listEmailTemplates(): Promise<EmailTemplateRow[]> {
       source,
       previewable: source === "crm" || source === "checkout" || source === "orders",
       toggleable: source === "crm" && t.category === "marketing" && t.key !== "newsletter_campaign",
+      subjectEditable: isSubjectEditable(t.key, t.category),
       sentLast30Days: counts[i],
     };
   });
@@ -134,7 +146,8 @@ export async function renderTemplate(
       unsubscribeUrl: `${url}/newsletter/abmelden?token=vorschau`,
       testBanner: "VORSCHAU",
     });
-    return { ...mail, source };
+    const stored = await storedSubject(key);
+    return { ...mail, subject: overrideSubject(mail.subject, stored), source };
   }
   const orderNumber = typeof props.order_number === "string" ? props.order_number : "PV-10001";
   const order = sampleOrderView(url, orderNumber);
@@ -242,4 +255,116 @@ export async function isTemplateEnabled(key: string): Promise<boolean> {
     .eq("key", key)
     .maybeSingle();
   return data?.is_enabled !== false;
+}
+
+/** Gespeicherter Betreff einer Vorlage, deren Betreff im Backoffice änderbar ist (sonst null). */
+export async function storedSubject(key: string): Promise<string | null> {
+  const { data } = await crmDb()
+    .from("email_templates")
+    .select("category, subject_template")
+    .eq("key", key)
+    .maybeSingle();
+  if (!data || !isSubjectEditable(key, data.category)) return null;
+  return data.subject_template;
+}
+
+const subjectSchema = z.object({
+  key: z.string().min(1).max(80),
+  subject: z
+    .string()
+    .trim()
+    .min(3, "Bitte gib einen Betreff ein.")
+    .max(SUBJECT_MAX, `Höchstens ${SUBJECT_MAX} Zeichen.`)
+    .refine((v) => !/[\r\n]/.test(v), "Ohne Zeilenumbruch."),
+  description: z.string().trim().max(300).optional(),
+});
+
+/**
+ * Betreff (und Beschreibung) einer Werbe-Vorlage der Automationen ändern. Transaktionale Vorlagen
+ * liegen im Code der Pakete Checkout, Bestellungen und Konto und sind hier schreibgeschützt.
+ */
+export async function updateTemplateSubject(
+  input: { key: string; subject: string; description?: string },
+  actor: StaffSession,
+): Promise<void> {
+  assertPermission(actor, "sendNewsletter");
+  const data = parseInput(subjectSchema, input);
+  const db = crmDb();
+  const { data: before } = await db
+    .from("email_templates")
+    .select("key, category, subject_template, description")
+    .eq("key", data.key)
+    .maybeSingle();
+  if (!before) throw new Error("Vorlage nicht gefunden");
+  if (!isSubjectEditable(data.key, before.category))
+    throw new Error("Der Betreff dieser Vorlage kommt aus dem Code und ist hier nicht änderbar");
+  const patch = {
+    subject_template: data.subject,
+    ...(data.description !== undefined ? { description: data.description || null } : {}),
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await db.from("email_templates").update(patch).eq("key", data.key);
+  if (error) throw dbError("Vorlage speichern", error);
+  await writeAudit(actor, {
+    action: "email_template.update",
+    entityType: "email_template",
+    entityId: data.key,
+    before: { subject_template: before.subject_template, description: before.description },
+    after: patch,
+  });
+}
+
+/**
+ * Testversand einer Vorlage mit Beispieldaten an eine Adresse der Allowlist (auch nach dem
+ * Go-live). Betreff mit [TEST], im Versandprotokoll mit metadata.test markiert.
+ */
+export async function sendTemplateTest(
+  input: { key: string; to: string },
+  actor: StaffSession,
+): Promise<{ status: EmailStatus }> {
+  assertPermission(actor, "sendNewsletter");
+  const data = parseInput(
+    z.object({
+      key: z.string().min(1).max(80),
+      to: z.string().trim().toLowerCase().email("Bitte gib eine gültige Testadresse ein."),
+    }),
+    input,
+  );
+  if (!canSendTo(data.to, serverEnv(), true))
+    throw new ValidationError({ to: "Testversand nur an Adressen der Allowlist." });
+  const { data: row } = await crmDb()
+    .from("email_templates")
+    .select("key, category, preview_props")
+    .eq("key", data.key)
+    .maybeSingle();
+  if (!row) throw new Error("Vorlage nicht gefunden");
+  const props =
+    row.preview_props && typeof row.preview_props === "object" && !Array.isArray(row.preview_props)
+      ? (row.preview_props as Record<string, unknown>)
+      : {};
+  const mail = await renderTemplate(data.key, props);
+  if (!mail)
+    throw new Error(
+      "Diese Vorlage hat keine Vorschau im Backoffice und lässt sich hier nicht testen",
+    );
+  const result = await sendTrackedEmail({
+    to: data.to,
+    subject: `[TEST] ${mail.subject}`,
+    html: mail.html,
+    text: mail.text,
+    category: row.category,
+    template: data.key,
+    unsubscribeUrl:
+      row.category === "marketing"
+        ? `${siteUrl()}/newsletter/abmelden?token=testversand`
+        : undefined,
+    metadata: { test: true, by: actor.email },
+  });
+  await writeAudit(actor, {
+    action: "email_template.test_send",
+    entityType: "email_template",
+    entityId: data.key,
+    after: { to: data.to, status: result.status },
+  });
+  return { status: result.status };
 }

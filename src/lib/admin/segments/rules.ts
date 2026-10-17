@@ -135,8 +135,10 @@ export const segmentRulesSchema = z.object({
 
 export type SegmentRules = z.infer<typeof segmentRulesSchema>;
 
-/** Interne Bedingungen der Kundenliste (nicht speicherbar): Freitextsuche. */
-export type InternalCondition = { field: "search"; op: "matches"; value: string };
+/** Interne Bedingungen der Kundenliste (nicht speicherbar): Freitextsuche, Sperrstatus. */
+export type InternalCondition =
+  | { field: "search"; op: "matches"; value: string }
+  | { field: "blocked"; op: "is"; value: boolean };
 
 export interface SegmentSql {
   /** WHERE-Bedingung über Alias c (public.customers), Werte nur als ($1->>n) */
@@ -315,6 +317,8 @@ function conditionSql(cond: SegmentCondition | InternalCondition, b: ParamBuilde
     }
     case "customer_type":
       return `c.customer_type::text = ${b.add(cond.value)}`;
+    case "blocked":
+      return cond.value ? `c.blocked_at is not null` : `c.blocked_at is null`;
     case "search": {
       const v = `lower(${b.add(cond.value)})`;
       return (
@@ -344,6 +348,7 @@ export function translateSegment(
       const value = c.value.trim().slice(0, 100);
       return `(${conditionSql({ ...c, value }, b)})`;
     }
+    if (c.field === "blocked") return `(${conditionSql({ ...c, value: c.value === true }, b)})`;
     return `(${conditionSql(segmentConditionSchema.parse(c), b)})`;
   });
   const where = extraParts.length > 0 ? [`(${ruleSql})`, ...extraParts].join(" and ") : ruleSql;

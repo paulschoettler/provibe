@@ -259,6 +259,7 @@ const CUSTOMER_EVENT_TITLES: Record<string, string> = {
   automation_sent: "Automation gesendet",
   lead_converted: "Aus Lead als B2B-Kunde übernommen",
   newsletter_admin_unsubscribe: "Newsletter im Backoffice abgemeldet",
+  erased_by_staff: "Gelöscht auf Antrag (Art. 17 DSGVO)",
 };
 
 const ORDER_EVENT_TITLES: Record<string, string> = {

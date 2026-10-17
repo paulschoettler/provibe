@@ -41,6 +41,8 @@ export const customerListFilterSchema = z.object({
   newsletter: z.enum(NEWSLETTER_SEGMENT_STATUSES).optional(),
   tag: z.string().trim().min(1).max(50).optional(),
   customerType: z.enum(["b2c", "b2b"]).optional(),
+  /** Sperrstatus: true nur gesperrte, false nur nicht gesperrte */
+  blocked: z.boolean().optional(),
   order: z
     .enum(["last_order_desc", "created_desc", "total_spent_desc", "orders_desc", "name_asc"])
     .default("last_order_desc"),
@@ -89,6 +91,7 @@ export async function listCustomers(
   if (f.newsletter) extra.push({ field: "newsletter_status", op: "is", value: f.newsletter });
   if (f.tag) extra.push({ field: "tag", op: "has", value: f.tag });
   if (f.customerType) extra.push({ field: "customer_type", op: "is", value: f.customerType });
+  if (f.blocked !== undefined) extra.push({ field: "blocked", op: "is", value: f.blocked });
 
   const [ids, total] = await Promise.all([
     segmentMemberIds(rules, {
@@ -405,4 +408,60 @@ export async function getCustomerProfile(id: string): Promise<CustomerProfile | 
       emails: emails.data ?? [],
     }),
   };
+}
+
+export interface CustomerSubscriptionRow {
+  id: string;
+  status: string;
+  quantity: number;
+  intervalUnit: string;
+  intervalCount: number;
+  discountBp: number;
+  nextOrderAt: string | null;
+  pausedUntil: string | null;
+  cancelledAt: string | null;
+  createdAt: string;
+  variantTitle: string | null;
+  productTitle: string | null;
+}
+
+/** Abos des Kunden (nur lesend im Profil; Verwaltung im Abo-Modul). */
+export async function getCustomerSubscriptions(id: string): Promise<CustomerSubscriptionRow[]> {
+  const customerId = parseInput(z.string().uuid(), id);
+  const { data, error } = await crmDb()
+    .from("subscriptions")
+    .select(
+      "id, status, quantity, interval_unit, interval_count, discount_bp, next_order_at, paused_until, cancelled_at, created_at, product_variants(title, products(handle, product_translations(title, locale)))",
+    )
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+  if (error) {
+    // Abo-Tabelle kann sich mit dem Abo-Paket noch ändern; das Profil zeigt dann keinen Hinweis
+    console.error("[crm] Abos laden", error.message);
+    return [];
+  }
+  return (data ?? []).map((s) => {
+    const v = s.product_variants as unknown as {
+      title: string | null;
+      products: {
+        handle: string;
+        product_translations: { title: string; locale: string }[] | null;
+      } | null;
+    } | null;
+    const t = v?.products?.product_translations?.find((x) => x.locale === "de");
+    return {
+      id: s.id,
+      status: String(s.status),
+      quantity: s.quantity,
+      intervalUnit: String(s.interval_unit),
+      intervalCount: s.interval_count,
+      discountBp: s.discount_bp,
+      nextOrderAt: s.next_order_at,
+      pausedUntil: s.paused_until,
+      cancelledAt: s.cancelled_at,
+      createdAt: s.created_at,
+      variantTitle: v?.title ?? null,
+      productTitle: t?.title ?? v?.products?.handle ?? null,
+    };
+  });
 }

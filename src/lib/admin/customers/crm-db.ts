@@ -101,3 +101,11 @@ export function dbError(context: string, error: { message: string } | null): Err
   console.error(`[crm] ${context}`, error?.message);
   return new Error(`${context} fehlgeschlagen`);
 }
+
+/**
+ * Ungetypter Zugriff für Tabellen und Spalten, deren generierte Typen hier nicht passen
+ * (zum Beispiel Löschung über viele Tabellen, Nachweise aus webhook_events). Nur serverseitig.
+ */
+export function untypedCrm(): SupabaseClient {
+  return supabaseAdmin() as unknown as SupabaseClient;
+}

@@ -48,16 +48,29 @@ export const AUTOMATION_META: Record<
 
 const int = (min: number, max: number) => z.coerce.number().int().min(min).max(max);
 
+/**
+ * Optionaler Rabattcode für Willkommens- und Warenkorbmail (Großbuchstaben, Ziffern, - und _).
+ * Ob der Code existiert und aktiv ist, prüft automations.ts beim Speichern.
+ */
+export const discountCodeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z0-9_-]{3,40}$/, "Code mit 3 bis 40 Zeichen: Buchstaben, Ziffern, - oder _.")
+  .optional();
+
 export const automationConfigSchemas = {
   welcome: z.object({
     delay_minutes: int(0, 7 * 24 * 60).default(5),
     template: z.literal("newsletter_welcome").default("newsletter_welcome"),
+    discount_code: discountCodeSchema,
   }),
   abandoned_cart: z.object({
     delay_hours: int(24, 7 * 24).default(24),
     max_age_days: int(1, 30).default(7),
     requires_marketing_consent: z.literal(true).default(true),
     template: z.literal("abandoned_cart").default("abandoned_cart"),
+    discount_code: discountCodeSchema,
   }),
   review_request: z.object({
     delay_days: int(1, 60).default(7),
@@ -91,6 +104,33 @@ export function delayLabel(key: AutomationKey, config: Record<string, unknown>):
   if (key === "abandoned_cart") return `${Number(config.delay_hours ?? 24)} Stunden`;
   return `${Number(config.delay_days ?? 7)} Tage nach Zustellung`;
 }
+
+/**
+ * Prüfungen der Entscheidungsfunktionen in Reihenfolge (Anzeige im Backoffice). Muss zu
+ * decideWelcome, decideAbandonedCart und decideReviewRequest passen (rules.test.ts prüft die Gründe).
+ */
+export const AUTOMATION_CHECKS: Record<AutomationKey, string[]> = {
+  welcome: [
+    "Automation eingeschaltet",
+    "Noch nicht an diesen Kontakt gesendet",
+    "Kein importierter Kontakt (Shopify-Import bekommt keine Willkommensmail)",
+    "Bestätigter Opt-in: Status abonniert mit Bestätigungszeitpunkt",
+  ],
+  abandoned_cart: [
+    "Automation eingeschaltet",
+    "Warenkorb noch nicht erinnert, aktiv und nicht bestellt",
+    "E-Mail-Adresse und mindestens ein Artikel vorhanden",
+    "Seit der letzten Aktivität mindestens die Verzögerung vergangen (nie unter 24 Stunden)",
+    "Warenkorb nicht älter als die Höchstdauer",
+    "Werbeeinwilligung: Newsletter bestätigt",
+  ],
+  review_request: [
+    "Automation eingeschaltet, keine Testbestellung",
+    "Noch nicht angefragt, Bestellung zugestellt, nicht storniert oder erstattet",
+    "Verzögerung seit Zustellung abgelaufen (sonst später erneut geprüft)",
+    "Werbeeinwilligung: Newsletter bestätigt (H20, bis zur anwaltlichen Freigabe)",
+  ],
+};
 
 export type Decision = { send: true } | { send: false; reason: string; final: boolean };
 

@@ -24,6 +24,14 @@ interface BaseInput {
   siteUrl: string;
   unsubscribeUrl: string;
   testBanner?: string | null;
+  /** Optionaler Rabattcode aus der Automation (Backoffice, Konfiguration der Automation) */
+  discountCode?: string | null;
+}
+
+function discountLine(input: BaseInput): string {
+  return input.discountCode
+    ? paragraph(`Dein Code: <strong>${escapeHtml(input.discountCode)}</strong>`)
+    : "";
 }
 
 function hello(firstName?: string | null): string {
@@ -57,6 +65,7 @@ export function welcomeEmail(input: BaseInput): RenderedMail {
     paragraph(
       "provibe ist Eistee mit 15 g Protein, ohne Zucker. Einfach kalt aus dem Kühlschrank, ganz ohne Shaker und Pulver.",
     ) +
+    discountLine(input) +
     button("Sorten entdecken", `${input.siteUrl}/collections/all`);
   return wrap(subject, "Danke für deine Anmeldung zum provibe Newsletter.", body, input);
 }
@@ -84,6 +93,7 @@ export function abandonedCartEmail(input: AbandonedCartInput): RenderedMail {
       ? `<ul style="margin:0 0 20px;padding-left:20px;font-size:16px;line-height:1.5">${list}</ul>`
       : "") +
     (input.products ?? []).slice(0, 3).map(productCard).join("") +
+    discountLine(input) +
     button("Zum Warenkorb", `${input.siteUrl}/cart`) +
     paragraph("Preise und Verfügbarkeit prüfen wir beim Bestellen noch einmal.", {
       muted: true,

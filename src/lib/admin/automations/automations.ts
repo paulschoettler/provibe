@@ -3,9 +3,12 @@ import { z } from "zod";
 import type { StaffSession } from "@/lib/admin/auth";
 import { writeAudit } from "@/lib/admin/audit";
 import { asJson, crmDb, dbError } from "@/lib/admin/customers/crm-db";
-import { assertPermission, parseInput } from "@/lib/admin/customers/guard";
-import { isAllowlistActive } from "@/lib/admin/emails/context";
+import { ValidationError, assertPermission, parseInput } from "@/lib/admin/customers/guard";
+import { isAllowlistActive, siteUrl } from "@/lib/admin/emails/context";
+import { canSendTo } from "@/lib/admin/emails/policy";
+import { sendTrackedEmail, type EmailStatus } from "@/lib/admin/emails/send";
 import { renderTemplate } from "@/lib/admin/emails/templates";
+import { serverEnv } from "@/lib/env/server";
 import { enqueueCrmJob } from "./queue";
 import {
   AUTOMATION_KEYS,
@@ -101,9 +104,22 @@ export async function updateAutomation(
     .maybeSingle();
   if (!before) throw new Error("Automation nicht gefunden");
   const current = parseAutomationConfig(data.key, before.config) as Record<string, unknown>;
-  const config = data.config
-    ? parseInput(automationConfigSchemas[data.key] as z.ZodType, { ...current, ...data.config })
-    : current;
+  const config = (
+    data.config
+      ? parseInput(automationConfigSchemas[data.key] as z.ZodType, { ...current, ...data.config })
+      : current
+  ) as Record<string, unknown>;
+  if (typeof config.discount_code === "string") {
+    const { data: code } = await db
+      .from("discount_codes")
+      .select("code, is_active, ends_at")
+      .eq("code", config.discount_code)
+      .maybeSingle();
+    if (!code || !code.is_active || (code.ends_at && new Date(code.ends_at) < new Date()))
+      throw new ValidationError({
+        discount_code: "Diesen Rabattcode gibt es nicht oder er ist nicht aktiv.",
+      });
+  }
   const isEnabled = data.isEnabled ?? before.is_enabled;
   const { error } = await db
     .from("automations")
@@ -140,4 +156,86 @@ export async function ensureCrmSweepScheduled(now: Date = new Date()): Promise<v
     priority: 150,
     maxAttempts: 3,
   });
+}
+
+export interface AutomationRunRow {
+  id: string;
+  key: AutomationKey;
+  targetType: string;
+  targetId: string;
+  email: string;
+  status: "scheduled" | "sent" | "skipped" | "failed";
+  scheduledFor: string;
+  sentAt: string | null;
+  skipReason: string | null;
+  error: string | null;
+  createdAt: string;
+}
+
+/** Letzte Läufe (automation_runs) mit Ergebnis und Grund aus den Regeln in rules.ts. */
+export async function listAutomationRuns(
+  filter: { key?: AutomationKey; status?: AutomationRunRow["status"]; limit?: number } = {},
+): Promise<AutomationRunRow[]> {
+  let query = crmDb()
+    .from("automation_runs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(Math.min(Math.max(filter.limit ?? 20, 1), 200));
+  if (filter.key) query = query.eq("automation_key", filter.key);
+  if (filter.status) query = query.eq("status", filter.status);
+  const { data, error } = await query;
+  if (error) throw dbError("Automationsläufe laden", error);
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    key: r.automation_key as AutomationKey,
+    targetType: r.target_type,
+    targetId: r.target_id,
+    email: String(r.email),
+    status: r.status as AutomationRunRow["status"],
+    scheduledFor: r.scheduled_for,
+    sentAt: r.sent_at,
+    skipReason: r.skip_reason,
+    error: r.error,
+    createdAt: r.created_at,
+  }));
+}
+
+/**
+ * Testversand einer Automation an eine Adresse der Allowlist (auch nach dem Go-live), mit
+ * Beispieldaten und Banner "TESTVERSAND". Wird wie jede Werbemail protokolliert.
+ */
+export async function sendAutomationTest(
+  input: { key: AutomationKey; to: string },
+  actor: StaffSession,
+): Promise<{ status: EmailStatus }> {
+  assertPermission(actor, "sendNewsletter");
+  const data = parseInput(
+    z.object({
+      key: z.enum(AUTOMATION_KEYS),
+      to: z.string().trim().toLowerCase().email("Bitte gib eine gültige Testadresse ein."),
+    }),
+    input,
+  );
+  if (!canSendTo(data.to, serverEnv(), true))
+    throw new ValidationError({ to: "Testversand nur an Adressen der Allowlist." });
+  const mail = await renderTemplate(AUTOMATION_META[data.key].template, { first_name: "Test" });
+  if (!mail) throw new Error("Vorlage nicht gefunden");
+  const unsubscribeUrl = `${siteUrl()}/newsletter/abmelden?token=testversand`;
+  const result = await sendTrackedEmail({
+    to: data.to,
+    subject: `[TEST] ${mail.subject}`,
+    html: mail.html.replace(/VORSCHAU/g, "TESTVERSAND"),
+    text: mail.text.replace(/VORSCHAU/g, "TESTVERSAND"),
+    category: "marketing",
+    template: AUTOMATION_META[data.key].template,
+    unsubscribeUrl,
+    metadata: { test: true, automation: data.key, by: actor.email },
+  });
+  await writeAudit(actor, {
+    action: "automation.test_send",
+    entityType: "automation",
+    entityId: data.key,
+    after: { to: data.to, status: result.status },
+  });
+  return { status: result.status };
 }

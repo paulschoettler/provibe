@@ -123,10 +123,14 @@ export async function listEmailMessages(
   };
 }
 
-export async function getEmailMessage(
-  id: string,
-): Promise<
-  (EmailLogEntry & { metadata: unknown; fromEmail: string; replyTo: string | null }) | null
+export async function getEmailMessage(id: string): Promise<
+  | (EmailLogEntry & {
+      metadata: unknown;
+      fromEmail: string;
+      replyTo: string | null;
+      providerMessageId: string | null;
+    })
+  | null
 > {
   const { data, error } = await crmDb()
     .from("email_messages")
@@ -140,5 +144,57 @@ export async function getEmailMessage(
     metadata: data.metadata,
     fromEmail: data.from_email,
     replyTo: data.reply_to,
+    providerMessageId: data.provider_message_id,
   };
+}
+
+export interface ResendEventEntry {
+  id: string;
+  type: string;
+  receivedAt: string;
+  detail: string | null;
+}
+
+const EVENT_LABELS: Record<string, string> = {
+  "email.sent": "Gesendet",
+  "email.delivered": "Zugestellt",
+  "email.delivery_delayed": "Zustellung verzögert",
+  "email.opened": "Geöffnet",
+  "email.clicked": "Link geklickt",
+  "email.bounced": "Unzustellbar",
+  "email.complained": "Beschwerde",
+  "email.failed": "Fehlgeschlagen",
+};
+
+export function resendEventLabel(type: string): string {
+  return EVENT_LABELS[type] ?? type;
+}
+
+/** Resend-Webhook-Ereignisse zu einer Nachricht (webhook_events, provider resend). */
+export async function listResendEvents(
+  providerMessageId: string | null,
+): Promise<ResendEventEntry[]> {
+  if (!providerMessageId) return [];
+  const { data, error } = await crmDb()
+    .from("webhook_events")
+    .select("id, event_type, received_at, payload, processing_error")
+    .eq("provider", "resend")
+    .filter("payload->data->>email_id", "eq", providerMessageId)
+    .order("received_at", { ascending: true })
+    .limit(50);
+  if (error) {
+    console.error("[crm] Resend-Ereignisse", error.message);
+    return [];
+  }
+  return (data ?? []).map((e) => {
+    const p = (e.payload ?? {}) as {
+      data?: { bounce?: { message?: string }; click?: { link?: string } };
+    };
+    return {
+      id: e.id,
+      type: e.event_type,
+      receivedAt: e.received_at,
+      detail: p.data?.bounce?.message ?? p.data?.click?.link ?? e.processing_error ?? null,
+    };
+  });
 }

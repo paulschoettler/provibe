@@ -85,10 +85,11 @@ export function renderCrmTemplate(
         testBanner: ctx.testBanner,
       });
     case "newsletter_welcome":
-      return welcomeEmail(base);
+      return welcomeEmail({ ...base, discountCode: str(props.discount_code) });
     case "abandoned_cart":
       return abandonedCartEmail({
         ...base,
+        discountCode: str(props.discount_code),
         items: Array.isArray(props.items)
           ? (props.items as { title: string; quantity: number; variantTitle?: string }[])
           : [

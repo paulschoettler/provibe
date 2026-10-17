@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { hasRole, PERMISSIONS, type StaffSession } from "@/lib/admin/auth";
 import { countOpenOrders } from "@/lib/admin/dashboard/queries";
 import { deadJobCount } from "@/lib/admin/jobs/admin";
+import { listContactMessages, listWithdrawals } from "@/lib/admin/leads/inbox";
+import { listLeads } from "@/lib/admin/leads/leads";
 import { countPendingReviews } from "@/lib/admin/reviews/queries";
 import { countSubscriptionAlerts } from "@/lib/subscriptions/admin-queries";
 import { initials, ROLE_LABELS } from "@/lib/admin/staff/rules";
@@ -22,7 +24,7 @@ export async function AdminShell({
   session: StaffSession;
   children: ReactNode;
 }) {
-  const [openOrders, aboAlerts, pendingReviews, deadJobs] = await Promise.all([
+  const [openOrders, aboAlerts, pendingReviews, deadJobs, openLeads] = await Promise.all([
     countOpenOrders(),
     // überfällige Abos plus ungeklärte Kündigungen ohne Login; Fulfillment ohne Zähler
     PERMISSIONS.viewCustomers(session)
@@ -32,12 +34,15 @@ export async function AdminShell({
     PERMISSIONS.viewCustomers(session) ? countPendingReviews() : Promise.resolve(0),
     // tote Hintergrundjobs, nur Owner und Admin sehen /admin/jobs
     hasRole(session, "admin") ? deadJobCount() : Promise.resolve(0),
+    // offene Leads, Kontaktanfragen und Widerrufe
+    PERMISSIONS.viewCustomers(session) ? countOpenInbox() : Promise.resolve(0),
   ]);
   const items = navFor(session, {
     "/admin/bestellungen": openOrders,
     "/admin/abos": aboAlerts.total,
     "/admin/bewertungen": pendingReviews,
     "/admin/jobs": deadJobs,
+    "/admin/leads": openLeads,
   });
   const user: ShellUser = {
     name: session.displayName,
@@ -89,4 +94,14 @@ export async function AdminShell({
       <ToastRegion />
     </div>
   );
+}
+
+/** Zähler für den Navigationspunkt Leads: offene Partneranfragen, Kontaktanfragen und Widerrufe. */
+async function countOpenInbox(): Promise<number> {
+  const [leads, contacts, withdrawals] = await Promise.all([
+    listLeads({ open: true, pageSize: 1 }),
+    listContactMessages({ pageSize: 1 }),
+    listWithdrawals({ pageSize: 1 }),
+  ]);
+  return leads.total + contacts.open + withdrawals.open;
 }

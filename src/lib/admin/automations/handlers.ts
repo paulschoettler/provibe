@@ -12,7 +12,8 @@ import {
 } from "@/lib/admin/emails/context";
 import { normalizeEmail } from "@/lib/admin/emails/policy";
 import { sendTrackedEmail } from "@/lib/admin/emails/send";
-import { isTemplateEnabled } from "@/lib/admin/emails/templates";
+import { isTemplateEnabled, storedSubject } from "@/lib/admin/emails/templates";
+import { overrideSubject } from "@/lib/admin/emails/subject";
 import { enqueueCrmJob, type CrmJobKind } from "./queue";
 import {
   AUTOMATION_META,
@@ -284,9 +285,14 @@ async function sendAutomationMail(input: {
       unsubscribeUrl: unsubscribeUrlFor(input.token),
     },
   );
+  // Eigener Betreff aus dem Backoffice (email_templates.subject_template), sonst der aus dem Code
+  const subject = overrideSubject(mail.subject, await storedSubject(template), {
+    first_name: input.firstName,
+    order_number: typeof input.props.order_number === "string" ? input.props.order_number : null,
+  });
   const result = await sendTrackedEmail({
     to: input.email,
-    subject: mail.subject,
+    subject,
     html: mail.html,
     text: mail.text,
     category: "marketing",
@@ -316,6 +322,15 @@ async function sendAutomationMail(input: {
       });
   }
   return "sent";
+}
+
+/** Optionaler Rabattcode aus der Konfiguration als Vorlagen-Prop discount_code. */
+function discountProps(
+  config: unknown,
+  key: "welcome" | "abandoned_cart",
+): Record<string, unknown> {
+  const code = parseAutomationConfig(key, config).discount_code;
+  return code ? { discount_code: code } : {};
 }
 
 async function customerIdFor(email: string): Promise<string | null> {
@@ -348,7 +363,7 @@ export async function runWelcome(runId: string): Promise<void> {
     email: String(contact.email),
     token: contact.unsubscribe_token,
     firstName: contact.first_name,
-    props: {},
+    props: discountProps(automations.get("welcome")?.config, "welcome"),
     customerId: contact.customer_id ?? (await customerIdFor(String(contact.email))),
   });
 }
@@ -399,7 +414,7 @@ export async function runAbandonedCart(runId: string): Promise<void> {
     email: cart.email,
     token: consent.unsubscribe_token,
     firstName: consent.first_name,
-    props: { items: lines },
+    props: { items: lines, ...discountProps(row?.config, "abandoned_cart") },
     customerId: cart.customer_id ?? (await customerIdFor(cart.email)),
   });
   if (sent === "sent") {

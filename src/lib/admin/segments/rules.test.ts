@@ -198,3 +198,16 @@ describe("Schema", () => {
     });
   });
 });
+
+describe("Filter der Kundenliste", () => {
+  it("übersetzt den Sperrstatus ohne Parameter", () => {
+    const rules: SegmentRules = { match: "all", conditions: [] };
+    expect(translateSegment(rules, [{ field: "blocked", op: "is", value: true }])).toEqual({
+      where: "(true) and (c.blocked_at is not null)",
+      params: [],
+    });
+    expect(translateSegment(rules, [{ field: "blocked", op: "is", value: false }]).where).toBe(
+      "(true) and (c.blocked_at is null)",
+    );
+  });
+});
