@@ -120,9 +120,9 @@ BYQ: Komponente `kelvin-video-2` (SVG-Logo-Maske mit Scroll-Reveal) als Gegenche
 
 Siehe `docs/fragen.md`, Abschnitt G.
 
-## 7. Umsetzung (Stand 21.09.2026)
+## 7. Umsetzung (Stand 17.10.2026)
 
-Die Startseite ist gebaut und auf dem Branch `claude/epic-edison-nb0vts` deployt (Netlify-Vorschau hinter Basic Auth). Aufbau in `src/app/page.tsx`, Architektur in ADR-009 und ADR-010.
+Die Startseite ist gebaut und auf dem Branch `claude/epic-edison-nb0vts` deployt (Netlify-Vorschau hinter Basic Auth). Aufbau in `src/app/page.tsx`, Architektur in ADR-009 und ADR-010. Der Hero folgt seit dem 17.10.2026 der freigegebenen Figma-Richtung A "Vibe" (Datei wttVzqEheGArNkqUliXd3x, Sektion 9-24): Sortenverlauf mit Blob-Formen und cremefarbenem Wellenband, riesiger Sortenname in zwei Ebenen um die 3D-Dose (hintere Zeile unter der Canvas, vordere darüber; WILD/BERRY, RASPBERRY/LIME, JUICY/PEACH, Riesentypo aria-hidden, Name als echter Text im aria-live-Bereich), Sticker (15 g Protein, Such dir deinen Vibe., Frucht-Illustrationen als Inline-SVG je Sorte), große runde Pfeile, Dosen-Silhouetten als Punkte, Warenkorb-Dock mit Mini-Dose, Zutatenpanel in Creme mit Radius 64/28 und Nährwert-Kacheln. Komponenten unter `src/components/home/hero/`.
 
 Gebaut wurde in drei parallelen Arbeitspaketen mit vorab festgelegten Verträgen (`src/lib/home/store.ts`, `src/lib/cart/types.ts`, `src/components/cart/cart-context.tsx`):
 

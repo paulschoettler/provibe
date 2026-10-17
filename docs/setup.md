@@ -80,3 +80,16 @@ Netlify baut private Repos nur noch, wenn der Autor des Commits ein verifizierte
 - Netlify: Site anlegen, mit GitHub verbinden, Build-Settings, Env-Variablen, Functions, Redirects, Header, Deploy Previews ohne Live-Secrets, Passwortschutz bis zum Go-live.
 - Supabase: Migrationen, RLS, Storage-Buckets, Auth-Konfiguration, SMTP über Resend, Advisors, Typgenerierung, Owner-Account.
 - Stripe, Resend, Lexware, DHL: Konfiguration über deren APIs, sobald die Keys da sind.
+
+### 5. Supabase Auth: Vorlagen und SMTP (sobald Resend-Key da ist)
+
+Unter Authentication, SMTP Settings Resend eintragen (Host smtp.resend.com, Port 465, Benutzer `resend`, Passwort = API-Key, Absender bestellung@provibe-drinks.de). Danach unter Email Templates diese Texte setzen, jeweils mit Link auf `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=<typ>&next=<ziel>`:
+
+| Vorlage        | Betreff                                         | Typ          | Ziel           |
+| -------------- | ----------------------------------------------- | ------------ | -------------- |
+| Magic Link     | Dein Anmeldelink für provibe                    | email        | /account       |
+| Confirm signup | Bestätige deine E-Mail-Adresse bei provibe      | signup       | /account       |
+| Reset password | Passwort zurücksetzen bei provibe               | recovery     | /account/daten |
+| Change email   | Bestätige deine neue E-Mail-Adresse bei provibe | email_change | /account/daten |
+
+Text je Mail: kurze Überschrift, ein Satz, Button "Jetzt öffnen", Hinweis "Der Link ist 15 Minuten gültig und funktioniert nur einmal. Wenn du das nicht warst, ignoriere diese Mail einfach.", Gruß "Dein provibe-Team".

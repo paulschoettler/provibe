@@ -188,3 +188,19 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **H12. Einzelpreis Founder Bundle III.** Aus den Komponentenpreisen ergibt sich 67,20 € (6 × 2,90 € + 19,90 € + 29,90 €), Shopify zeigte 63,90 €. Entscheidung: Wert aus der Datenbank berechnen, keine Handzahl.
 
 **H13. Shirt-Größen und Produktfotos.** Im Shopify-Snapshot gibt es für das Shirt nur S, M und L; XL wird nicht angeboten. Für Shirt, Cup und weitere Galeriebilder fehlen Fotos, bis dahin Platzhalterkarten. Lagerhinweis (LMIV) fehlt in den Daten: Annahme "Kühl und trocken lagern, vor Sonnenlicht schützen, gekühlt servieren" bis zur Freigabe.
+
+**H14. Lagereinheit.** Entscheidung: Die Dose ist die Lagereinheit, Packvarianten sind Vielfache (unit_count), Bundles buchen Komponenten ab. So ist das Datenmodell schon angelegt.
+
+**H15. Zwei-Faktor-Wiederherstellung.** "Code erneut senden" gibt es bei Authenticator-Apps nicht. Entscheidung: Wiederherstellungscodes beim Einrichten anzeigen und im Backoffice "Zwei-Faktor zurücksetzen" durch einen Owner.
+
+**H16. Zahl- und Versandstatus.** Entscheidung: beide werden aus dem Bestellstatus und den Zahlungs- und Sendungsdaten abgeleitet, keine eigenen Felder.
+
+**H17. Streichpreis-Art.** Der Shop zeigt keine Streichpreise aus Packgrößen-Vergleichen (B3), Bundles zeigen "Einzeln: X €" (B4). Frühere Preise (30-Tage-Regel nach PAngV § 11) nur mit automatischem Nachweis aus price_history; bis der Anwalt das freigibt, bleibt die Art "former_price" im Backoffice ausgeschaltet.
+
+**H18. Lead-Status.** Das Enum kennt `qualified`, der Entwurf zeigt "Angebot". Entscheidung: Anzeige "Qualifiziert" statt Umbenennen des Enums; ein zusätzlicher Status "Angebot" kommt nur, wenn ihr ihn im Vertrieb wirklich nutzt.
+
+**H19. Rollenrechte.** Entscheidung: Benutzerverwaltung nur für Owner, Erstattungen für Owner und Admin, nicht für Fulfillment und Support. Wird in der Backoffice-Migration als Policy-Anpassung umgesetzt.
+
+**H20. Bewertungsanfrage ohne Werbeeinwilligung (§ 7 Abs. 3 UWG).** Rechtsfrage, nicht geraten: Die Automation "Bewertungsanfrage" bleibt ausgeschaltet und sendet nur an Kontakte mit Werbeeinwilligung, bis dein Anwalt die Bestandskundenausnahme freigibt.
+
+**H21. Rechnungsnummern.** Laut Briefing vergibt Lexware die Rechnungsnummern, der Shop keinen eigenen Kreis. So ist der Checkout gebaut (orders.invoice_number wird von Lexware gefüllt). Bis der Lexware-Key da ist, bleiben Rechnungen Entwürfe ohne Nummer.

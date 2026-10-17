@@ -124,26 +124,83 @@
   status = 301
 
 [[redirects]]
-  from = "/account/login"
-  to = "/konto/login"
-  status = 301
-
-[[redirects]]
   from = "/account/register"
-  to = "/konto/login"
+  to = "/account/login"
   status = 301
 
 [[redirects]]
-  from = "/account"
-  to = "/konto"
-  status = 301
-
-[[redirects]]
-  from = "/customer_authentication/redirect"
-  to = "/konto/login"
+  from = "/customer_authentication/*"
+  to = "/account/login"
   status = 301
 
 [[redirects]]
   from = "/agents.md"
   to = "/llms.txt"
+  status = 301
+
+# Weitere alte Shopify-Pfade (docs/redirects.md, 17.10.2026)
+
+[[redirects]]
+  from = "/account/activate/*"
+  to = "/account/konto-aktivieren"
+  status = 301
+
+[[redirects]]
+  from = "/account/reset/*"
+  to = "/account/login"
+  status = 301
+
+[[redirects]]
+  from = "/account/orders/*"
+  to = "/account/bestellungen"
+  status = 301
+
+[[redirects]]
+  from = "/account/addresses"
+  to = "/account/adressen"
+  status = 301
+
+[[redirects]]
+  from = "/account/logout"
+  to = "/account/login"
+  status = 301
+
+[[redirects]]
+  from = "/policies/subscription-policy"
+  to = "/pages/allgemeine-geschaftsbedingungen"
+  status = 301
+
+[[redirects]]
+  from = "/blogs/news.atom"
+  to = "/blogs/news"
+  status = 301
+
+[[redirects]]
+  from = "/blogs/news/tagged/*"
+  to = "/blogs/news"
+  status = 301
+
+[[redirects]]
+  from = "/sitemap_products_1.xml"
+  to = "/sitemap.xml"
+  status = 301
+
+[[redirects]]
+  from = "/sitemap_pages_1.xml"
+  to = "/sitemap.xml"
+  status = 301
+
+[[redirects]]
+  from = "/sitemap_collections_1.xml"
+  to = "/sitemap.xml"
+  status = 301
+
+[[redirects]]
+  from = "/sitemap_blogs_1.xml"
+  to = "/sitemap.xml"
+  status = 301
+
+[[redirects]]
+  from = "/sitemap_agentic_discovery.xml"
+  to = "/sitemap.xml"
   status = 301

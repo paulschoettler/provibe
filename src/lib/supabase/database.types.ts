@@ -1,4 +1,3 @@
-// Generiert über den Supabase-MCP (generate_typescript_types), Stand 2026-09-21. Nicht von Hand ändern.
 export type Json =
   | string
   | number
@@ -11,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -770,6 +769,7 @@ export type Database = {
           name: string
           phone: string | null
           status: string
+          subject: string | null
           updated_at: string
         }
         Insert: {
@@ -781,6 +781,7 @@ export type Database = {
           name: string
           phone?: string | null
           status?: string
+          subject?: string | null
           updated_at?: string
         }
         Update: {
@@ -792,6 +793,7 @@ export type Database = {
           name?: string
           phone?: string | null
           status?: string
+          subject?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -3624,6 +3626,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonymize_customer: {
+        Args: { p_customer_id: string }
+        Returns: undefined
+      }
       apply_inventory_movement: {
         Args: {
           p_actor?: string
@@ -3637,6 +3643,21 @@ export type Database = {
         Returns: undefined
       }
       available_quantity: { Args: { p_variant_id: string }; Returns: number }
+      bundle_components_public: {
+        Args: { p_bundle_variant_id: string; p_locale?: string }
+        Returns: {
+          component_variant_id: string
+          deposit_cents_per_unit: number
+          option_values: Json
+          price_cents: number
+          product_handle: string
+          product_tags: string[]
+          product_title: string
+          quantity: number
+          unit_count: number
+          variant_title: string
+        }[]
+      }
       bundle_components_sum_cents: {
         Args: { p_bundle_variant_id: string }
         Returns: number
@@ -3644,6 +3665,10 @@ export type Database = {
       check_rate_limit: {
         Args: { p_key: string; p_limit: number; p_window: string }
         Returns: boolean
+      }
+      claim_guest_orders_for: {
+        Args: { p_customer_id: string }
+        Returns: number
       }
       claim_jobs: {
         Args: { p_kinds?: string[]; p_limit?: number; p_worker: string }
@@ -3726,10 +3751,28 @@ export type Database = {
         Args: { p_roles?: Database["public"]["Enums"]["staff_role"][] }
         Returns: boolean
       }
+      link_auth_user_to_customer: {
+        Args: {
+          p_confirmed: boolean
+          p_email: string
+          p_meta?: Json
+          p_user_id: string
+        }
+        Returns: string
+      }
       lowest_price_last_30_days: {
         Args: { p_variant_id: string }
         Returns: number
       }
+      merge_cart_into: {
+        Args: { p_source: string; p_target: string }
+        Returns: number
+      }
+      merge_customer_into: {
+        Args: { p_source: string; p_target: string }
+        Returns: undefined
+      }
+      next_order_number: { Args: never; Returns: string }
       random_token: { Args: { p_bytes?: number }; Returns: string }
       release_reservations: {
         Args: { p_checkout_session_id: string }
@@ -4120,4 +4163,3 @@ export const Constants = {
     },
   },
 } as const
-
