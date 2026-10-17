@@ -2,6 +2,13 @@
 
 Kurzform: Kontext, Entscheidung, Konsequenz. Neue Einträge oben anfügen.
 
+## ADR-017: 404 bei dynamischen Segmenten über den Proxy
+
+- Datum: 2026-10-17
+- Kontext: `notFound()` aus einer Seite unter einem dynamischen Segment (`/products/[handle]`, `/collections/[handle]`, `/blogs/news/[slug]`, `/checkout/danke/[token]`) liefert in Next 16.3 Status 404, aber nur eine leere HTML-Hülle; die 404-Seite entsteht erst im Browser aus dem RSC-Payload. Das verletzt die Rendering-Regel. Live mit `curl` bestätigt, ebenso im lokalen `next start`, also kein Netlify-Problem. `dynamicParams = false` liefert zwar die statische 404, macht neue Produkte aus dem Backoffice aber bis zum nächsten Build unerreichbar, weil `revalidatePath` keine neuen Pfade ergänzt. Ein eigenes `not-found.tsx` im Segment und `notFound()` in `generateMetadata` ändern nichts.
+- Entscheidung: `src/proxy.ts` prüft diese Pfade vor dem Routing gegen eine Handle-Liste aus Supabase (`src/lib/routing/not-found-guard.ts`, Publishable Key mit denselben Filtern wie der Katalog, je Instanz 60 Sekunden im Speicher, Nachladen bei Fehltreffer höchstens alle 10 Sekunden) und schreibt unbekannte Handles auf `/_404` um, einen Pfad ohne Route, auf dem Next die statische 404 mit vollem HTML liefert. Tokens der Danke-Seite, die keine UUID sind, gehen ohne Abfrage auf die 404. Ist die Liste nicht ladbar, lässt der Proxy durch, und `notFound()` in der Seite bleibt als Rückfall.
+- Konsequenz: Die Seiten bleiben statisch mit `revalidate`. Neue dynamische Storefront-Routen mit `notFound()` müssen in `guardTarget` eingetragen werden. Prüfung per `curl` auf `id="fehler-titel"`. Restfälle mit leerer Hülle bleiben (unbekannte, aber gültig aussehende Checkout-UUID, Seiten hinter Login, ein gerade deaktiviertes Produkt innerhalb der 60 Sekunden); sie brauchen eine Korrektur in Next.
+
 ## ADR-016: Einwilligung als Cookie ohne Personenbezug, Tracking nur hinter der Einwilligung
 
 - Datum: 2026-10-17

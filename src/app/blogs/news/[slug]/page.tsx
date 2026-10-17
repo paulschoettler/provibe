@@ -20,7 +20,8 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPost(slug);
-  // notFound() schon hier, damit die 404 vollständig im Server-HTML steht (nicht erst im Stream)
+  // Unbekannte Slugs fängt schon der Proxy ab und liefert die statische 404 (ADR-017). notFound()
+  // hier und in der Seite greift nur, wenn der Proxy den Beitrag noch kennt (Cache bis 60 s).
   if (!post) notFound();
   const path = `/blogs/news/${post.handle}`;
   return {

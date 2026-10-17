@@ -1,14 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { redirectFromTable } from "@/lib/redirects/proxy";
+import { notFoundRewrite } from "@/lib/routing/not-found-guard";
 
 /**
  * Läuft vor jeder Anfrage.
  * 1. Bis zum Go-live: Basic Auth für die gesamte Site, wenn SITE_PROTECT_USER/PASSWORD gesetzt sind.
  *    Webhooks (/api/webhooks/*) und der Health-Check bleiben erreichbar, weil externe Dienste
  *    keine Zugangsdaten mitschicken.
- * 2. /admin ist immer noindex (zusätzlich zum Header in netlify.toml).
- * 3. Supabase-Session auffrischen, wenn ein Auth-Cookie da ist (Server Components können
+ * 2. Weiterleitungen aus der Tabelle, danach 404 für unbekannte Handles (ADR-017).
+ * 3. /admin ist immer noindex (zusätzlich zum Header in netlify.toml).
+ * 4. Supabase-Session auffrischen, wenn ein Auth-Cookie da ist (Server Components können
  *    erneuerte Tokens nicht speichern, sonst fliegen Kunden nach einer Stunde raus).
  */
 export async function proxy(request: NextRequest) {
@@ -42,6 +44,11 @@ export async function proxy(request: NextRequest) {
   // Im Backoffice gepflegte Weiterleitungen (Tabelle redirects, je Instanz fünf Minuten gecacht)
   const tableRedirect = await redirectFromTable(request);
   if (tableRedirect) return tableRedirect;
+
+  // Unbekannte Produkte, Kollektionen, Blogartikel und Checkout-Tokens auf die statische 404
+  // umschreiben, damit sie vollständiges HTML mit Status 404 bekommen (ADR-017)
+  const missing = await notFoundRewrite(request);
+  if (missing) return missing;
 
   let response = NextResponse.next({ request });
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
