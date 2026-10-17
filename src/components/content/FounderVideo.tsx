@@ -20,10 +20,22 @@ import { FounderVideoPlayer, type VideoSource } from "./FounderVideoPlayer";
 
 /** Seitenverhältnis des gelieferten Videos. Hochkant vom Telefon ist am wahrscheinlichsten. */
 const FORMAT: "hoch" | "quer" = "hoch";
+/**
+ * Alternative zur Datei im Repo: öffentliche URL aus dem Supabase-Speicher (Bucket product-media,
+ * Ordner videos). Große Videos gehören nicht ins Git. Leer lassen, solange keine URL vorliegt.
+ */
+const REMOTE_VIDEO_URL = "";
 const POSTER = "/images/team/celine.jpg";
 
 function videoSources(): VideoSource[] {
   const list: VideoSource[] = [];
+  if (REMOTE_VIDEO_URL) {
+    list.push({
+      src: REMOTE_VIDEO_URL,
+      type: REMOTE_VIDEO_URL.endsWith(".webm") ? "video/webm" : "video/mp4",
+    });
+    return list;
+  }
   if (fs.existsSync(path.join(process.cwd(), "public/videos/ueber-uns.webm"))) {
     list.push({ src: "/videos/ueber-uns.webm", type: "video/webm" });
   }
