@@ -1,0 +1,220 @@
+import Image from "next/image";
+import { SiteLink } from "@/components/layout/SiteLink";
+import type { CatalogProduct } from "@/lib/catalog/products";
+import { formatEur } from "@/lib/money";
+import { AddToCartForm } from "./AddToCartForm";
+import { CanTrio } from "./CanTrio";
+import { ArrowRightIcon, Blob, CartLineIcon, CupIcon, ShirtIcon } from "./icons";
+
+/**
+ * Produktkarte (Figma Katalog/Produktkarte 22:1359) als Server-Komponente.
+ *
+ * Typen: Sorte, Mixed, Bundle, Merch. Größen wie im Entwurf: "standard" (Desktop-Raster),
+ * "klein" (mobil zweispaltig), "kompakt" (mobil als Liste, Bild links). Über layout wird die
+ * Größe responsiv gewählt, ohne den Inhalt doppelt ins HTML zu schreiben:
+ * "grid" = klein, ab 768 px standard; "list" = kompakt, ab 768 px standard; "compact" = immer
+ * kompakt (Suche). Das Raster dafür steht im Block "Katalog" in globals.css.
+ *
+ * Preise nach Entscheidung H11: Hauptpreis ist der Packpreis "ab 26,10 €" mit "9 Dosen",
+ * darunter Preis je Dose, Pfand je Dose und Grundpreis (PAngV).
+ */
+export type ProductCardLayout = "grid" | "list" | "compact";
+
+/** Blob-Farbe je Sorte (Figma: Pink hinter Wildberry und Raspberry Lime, Peach hinter Peach). */
+const BLOB_COLOR: Record<string, string> = {
+  wildberry: "#E98AB0",
+  "raspberry-lime": "#E98AB0",
+  peach: "#F7CA99",
+};
+/** Fläche hinter der Dose in der kompakten Karte */
+const COMPACT_BG: Record<string, string> = {
+  wildberry: "var(--color-pink-light)",
+  "raspberry-lime": "var(--color-pink-light)",
+  peach: "var(--color-butter-2)",
+};
+
+export function ProductCard({
+  product,
+  layout = "grid",
+  headingLevel = 3,
+  priority = false,
+}: {
+  product: CatalogProduct;
+  layout?: ProductCardLayout;
+  headingLevel?: 2 | 3;
+  priority?: boolean;
+}) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
+  const { type, defaultVariant: v } = product;
+  const isDrink = type === "sorte" || type === "mixed";
+  const pack = product.variants.find((x) => x.unitCount === 9);
+
+  return (
+    <article
+      className={`pvc-card pvc-card--${layout} pvc-card--${type}`}
+      style={
+        {
+          "--pvc-blob": BLOB_COLOR[product.handle] ?? product.palette.via,
+          "--pvc-compact-bg": COMPACT_BG[product.handle] ?? "var(--color-pink-light)",
+        } as React.CSSProperties
+      }
+    >
+      <span className="pvc-badge">{product.badge}</span>
+
+      <Heading className="pvc-title">
+        <SiteLink href={product.productUrl} className="pvc-link">
+          {product.shortTitle}
+        </SiteLink>
+      </Heading>
+
+      <div className="pvc-media" aria-hidden={product.image ? undefined : true}>
+        <CardMedia product={product} priority={priority} />
+      </div>
+
+      <div className="pvc-lines">
+        <p className="pvc-line1">{product.line1}</p>
+        {product.line2 ? <p className="pvc-line2">{product.line2}</p> : null}
+      </div>
+
+      <p className="pvc-price">
+        <span className="pvc-price-main">
+          {product.hasPriceRange ? "ab " : ""}
+          {formatEur(isDrink ? (pack ?? v).priceCents : product.priceFromCents)}
+        </span>
+        {isDrink ? <span className="pvc-price-unit">{(pack ?? v).unitCount} Dosen</span> : null}
+      </p>
+
+      <p className="pvc-fine">
+        {isDrink ? (
+          <>
+            <span className="pvc-nowrap">{formatEur((pack ?? v).perUnitCents)} je Dose</span>
+            {(pack ?? v).depositPerUnitCents > 0 ? (
+              <>
+                <span className="pvc-sep"> · </span>
+                <span className="pvc-nowrap">
+                  zzgl. {formatEur((pack ?? v).depositPerUnitCents)} Pfand je Dose
+                </span>
+              </>
+            ) : null}
+            {(pack ?? v).basePriceText ? (
+              <>
+                <span className="pvc-sep"> · </span>
+                <span className="pvc-nowrap">{(pack ?? v).basePriceText}</span>
+              </>
+            ) : null}
+          </>
+        ) : type === "bundle" && v.depositCents > 0 ? (
+          <>inkl. {formatEur(v.depositCents)} Pfand</>
+        ) : (
+          <>inkl. MwSt., zzgl. Versand</>
+        )}
+      </p>
+
+      <div className="pvc-action">
+        <CardAction product={product} />
+      </div>
+    </article>
+  );
+}
+
+function CardMedia({ product, priority }: { product: CatalogProduct; priority: boolean }) {
+  const { type, image } = product;
+  if (type === "mixed") {
+    return (
+      <>
+        <Blob className="pvc-blob" />
+        <CanTrio
+          className="pvc-card-trio"
+          sizes="(min-width: 768px) 130px, 80px"
+          preload={priority}
+        />
+      </>
+    );
+  }
+  if (type === "sorte" && image) {
+    return (
+      <>
+        <Blob className="pvc-blob" />
+        <Image
+          src={image.src}
+          alt={image.alt}
+          width={image.width}
+          height={image.height}
+          sizes="(min-width: 768px) 150px, 90px"
+          preload={priority}
+          className="pvc-can"
+        />
+      </>
+    );
+  }
+  if (image) {
+    return (
+      <Image
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
+        sizes="(min-width: 1024px) 330px, (min-width: 768px) 45vw, 50vw"
+        preload={priority}
+        className="pvc-photo"
+      />
+    );
+  }
+  // Platzhalter (Entscheidung H13): Merch ohne Foto
+  return (
+    <span className="pvc-placeholder">
+      {product.handle.includes("cup") ? (
+        <CupIcon className="pvc-placeholder-icon" />
+      ) : (
+        <ShirtIcon className="pvc-placeholder-icon" />
+      )}
+      <span className="pvc-placeholder-name">{product.title}</span>
+      <span className="pvc-placeholder-note">Foto folgt</span>
+    </span>
+  );
+}
+
+function CardAction({ product }: { product: CatalogProduct }) {
+  const { type, variants, defaultVariant } = product;
+  const isDrink = type === "sorte" || type === "mixed";
+  const pack = variants.find((x) => x.unitCount === 9);
+
+  // Sorten und Mix: 9er-Pack direkt in den Warenkorb (Entscheidung G6/H11)
+  if (isDrink && pack) {
+    return (
+      <AddToCartForm
+        variantId={pack.id}
+        label="In den Warenkorb"
+        ariaLabel={`${product.shortTitle}, 9er-Pack für ${formatEur(pack.priceCents)}: In den Warenkorb`}
+        buttonClassName="pvc-btn"
+        icon={<CartLineIcon className="pvc-btn-icon" />}
+      />
+    );
+  }
+  // Ein einziger Artikel (Founder Bundle I, Becher): direkt kaufbar
+  if (variants.length === 1) {
+    return (
+      <AddToCartForm
+        variantId={defaultVariant.id}
+        label="In den Warenkorb"
+        ariaLabel={`${product.shortTitle} für ${formatEur(defaultVariant.priceCents)}: In den Warenkorb`}
+        buttonClassName="pvc-btn"
+        icon={<CartLineIcon className="pvc-btn-icon" />}
+      />
+    );
+  }
+  // Mehrere Größen: Auswahl auf der Produktseite
+  return (
+    <SiteLink
+      href={product.productUrl}
+      className="pvc-btn"
+      aria-label={`${product.shortTitle}: Größe wählen`}
+    >
+      <CartLineIcon className="pvc-btn-icon" />
+      <span className="pvc-btn-label">Größe wählen</span>
+      <ArrowRightIcon className="pvc-btn-arrow" />
+    </SiteLink>
+  );
+}
+
+export default ProductCard;
