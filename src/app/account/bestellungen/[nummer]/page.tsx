@@ -218,7 +218,9 @@ export default async function OrderDetailPage({ params }: Params) {
             <div className="flex items-end justify-between gap-4">
               <div>
                 <dt className="text-[16px] font-semibold">Gesamt</dt>
-                <dd className="text-[12px] leading-[1.4]">inkl. {taxText}</dd>
+                <dd className="text-[12px] leading-[1.4]">
+                  Zahlbetrag inkl. Pfand und MwSt. (darin {taxText})
+                </dd>
               </div>
               <dd className="text-[28px] leading-none font-semibold whitespace-nowrap">
                 {formatEur(order.totalCents)}

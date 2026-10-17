@@ -1,6 +1,6 @@
 import { formatEur } from "@/lib/money";
 import { deliveryWindow, formatDeliveryWindow, formatGermanDate } from "./delivery";
-import type { OrderView } from "./order-view";
+import { lineAmounts, type OrderView } from "./order-view";
 import { formatAddressLines } from "./snapshot";
 
 /**
@@ -79,12 +79,13 @@ function row(label: string, value: string, strong = false): string {
 
 function summaryTable(order: OrderView): string {
   const items = order.items
+    .map((i) => ({ i, a: lineAmounts(i) }))
     .map(
-      (i) =>
+      ({ i, a }) =>
         `<tr><td style="padding:8px 0;border-bottom:1px solid #e2d9d0;font-size:15px"><strong>${escapeHtml(i.title)}</strong><br>
 <span style="font-size:13px">${escapeHtml(i.description)}</span><br>
-<span style="font-size:13px">Menge ${i.quantity}${i.unitDepositCents > 0 ? ` · inkl. ${formatEur(i.quantity * i.unitDepositCents)} Pfand` : ""}${i.basePriceText ? ` · ${escapeHtml(i.basePriceText)}` : ""}</span></td>
-<td style="padding:8px 0;border-bottom:1px solid #e2d9d0;text-align:right;font-size:15px;font-weight:600;vertical-align:top">${formatEur(i.displayTotalCents)}</td></tr>`,
+<span style="font-size:13px">Menge ${i.quantity}${a.depositCents > 0 ? ` · zzgl. ${formatEur(a.depositCents)} Pfand` : ""}${i.basePriceText ? ` · ${escapeHtml(i.basePriceText)}` : ""}</span></td>
+<td style="padding:8px 0;border-bottom:1px solid #e2d9d0;text-align:right;font-size:15px;font-weight:600;vertical-align:top">${formatEur(a.goodsCents)}</td></tr>`,
     )
     .join("");
   const tax = order.taxLines
@@ -99,7 +100,7 @@ ${row(`Versand (${escapeHtml(order.shippingName)})`, order.shippingFree ? "koste
 ${row("Lieferzeit", escapeHtml(order.deliveryTimeText))}
 ${row("Gesamt", formatEur(order.totalCents), true)}
 </table>
-<p style="font-size:13px;margin:4px 0 0">inkl. ${tax || `${formatEur(order.taxCents)} MwSt.`}</p>`;
+<p style="font-size:13px;margin:4px 0 0">Zahlbetrag inkl. Pfand und MwSt. (darin ${tax || `${formatEur(order.taxCents)} MwSt.`})</p>`;
 }
 
 function addressBlock(title: string, lines: string[]): string {
@@ -141,14 +142,17 @@ ${legalSections}`;
     `Danke, dein Vibe ist unterwegs!`,
     ``,
     `Bestellung ${order.orderNumber}`,
-    ...order.items.map(
-      (i) => `${i.quantity} × ${i.title} (${i.description}): ${formatEur(i.displayTotalCents)}`,
-    ),
+    ...order.items.map((i) => {
+      const a = lineAmounts(i);
+      return `${i.quantity} × ${i.title} (${i.description}): ${formatEur(a.goodsCents)}${
+        a.depositCents > 0 ? ` zzgl. ${formatEur(a.depositCents)} Pfand` : ""
+      }`;
+    }),
     `Zwischensumme (ohne Pfand): ${formatEur(order.subtotalCents)}`,
     ...(order.discountCents > 0 ? [`Rabatt: −${formatEur(order.discountCents)}`] : []),
     ...(order.depositCents > 0 ? [`${order.depositLabel}: ${formatEur(order.depositCents)}`] : []),
     `Versand: ${order.shippingFree ? "kostenlos" : formatEur(order.shippingCents)}`,
-    `Gesamt: ${formatEur(order.totalCents)} (inkl. ${formatEur(order.taxCents)} MwSt.)`,
+    `Gesamt: ${formatEur(order.totalCents)} (Zahlbetrag inkl. Pfand und MwSt., darin ${formatEur(order.taxCents)} MwSt.)`,
     `Zustellung voraussichtlich: ${window}`,
     ``,
     `Lieferadresse: ${formatAddressLines(order.shippingAddress).join(", ")}`,

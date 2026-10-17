@@ -79,8 +79,11 @@ describe("buildCartView", () => {
     const line = view.lines[0];
     expect(line.unitDepositCents).toBe(225);
     expect(line.unitPriceCents).toBe(2385);
-    // Die Zeilensumme bleibt der Bruttopreis: Warenwert plus Pfand
+    // Die Zeilensumme bleibt der Zahlbetrag: Warenwert plus Pfand
     expect(line.lineTotalCents).toBe(2610);
+    // Angezeigt werden Preis ohne Pfand und Pfand getrennt (§ 7 PAngV, H22)
+    expect(line.lineGoodsCents).toBe(2385);
+    expect(line.lineDepositCents).toBe(225);
     expect(view.totals?.subtotalCents).toBe(2385);
     expect(view.totals?.depositCents).toBe(225);
   });
@@ -111,7 +114,11 @@ describe("buildCartView", () => {
     });
     expect(view.itemCount).toBe(3);
     expect(view.lines[0].lineTotalCents).toBe(5220);
+    expect(view.lines[0].lineGoodsCents).toBe(4770);
+    expect(view.lines[0].lineDepositCents).toBe(450);
     expect(view.lines[1].lineTotalCents).toBe(2990);
+    expect(view.lines[1].lineGoodsCents).toBe(2990);
+    expect(view.lines[1].lineDepositCents).toBe(0);
     expect(view.totals?.subtotalCents).toBe(2385 * 2 + 2990);
     expect(view.totals?.depositCents).toBe(450);
     expect(view.totals?.totalWeightGrams).toBe(3640 * 2 + 300);
@@ -206,6 +213,25 @@ describe("buildCartView", () => {
     });
     expect(view.lines[0].unitDepositCents).toBe(150);
     expect(view.lines[0].unitPriceCents).toBe(3430);
+    expect(view.lines[0].lineGoodsCents).toBe(3430);
+    expect(view.lines[0].lineDepositCents).toBe(150);
     expect(view.lines[0].basePriceText).toBe("34,30 € / Stück");
+  });
+
+  it("Zeilenpreis ohne Pfand plus Pfand ergibt immer den Zahlbetrag der Zeile", () => {
+    const view = buildCartView({
+      cartId: "cart-1",
+      updatedAt: null,
+      lines: [
+        pack({ quantity: 4 }),
+        pack({ id: "line-2", quantity: 1, priceCents: 13200, unitCount: 48 }),
+      ],
+      shippingRates: [dhl],
+    });
+    for (const line of view.lines) {
+      expect(line.lineGoodsCents + line.lineDepositCents).toBe(line.lineTotalCents);
+    }
+    expect(view.lines.reduce((s, l) => s + l.lineGoodsCents, 0)).toBe(view.totals?.subtotalCents);
+    expect(view.lines.reduce((s, l) => s + l.lineDepositCents, 0)).toBe(view.totals?.depositCents);
   });
 });

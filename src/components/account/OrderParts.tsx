@@ -137,12 +137,10 @@ export function OrderRow({ order }: { order: OrderSummary }) {
   );
 }
 
-/** Bestellposition (Figma 26:1330) */
+/** Bestellposition (Figma 26:1330): Preis ohne Pfand, Pfand getrennt (§ 7 PAngV, H22) */
 export function OrderLineItem({ item }: { item: OrderItemView }) {
   const depositText =
-    item.unitDepositCents > 0
-      ? ` · inkl. ${formatEur(item.unitDepositCents * item.quantity)} Pfand`
-      : "";
+    item.depositTotalCents > 0 ? ` · zzgl. ${formatEur(item.depositTotalCents)} Pfand` : "";
   return (
     <li className="flex items-start gap-3 py-2">
       <div className="bg-pink-light relative size-[52px] shrink-0 overflow-hidden rounded-[12px]">
@@ -168,7 +166,7 @@ export function OrderLineItem({ item }: { item: OrderItemView }) {
       </div>
       <div className="flex flex-col items-end gap-0.5 text-right">
         <p className="text-[15px] leading-[1.35] font-semibold whitespace-nowrap">
-          {formatEur(item.lineTotalCents)}
+          {formatEur(item.goodsTotalCents)}
         </p>
         {item.basePriceText ? (
           <p className="text-[12px] leading-[1.4] whitespace-nowrap">{item.basePriceText}</p>

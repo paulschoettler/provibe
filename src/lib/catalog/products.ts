@@ -73,6 +73,11 @@ export interface VariantView {
   unitCount: number;
   /** Verkaufspreis der Variante, brutto, inklusive Pfand (so steht er in der Datenbank) */
   priceCents: number;
+  /**
+   * Preis ohne Pfand (priceCents − depositCents). Das ist der Gesamtpreis im Sinne der PAngV und
+   * der Hauptpreis jeder Anzeige; das Pfand steht getrennt daneben (§ 7 PAngV, Entscheidung H22).
+   */
+  goodsPriceCents: number;
   /** Pfand der Variante gesamt (unitCount × Pfand je Dose, bei Bundles aus den Komponenten) */
   depositCents: number;
   /** Pfand je Dose */
@@ -83,8 +88,10 @@ export interface VariantView {
   basePriceText: string | null;
   /** Grundpreis in Cent je Liter bzw. Kilogramm (ohne Pfand), null ohne Grundpreispflicht */
   basePriceCents: number | null;
-  /** Summe der Komponentenpreise bei Bundles ("Einzeln: X €"), sonst null */
+  /** Summe der Komponentenpreise bei Bundles inklusive Pfand (Datenbankwert), sonst null */
   componentsSumCents: number | null;
+  /** Summe der Komponentenpreise ohne Pfand ("Einzeln: X €", Entscheidung H22), sonst null */
+  componentsSumGoodsCents: number | null;
   available: boolean;
   sku: string | null;
 }
@@ -130,8 +137,12 @@ export interface CatalogProduct {
   variants: VariantView[];
   /** Standardvariante: 9er-Pack bei Eistee, sonst erste Variante */
   defaultVariant: VariantView;
-  /** Kleinster Packpreis aller Varianten (Anzeige "ab …") */
+  /** Kleinster Packpreis aller Varianten inklusive Pfand (Sortierung) */
   priceFromCents: number;
+  /** Preis ohne Pfand der günstigsten Variante (Anzeige "ab …", Entscheidung H22) */
+  priceFromGoodsCents: number;
+  /** Pfand der günstigsten Variante, getrennt neben priceFromGoodsCents anzuzeigen */
+  priceFromDepositCents: number;
   /** true, wenn sich die Varianten im Preis unterscheiden */
   hasPriceRange: boolean;
   /** Nettofüllmenge je Einheit als Text, z.B. "0,33 l" */
@@ -301,7 +312,8 @@ export function netContentText(net: number | null, measure: string): string | nu
 
 /**
  * Preisangaben einer Variante. Der Datenbankpreis enthält das Pfand (siehe src/lib/cart/mapping.ts),
- * calculateBasePrice zieht es ab und liefert Grundpreis je Liter und Preis je Dose.
+ * calculateBasePrice zieht es ab und liefert Preis ohne Pfand, Grundpreis je Liter und Preis je
+ * Dose. Angezeigt wird immer der Preis ohne Pfand, das Pfand getrennt daneben (H22).
  */
 export function buildVariantView(input: {
   variant: Pick<
@@ -345,12 +357,18 @@ export function buildVariantView(input: {
     optionValue,
     unitCount: variant.unit_count,
     priceCents: variant.price_cents,
+    goodsPriceCents: perUnit.priceWithoutDepositCents,
     depositCents: perUnit.depositCents,
     depositPerUnitCents: deposit,
     perUnitCents: perUnit.cents,
     basePriceText: basePrice ? formatBasePrice(basePrice) : null,
     basePriceCents: basePrice ? basePrice.cents : null,
     componentsSumCents: input.componentsSumCents ?? null,
+    // Komponenten tragen ihr Pfand im Datenbankpreis, das Bundle-Pfand ist genau deren Summe (H1)
+    componentsSumGoodsCents:
+      input.componentsSumCents != null
+        ? Math.max(0, input.componentsSumCents - perUnit.depositCents)
+        : null,
     available: input.available ?? true,
     sku: variant.sku,
   };
@@ -849,6 +867,10 @@ function toCatalogProduct(raw: RawCatalog, p: ProductRow): CatalogProduct | null
   const defaultVariant = pickDefaultVariant(variants)!;
   const shortTitle = shortTitleOf(p.handle, type, t.title);
   const prices = variants.map((v) => v.priceCents);
+  // Günstigste Variante nach Preis ohne Pfand (Anzeige "ab …"), bei Gleichstand die erste
+  const fromVariant = variants.reduce((min, v) =>
+    v.goodsPriceCents < min.goodsPriceCents ? v : min,
+  );
   const net = netContentText(p.net_content_per_unit, p.net_content_measure);
   const firstBundle = raw.bundles.get(rows[0].id);
   const optionKey = Object.keys(asRecord(rows[0].option_values))[0] ?? null;
@@ -893,6 +915,8 @@ function toCatalogProduct(raw: RawCatalog, p: ProductRow): CatalogProduct | null
     variants,
     defaultVariant,
     priceFromCents: Math.min(...prices),
+    priceFromGoodsCents: fromVariant.goodsPriceCents,
+    priceFromDepositCents: fromVariant.depositCents,
     hasPriceRange: Math.min(...prices) !== Math.max(...prices),
     netContentText: net,
     optionName: rows.length > 1 ? optionKey : null,

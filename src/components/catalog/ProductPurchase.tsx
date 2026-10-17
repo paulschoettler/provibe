@@ -15,7 +15,8 @@ import { CartLineIcon, CheckIcon, ClockIcon, MinusIcon, PlusIcon } from "./icons
  *
  * Progressive Enhancement: Der ganze Block ist ein Formular für die Server Action addToCartForm
  * (Radio "variantId", Zahl "quantity"). Ohne JavaScript zeigt jede Packgrößen-Pill ihren eigenen
- * Packpreis, Preis je Dose und Grundpreis; der Preisblock zeigt die Standardvariante. Mit
+ * Packpreis ohne Pfand, das Pfand, Preis je Dose und Grundpreis; der Preisblock zeigt die
+ * Standardvariante. Pfand steht immer getrennt neben dem Preis (§ 7 PAngV, H22). Mit
  * JavaScript aktualisiert sich der Preisblock bei der Auswahl, und der Button nutzt
  * useCart().addLine (Drawer öffnet sich). Alle Beträge kommen fertig gerechnet vom Server.
  */
@@ -113,9 +114,14 @@ export function ProductPurchase({
                         <CheckIcon className="h-3.5 w-3.5" />
                       </span>
                       <span className="text-[15px] font-semibold">{v.title}</span>
-                      <span className="text-[17px] font-bold">{formatEur(v.priceCents)}</span>
+                      <span className="text-[17px] font-bold">{formatEur(v.goodsPriceCents)}</span>
                       {isDrink ? (
                         <>
+                          {v.depositCents > 0 ? (
+                            <span className="text-[12px]">
+                              zzgl. {formatEur(v.depositCents)} Pfand
+                            </span>
+                          ) : null}
                           <span className="text-plum text-[12px]">
                             {formatEur(v.perUnitCents)} je Dose
                           </span>
@@ -142,7 +148,7 @@ export function ProductPurchase({
       <div className="flex flex-col gap-1" aria-live="polite">
         <p className="flex flex-wrap items-end gap-x-3">
           <span className="text-[40px] leading-none font-bold tracking-[-0.01em] lg:text-[44px]">
-            {formatEur(selected.priceCents)}
+            {formatEur(selected.goodsPriceCents)}
           </span>
           {isDrink ? (
             <span className="text-plum pb-0.5 text-[17px] font-medium">
@@ -150,26 +156,30 @@ export function ProductPurchase({
             </span>
           ) : null}
         </p>
-        {type === "bundle" &&
-        selected.componentsSumCents &&
-        selected.componentsSumCents > selected.priceCents ? (
-          <p className="text-plum text-[17px] font-medium">
-            Einzeln: {formatEur(selected.componentsSumCents)}
-          </p>
-        ) : null}
         {isDrink && selected.depositCents > 0 ? (
-          <p className="text-[15px] leading-[1.45]">
-            inkl. {formatEur(selected.depositCents)} Pfand ({selected.unitCount} ×{" "}
-            {formatEur(selected.depositPerUnitCents)}) · entspricht{" "}
-            {formatEur(selected.perUnitCents)} je Dose zzgl. Pfand
+          <p className="text-[15px] leading-[1.45] font-medium">
+            zzgl. {formatEur(selected.depositCents)} Pfand ({selected.unitCount} ×{" "}
+            {formatEur(selected.depositPerUnitCents)})
           </p>
         ) : null}
         {type === "bundle" && selected.depositCents > 0 ? (
-          <p className="text-[15px] leading-[1.45]">
-            inkl. {formatEur(selected.depositCents)} Pfand
+          <p className="text-[15px] leading-[1.45] font-medium">
+            zzgl. {formatEur(selected.depositCents)} Pfand
             {bundleCans && bundleCans.count > 0
               ? ` (${bundleCans.count} Dosen × ${formatEur(bundleCans.depositPerCanCents)})`
               : ""}
+          </p>
+        ) : null}
+        {type === "bundle" &&
+        selected.componentsSumGoodsCents &&
+        selected.componentsSumGoodsCents > selected.goodsPriceCents ? (
+          <p className="text-plum text-[17px] font-medium">
+            Einzeln: {formatEur(selected.componentsSumGoodsCents)}
+          </p>
+        ) : null}
+        {isDrink ? (
+          <p className="text-[15px] leading-[1.45]">
+            entspricht {formatEur(selected.perUnitCents)} je Dose zzgl. Pfand
           </p>
         ) : null}
         {selected.basePriceText ? (

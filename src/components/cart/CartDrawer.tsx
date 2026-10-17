@@ -198,10 +198,10 @@ function DrawerLine({
             </Link>
             <p className="text-aubergine/70 text-[14px]">{line.variantTitle}</p>
           </div>
-          <p className="shrink-0 text-[16px] font-semibold">{formatEur(line.lineTotalCents)}</p>
+          <p className="shrink-0 text-[16px] font-semibold">{formatEur(line.lineGoodsCents)}</p>
         </div>
 
-        <DepositNote quantity={line.quantity} unitDepositCents={line.unitDepositCents} />
+        <DepositNote lineDepositCents={line.lineDepositCents} />
         <p className="text-aubergine/60 text-[13px]">Grundpreis: {line.basePriceText}</p>
 
         <div className="mt-2 flex items-center justify-between gap-2">

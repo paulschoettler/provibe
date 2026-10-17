@@ -1,6 +1,7 @@
 import { supabaseAnon } from "@/lib/supabase/server";
 import { calculateBasePrice, formatBasePrice, type UnitMeasure } from "@/lib/pricing";
 import type { Database } from "@/lib/supabase/database.types";
+import { listProducts } from "./products";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 type TranslationRow = Database["public"]["Tables"]["product_translations"]["Row"];
@@ -31,7 +32,10 @@ export interface HomeFlavor {
     variantId: string;
     sku: string | null;
     unitCount: number;
+    /** Datenbankpreis inklusive Pfand */
     priceCents: number;
+    /** Preis ohne Pfand, Hauptpreis jeder Anzeige (§ 7 PAngV, Entscheidung H22) */
+    priceWithoutDepositCents: number;
     depositCents: number;
     basePriceText: string;
   };
@@ -47,8 +51,16 @@ export interface HomeFlavor {
 export interface HomeBundle {
   handle: string;
   title: string;
+  /** Datenbankpreis inklusive Pfand */
   priceCents: number;
+  /** Preis ohne Pfand, Hauptpreis der Karte (H22) */
+  priceWithoutDepositCents: number;
+  /** Pfand der enthaltenen Dosen (H1), getrennt neben dem Preis */
+  depositCents: number;
+  /** Summe der Komponentenpreise inklusive Pfand (Datenbankwert) */
   componentsSumCents: number;
+  /** Summe der Komponentenpreise ohne Pfand ("Einzeln: X €") */
+  componentsSumWithoutDepositCents: number;
   imageUrl: string;
   productUrl: string;
   badge: string;
@@ -75,7 +87,12 @@ const FLAVOR_SHORT: Record<string, string> = {
   "raspberry-lime": "Raspberry Lime",
   peach: "Peach",
 };
-const DEFAULT_PALETTE: FlavorPalette = { from: "#F7DCEB", via: "#E98AB0", to: "#B5578C", accent: "#702249" };
+const DEFAULT_PALETTE: FlavorPalette = {
+  from: "#F7DCEB",
+  via: "#E98AB0",
+  to: "#B5578C",
+  accent: "#702249",
+};
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -84,22 +101,32 @@ function asRecord(v: unknown): Record<string, unknown> {
 export async function getHomeData(locale = "de"): Promise<HomeData> {
   const db = supabaseAnon();
 
-  const [products, translations, variants, bundlesCollection, modules, menus, menuItems, announcements, settings] =
-    await Promise.all([
-      db.from("products").select("*").eq("status", "active"),
-      db.from("product_translations").select("*").eq("locale", locale),
-      db.from("product_variants").select("*").eq("is_active", true).order("position"),
-      db.from("collections").select("id, handle").eq("handle", "aktion").maybeSingle(),
-      db.from("homepage_modules").select("*").eq("is_enabled", true).order("position"),
-      db.from("menus").select("id, handle"),
-      db.from("menu_items").select("*").order("position"),
-      db.from("announcement_messages").select("message").eq("is_active", true).order("position"),
-      db.from("shop_settings").select("key, value").eq("is_public", true),
-    ]);
+  const [
+    products,
+    translations,
+    variants,
+    bundlesCollection,
+    modules,
+    menus,
+    menuItems,
+    announcements,
+    settings,
+  ] = await Promise.all([
+    db.from("products").select("*").eq("status", "active"),
+    db.from("product_translations").select("*").eq("locale", locale),
+    db.from("product_variants").select("*").eq("is_active", true).order("position"),
+    db.from("collections").select("id, handle").eq("handle", "aktion").maybeSingle(),
+    db.from("homepage_modules").select("*").eq("is_enabled", true).order("position"),
+    db.from("menus").select("id, handle"),
+    db.from("menu_items").select("*").order("position"),
+    db.from("announcement_messages").select("message").eq("is_active", true).order("position"),
+    db.from("shop_settings").select("key, value").eq("is_public", true),
+  ]);
 
   const productList = (products.data ?? []) as ProductRow[];
   const translationByProduct = new Map<string, TranslationRow>();
-  for (const t of (translations.data ?? []) as TranslationRow[]) translationByProduct.set(t.product_id, t);
+  for (const t of (translations.data ?? []) as TranslationRow[])
+    translationByProduct.set(t.product_id, t);
   const variantsByProduct = new Map<string, VariantRow[]>();
   for (const v of (variants.data ?? []) as VariantRow[]) {
     const list = variantsByProduct.get(v.product_id) ?? [];
@@ -144,6 +171,7 @@ export async function getHomeData(locale = "de"): Promise<HomeData> {
         sku: pack.sku,
         unitCount: pack.unit_count,
         priceCents: pack.price_cents,
+        priceWithoutDepositCents: basePrice.priceWithoutDepositCents,
         depositCents,
         basePriceText: formatBasePrice(basePrice),
       },
@@ -159,6 +187,8 @@ export async function getHomeData(locale = "de"): Promise<HomeData> {
   // Founder Bundles aus der Kollektion "aktion", Reihenfolge wie dort
   const bundles: HomeBundle[] = [];
   if (bundlesCollection.data) {
+    // Bundle-Pfand steckt in den Komponenten (H1); der Katalog rechnet es samt Einzelsumme heraus
+    const catalogBundles = await listProducts({ filter: "bundles", locale });
     const { data: cp } = await db
       .from("collection_products")
       .select("product_id, position")
@@ -174,12 +204,22 @@ export async function getHomeData(locale = "de"): Promise<HomeData> {
       const t = product ? translationByProduct.get(product.id) : undefined;
       const first = product ? (variantsByProduct.get(product.id) ?? [])[0] : undefined;
       if (!product || !t || !first) continue;
-      const { data: sum } = await db.rpc("bundle_components_sum_cents", { p_bundle_variant_id: first.id });
+      const { data: sum } = await db.rpc("bundle_components_sum_cents", {
+        p_bundle_variant_id: first.id,
+      });
+      const componentsSumCents = typeof sum === "number" ? sum : 0;
+      const view = catalogBundles
+        .find((b) => b.handle === product.handle)
+        ?.variants.find((v) => v.id === first.id);
+      const depositCents = view?.depositCents ?? 0;
       bundles.push({
         handle: product.handle,
         title: t.title,
         priceCents: first.price_cents,
-        componentsSumCents: typeof sum === "number" ? sum : 0,
+        priceWithoutDepositCents: first.price_cents - depositCents,
+        depositCents,
+        componentsSumCents,
+        componentsSumWithoutDepositCents: Math.max(0, componentsSumCents - depositCents),
         imageUrl: imageByHandle[product.handle] ?? "/images/bundle-1.jpg",
         productUrl: `/products/${product.handle}`,
         badge: "Limitiertes Set",
@@ -194,7 +234,11 @@ export async function getHomeData(locale = "de"): Promise<HomeData> {
   const items = (handle: string): MenuItem[] =>
     (menuItems.data ?? [])
       .filter((i) => i.menu_id === menuId(handle))
-      .map((i) => ({ label: String(asRecord(i.label)[locale] ?? ""), url: i.url, external: i.is_external }));
+      .map((i) => ({
+        label: String(asRecord(i.label)[locale] ?? ""),
+        url: i.url,
+        external: i.is_external,
+      }));
 
   const settingsMap: Record<string, unknown> = {};
   for (const s of settings.data ?? []) settingsMap[s.key] = s.value;

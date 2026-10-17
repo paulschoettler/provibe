@@ -16,7 +16,8 @@ import { EMPTY_CART } from "./types";
  *
  * Wichtig: priceCents ist der Bruttopreis der Variante INKLUSIVE Pfand. Der Pfandanteil wird
  * hier herausgerechnet, weil Pfand nach PAngV § 7 getrennt auszuweisen und nicht in den
- * Grundpreis einzurechnen ist (gleiche Annahme wie in calculateBasePrice).
+ * Grundpreis einzurechnen ist (gleiche Annahme wie in calculateBasePrice). Angezeigt werden
+ * lineGoodsCents (ohne Pfand) und lineDepositCents getrennt, nie lineTotalCents (H22).
  */
 export interface CartRawLine {
   /** cart_items.id */
@@ -109,6 +110,8 @@ export function buildCartView(input: BuildCartViewInput): CartView {
       unitPriceCents: priceLine.unitPriceCents,
       unitDepositCents: priceLine.unitDepositCents,
       lineTotalCents: totals.lines[i].lineTotalCents,
+      lineGoodsCents: totals.lines[i].grossCents,
+      lineDepositCents: totals.lines[i].depositCents,
       imageUrl: l.imageUrl,
       productUrl: l.productUrl,
       basePriceText: formatBasePrice(basePrice),

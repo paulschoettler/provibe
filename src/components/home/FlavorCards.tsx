@@ -15,7 +15,8 @@ const CAN_SIZE: Record<string, { width: number; height: number }> = {
 /**
  * "Unsere Sorten": Aufbau, Klassen und Maße 1:1 aus dem alten Shop (#pvshop).
  * Preise, Pfand und Grundpreis kommen aus der Datenbank, der Grundpreis steht
- * an jedem Preis, weil die Preisangabenverordnung das verlangt.
+ * an jedem Preis, weil die Preisangabenverordnung das verlangt. Der Dosenpreis ist ohne
+ * Pfand, das Pfand steht getrennt daneben (§ 7 PAngV, Entscheidung H22).
  */
 export function FlavorCards({ flavors }: { flavors: HomeFlavor[] }) {
   return (
@@ -62,7 +63,8 @@ export function FlavorCards({ flavors }: { flavors: HomeFlavor[] }) {
                 <div className="pvshop-price">{formatEur(flavor.perCanCents)}</div>
               </div>
               <div className="pvshop-fine">
-                zzgl. {formatEur(flavor.depositPerCanCents)} Pfand · {flavor.pack.basePriceText}
+                je Dose, zzgl. {formatEur(flavor.depositPerCanCents)} Pfand ·{" "}
+                {flavor.pack.basePriceText}
               </div>
             </SiteLink>
           );

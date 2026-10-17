@@ -9,12 +9,28 @@ export interface OrderViewItem {
   title: string;
   description: string;
   quantity: number;
-  /** Menge × (Preis + Pfand), vor Rabatt */
+  /** Menge × (Preis + Pfand), vor Rabatt (Zahlbetrag der Zeile, nicht als Preis anzeigen) */
   displayTotalCents: number;
+  /** Preis je Stück ohne Pfand */
   unitPriceCents: number;
   unitDepositCents: number;
   basePriceText: string | null;
   imageUrl: string | null;
+}
+
+/**
+ * Zeilenbeträge für die Anzeige (§ 7 PAngV, Entscheidung H22): Preis ohne Pfand als Zeilenpreis,
+ * Pfand getrennt daneben. Beide vor Rabatt; der Rabatt steht als eigene Summenzeile.
+ */
+export function lineAmounts(item: {
+  quantity: number;
+  unitPriceCents: number;
+  unitDepositCents: number;
+}): { goodsCents: number; depositCents: number } {
+  return {
+    goodsCents: item.quantity * item.unitPriceCents,
+    depositCents: item.quantity * item.unitDepositCents,
+  };
 }
 
 export interface OrderView {

@@ -103,7 +103,7 @@ export function PriceFootnote({
       <SiteLink href="/pages/versand" className="underline underline-offset-2">
         Versandkosten
       </SiteLink>{" "}
-      ({shippingText(shipping)}). Pfand wird je Dose ausgewiesen.
+      ({shippingText(shipping)}). Pfand kommt hinzu und wird getrennt ausgewiesen.
     </p>
   );
 }

@@ -143,7 +143,12 @@ export interface OrderItemView {
   variantTitle: string | null;
   quantity: number;
   unitDepositCents: number;
+  /** Menge × (Preis + Pfand) − Rabatt (Zahlbetrag der Zeile, nicht als Preis anzeigen) */
   lineTotalCents: number;
+  /** Menge × Preis ohne Pfand, vor Rabatt: Zeilenpreis der Anzeige (§ 7 PAngV, H22) */
+  goodsTotalCents: number;
+  /** Menge × Pfand, getrennt neben dem Zeilenpreis */
+  depositTotalCents: number;
   basePriceText: string | null;
   image: string | null;
   handle: string | null;
@@ -215,7 +220,7 @@ export async function getOrderByNumber(number: string): Promise<OrderDetail | nu
     supabase
       .from("order_items")
       .select(
-        "id, product_title, variant_title, product_handle, image_path, quantity, unit_deposit_cents, line_total_cents, base_price_text, position",
+        "id, product_title, variant_title, product_handle, image_path, quantity, unit_price_cents, unit_deposit_cents, line_total_cents, base_price_text, position",
       )
       .eq("order_id", row.id)
       .order("position", { ascending: true }),
@@ -235,6 +240,8 @@ export async function getOrderByNumber(number: string): Promise<OrderDetail | nu
     quantity: i.quantity,
     unitDepositCents: i.unit_deposit_cents,
     lineTotalCents: i.line_total_cents,
+    goodsTotalCents: i.quantity * i.unit_price_cents,
+    depositTotalCents: i.quantity * i.unit_deposit_cents,
     basePriceText: i.base_price_text,
     image: orderItemImage(i.product_handle, i.image_path),
     handle: i.product_handle,

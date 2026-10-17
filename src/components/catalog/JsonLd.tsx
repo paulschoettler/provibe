@@ -12,7 +12,7 @@ export function absoluteUrl(path: string): string {
   return path.startsWith("http") ? path : `${siteUrl}${path}`;
 }
 
-/** Cent als Euro-String mit Punkt, wie schema.org es erwartet ("26.10"). */
+/** Cent als Euro-String mit Punkt, wie schema.org es erwartet ("23.85"). */
 export function centsToSchemaPrice(cents: number): string {
   return (cents / 100).toFixed(2);
 }
@@ -52,9 +52,10 @@ export function itemListLd(name: string, products: CatalogProduct[]) {
 }
 
 /**
- * Product mit Offer. price ist der Packpreis der Standardvariante in Euro (inklusive Pfand, so
- * wie er im Warenkorb berechnet wird). Bei Getränken kommt der Grundpreis als
- * UnitPriceSpecification dazu (Bezug 1 Liter, ohne Pfand, aus src/lib/pricing).
+ * Product mit Offer. price ist der Packpreis der Standardvariante in Euro ohne Pfand, also der
+ * Gesamtpreis im Sinne der PAngV wie auf der Seite (Entscheidung H22). Das Pfand steht bewusst
+ * nicht in der Offer. Bei Getränken kommt der Grundpreis als UnitPriceSpecification dazu (Bezug
+ * 1 Liter, ohne Pfand, aus src/lib/pricing).
  */
 export function productLd(product: ProductDetail) {
   const v = product.defaultVariant;
@@ -68,7 +69,7 @@ export function productLd(product: ProductDetail) {
   const offer: Record<string, unknown> = {
     "@type": "Offer",
     url: absoluteUrl(product.productUrl),
-    price: centsToSchemaPrice(v.priceCents),
+    price: centsToSchemaPrice(v.goodsPriceCents),
     priceCurrency: "EUR",
     availability: v.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
     itemCondition: "https://schema.org/NewCondition",

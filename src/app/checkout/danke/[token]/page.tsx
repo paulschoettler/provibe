@@ -8,7 +8,7 @@ import { FreePill, Notice } from "@/components/checkout/parts";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { WaveDivider } from "@/components/layout/WaveDivider";
 import { deliveryWindow, formatDeliveryWindow, formatGermanDate } from "@/lib/checkout/delivery";
-import type { OrderView } from "@/lib/checkout/order-view";
+import { lineAmounts, type OrderView } from "@/lib/checkout/order-view";
 import { loadOrderView } from "@/lib/checkout/orders";
 import { findSessionById } from "@/lib/checkout/session";
 import { formatAddressLines } from "@/lib/checkout/snapshot";
@@ -185,37 +185,40 @@ function OrderCard({ order }: { order: OrderView }) {
         <p className="text-[14px]">{order.itemCount} Artikel</p>
       </div>
       <ul className="flex flex-col gap-3.5">
-        {order.items.map((item, i) => (
-          <li key={`${item.title}-${i}`} className="flex items-center gap-3">
-            <div className="bg-pink-light flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
-              {item.imageUrl ? (
-                <Image
-                  src={item.imageUrl}
-                  alt={item.title}
-                  width={56}
-                  height={56}
-                  className={`h-14 w-14 ${item.imageUrl.endsWith(".jpg") ? "rounded-[10px] object-cover" : "object-contain"}`}
-                />
-              ) : null}
-            </div>
-            <div className="min-w-0 flex-1 leading-[1.4]">
-              <p className="text-[15px] font-semibold">{item.title}</p>
-              <p className="text-[13px]">{item.description}</p>
-              <p className="text-[13px]">
-                Menge {item.quantity}
-                {item.unitDepositCents > 0
-                  ? ` · inkl. ${formatEur(item.quantity * item.unitDepositCents)} Pfand`
-                  : ""}
-              </p>
-            </div>
-            <div className="shrink-0 text-right leading-[1.4]">
-              <p className="text-[15px] font-semibold">{formatEur(item.displayTotalCents)}</p>
-              {item.basePriceText && !item.basePriceText.endsWith("Stück") ? (
-                <p className="text-[12px]">{item.basePriceText.replace(" / ", "/")}</p>
-              ) : null}
-            </div>
-          </li>
-        ))}
+        {order.items.map((item, i) => {
+          const amounts = lineAmounts(item);
+          return (
+            <li key={`${item.title}-${i}`} className="flex items-center gap-3">
+              <div className="bg-pink-light flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
+                {item.imageUrl ? (
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    width={56}
+                    height={56}
+                    className={`h-14 w-14 ${item.imageUrl.endsWith(".jpg") ? "rounded-[10px] object-cover" : "object-contain"}`}
+                  />
+                ) : null}
+              </div>
+              <div className="min-w-0 flex-1 leading-[1.4]">
+                <p className="text-[15px] font-semibold">{item.title}</p>
+                <p className="text-[13px]">{item.description}</p>
+                <p className="text-[13px]">
+                  Menge {item.quantity}
+                  {amounts.depositCents > 0
+                    ? ` · zzgl. ${formatEur(amounts.depositCents)} Pfand`
+                    : ""}
+                </p>
+              </div>
+              <div className="shrink-0 text-right leading-[1.4]">
+                <p className="text-[15px] font-semibold">{formatEur(amounts.goodsCents)}</p>
+                {item.basePriceText && !item.basePriceText.endsWith("Stück") ? (
+                  <p className="text-[12px]">{item.basePriceText.replace(" / ", "/")}</p>
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
       </ul>
       <hr className="border-aubergine/20" />
       <dl className="flex flex-col gap-2 text-[15px]">
@@ -244,7 +247,10 @@ function OrderCard({ order }: { order: OrderView }) {
       <div className="flex items-end justify-between">
         <div className="leading-[1.4]">
           <p className="text-[18px] font-semibold">Gesamt</p>
-          <p className="text-[13px]">inkl. {taxText || `${formatEur(order.taxCents)} MwSt.`}</p>
+          <p className="text-[13px]">
+            Zahlbetrag inkl. Pfand und MwSt. (darin{" "}
+            {taxText || `${formatEur(order.taxCents)} MwSt.`})
+          </p>
         </div>
         <p className="text-[24px] leading-[1.2] font-bold">{formatEur(order.totalCents)}</p>
       </div>

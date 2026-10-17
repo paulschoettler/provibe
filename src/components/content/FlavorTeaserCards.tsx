@@ -12,7 +12,8 @@ const CAN_SIZE: Record<string, { width: number; height: number }> = {
 
 /**
  * Drei Sortenkarten mit Link (Figma 404, 28:6944). Preise aus der Datenbank, Darstellung nach H11:
- * Hauptpreis ist der Packpreis "ab …" mit Dosenzahl, darunter Dosenpreis, Pfand und Grundpreis.
+ * Hauptpreis ist der Packpreis ohne Pfand "ab …" mit Dosenzahl, darunter Dosenpreis, Pfand und
+ * Grundpreis. Pfand steht getrennt, nie im Preis (§ 7 PAngV, Entscheidung H22).
  */
 export function FlavorTeaserCards({
   flavors,
@@ -53,7 +54,8 @@ export function FlavorTeaserCards({
                   15 g Protein
                 </span>
                 <p className="pv-flavor-card-price">
-                  ab {formatEur(f.pack.priceCents)} <small>{f.pack.unitCount} Dosen</small>
+                  ab {formatEur(f.pack.priceWithoutDepositCents)}{" "}
+                  <small>{f.pack.unitCount} Dosen</small>
                 </p>
                 <p className="pv-flavor-card-fine">
                   {formatEur(f.perCanCents)} je Dose · zzgl. {formatEur(f.depositPerCanCents)} Pfand

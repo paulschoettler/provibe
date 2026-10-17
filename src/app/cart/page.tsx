@@ -111,12 +111,14 @@ function CartPageLine({ line }: { line: CartLineView }) {
             </Link>
             <p className="text-aubergine/70 text-[15px]">{line.variantTitle}</p>
             <p className="text-aubergine/60 text-[13px]">
-              Einzelpreis {formatEur(line.unitPriceCents)}, Grundpreis: {line.basePriceText}
+              {`Einzelpreis ${formatEur(line.unitPriceCents)}${
+                line.unitDepositCents > 0 ? ` zzgl. ${formatEur(line.unitDepositCents)} Pfand` : ""
+              }, Grundpreis: ${line.basePriceText}`}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[17px] font-semibold">{formatEur(line.lineTotalCents)}</p>
-            <DepositNote quantity={line.quantity} unitDepositCents={line.unitDepositCents} />
+            <p className="text-[17px] font-semibold">{formatEur(line.lineGoodsCents)}</p>
+            <DepositNote lineDepositCents={line.lineDepositCents} />
           </div>
         </div>
 

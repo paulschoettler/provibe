@@ -41,7 +41,7 @@ export function FreeShippingHint({ totals }: { totals: CartTotals }) {
 export function CartSummary({ totals }: { totals: CartTotals }) {
   return (
     <dl className="text-[15px]">
-      <Row label="Zwischensumme" value={formatEur(totals.subtotalCents)} />
+      <Row label="Zwischensumme (ohne Pfand)" value={formatEur(totals.subtotalCents)} />
       {totals.depositCents > 0 && <Row label="Pfand" value={formatEur(totals.depositCents)} />}
       <Row
         label="Versand"
@@ -59,7 +59,7 @@ export function CartSummary({ totals }: { totals: CartTotals }) {
         <dd className="text-[19px] font-semibold">{formatEur(totals.totalCents)}</dd>
       </div>
       <p className="text-aubergine/60 mt-1 text-[13px]">
-        inkl. {formatEur(totals.taxCents)} MwSt.
+        Zahlbetrag inkl. Pfand und MwSt. (darin {formatEur(totals.taxCents)} MwSt.)
         {totals.shippingRate === null ? ", zzgl. Versand" : ""}
       </p>
     </dl>
@@ -78,18 +78,11 @@ function Row({ label, value, hint }: { label: string; value: string; hint?: stri
   );
 }
 
-/** Pfandhinweis je Position, getrennt vom Preis (PAngV § 7). */
-export function DepositNote({
-  quantity,
-  unitDepositCents,
-}: {
-  quantity: number;
-  unitDepositCents: number;
-}) {
-  if (unitDepositCents <= 0) return null;
-  return (
-    <p className="text-aubergine/60 text-[13px]">
-      inkl. {formatEur(quantity * unitDepositCents)} Pfand
-    </p>
-  );
+/**
+ * Pfandhinweis je Position, getrennt neben dem Zeilenpreis ohne Pfand (§ 7 PAngV, H22).
+ * Erst die Summe "Gesamt" rechnet das Pfand in den Zahlbetrag ein.
+ */
+export function DepositNote({ lineDepositCents }: { lineDepositCents: number }) {
+  if (lineDepositCents <= 0) return null;
+  return <p className="text-aubergine/60 text-[13px]">zzgl. {formatEur(lineDepositCents)} Pfand</p>;
 }

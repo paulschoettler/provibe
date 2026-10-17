@@ -80,6 +80,9 @@ describe("buildVariantView", () => {
       measure: "l",
     });
     expect(v.depositCents).toBe(225);
+    // Hauptpreis ohne Pfand (§ 7 PAngV, H22): 26,10 € − 2,25 € = 23,85 €
+    expect(v.goodsPriceCents).toBe(2385);
+    expect(v.priceCents).toBe(2610);
     expect(v.perUnitCents).toBe(265);
     expect(v.basePriceCents).toBe(803);
     expect(v.basePriceText).toBe("8,03 € / l");
@@ -107,6 +110,8 @@ describe("buildVariantView", () => {
     expect(v.basePriceText).toBeNull();
     expect(v.basePriceCents).toBeNull();
     expect(v.depositCents).toBe(0);
+    expect(v.goodsPriceCents).toBe(2990);
+    expect(v.componentsSumGoodsCents).toBeNull();
     expect(v.optionValue).toBe("M");
   });
 
@@ -120,6 +125,9 @@ describe("buildVariantView", () => {
     });
     expect(v.depositCents).toBe(150);
     expect(v.componentsSumCents).toBe(6720);
+    // Founder Bundle III: 57,40 € → 55,90 € zzgl. 1,50 € Pfand, einzeln 65,70 € ohne Pfand
+    expect(v.goodsPriceCents).toBe(5590);
+    expect(v.componentsSumGoodsCents).toBe(6570);
   });
 
   it("begrenzt Pfand, das über dem Preis läge, auf 0", () => {
@@ -130,6 +138,7 @@ describe("buildVariantView", () => {
       measure: "l",
     });
     expect(v.depositCents).toBe(0);
+    expect(v.goodsPriceCents).toBe(100);
   });
 });
 

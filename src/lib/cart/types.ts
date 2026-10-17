@@ -18,8 +18,12 @@ export interface CartLineView {
   unitPriceCents: number;
   /** Pfand je Stück (unit_count × deposit_cents_per_unit) */
   unitDepositCents: number;
-  /** quantity × (unitPriceCents + unitDepositCents) − Rabatt */
+  /** quantity × (unitPriceCents + unitDepositCents) − Rabatt (Zahlbetrag der Zeile, nicht anzeigen) */
   lineTotalCents: number;
+  /** quantity × unitPriceCents: Zeilenpreis ohne Pfand, vor Rabatt (Hauptpreis der Anzeige, H22) */
+  lineGoodsCents: number;
+  /** quantity × unitDepositCents: Pfand der Zeile, getrennt neben dem Preis (§ 7 PAngV) */
+  lineDepositCents: number;
   imageUrl: string | null;
   productUrl: string;
   /** Grundpreis nach PAngV, fertig formatiert, z.B. "8,79 € / l" (Pflichtangabe neben dem Preis) */

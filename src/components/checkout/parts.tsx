@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { formatEur } from "@/lib/money";
+import { lineAmounts } from "@/lib/checkout/order-view";
 import { depositLabel } from "@/lib/checkout/snapshot";
 import type { AmountsSnapshot, SnapshotLine } from "@/lib/checkout/types";
 import { AlertIcon, BagIcon, CheckIcon, ChevronDownIcon, InfoIcon } from "./icons";
@@ -49,8 +50,13 @@ export function CheckoutTitle({ title }: { title: string }) {
   );
 }
 
+/**
+ * Bestellposition: Zeilenpreis ohne Pfand (Menge × Preis), das Pfand getrennt daneben
+ * (§ 7 PAngV, Entscheidung H22). Erst "Gesamt" rechnet das Pfand in den Zahlbetrag ein.
+ */
 export function OrderLine({ line }: { line: SnapshotLine }) {
   const isBundle = line.components !== null;
+  const { goodsCents, depositCents } = lineAmounts(line);
   return (
     <li className="flex items-center gap-3">
       <div className="bg-pink-light flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[14px]">
@@ -69,13 +75,11 @@ export function OrderLine({ line }: { line: SnapshotLine }) {
         <p className="text-[13px]">{line.description}</p>
         <p className="text-[13px]">
           Menge {line.quantity}
-          {line.unitDepositCents > 0
-            ? ` · inkl. ${formatEur(line.quantity * line.unitDepositCents)} Pfand`
-            : ""}
+          {depositCents > 0 ? ` · zzgl. ${formatEur(depositCents)} Pfand` : ""}
         </p>
       </div>
       <div className="shrink-0 text-right leading-[1.4] whitespace-nowrap">
-        <p className="text-[15px] font-semibold">{formatEur(line.displayTotalCents)}</p>
+        <p className="text-[15px] font-semibold">{formatEur(goodsCents)}</p>
         {line.basePriceText && !line.basePriceText.endsWith("Stück") ? (
           <p className="text-[12px]">
             <span className="sr-only">Grundpreis </span>
@@ -105,8 +109,8 @@ export function FreePill({ children = "kostenlos" }: { children?: React.ReactNod
 }
 
 /**
- * Bestellübersicht mit allen Angaben nach § 312j BGB: Produkte, Mengen, Preise, Pfand, Versand,
- * Lieferzeit, Gesamt inklusive ausgewiesener MwSt.
+ * Bestellübersicht mit allen Angaben nach § 312j BGB: Produkte, Mengen, Preise ohne Pfand, Pfand
+ * als eigene Zeile, Versand, Lieferzeit, Gesamt (Zahlbetrag inklusive Pfand und ausgewiesener MwSt.).
  */
 export function OrderSummary({
   snapshot,
@@ -172,7 +176,10 @@ export function OrderSummary({
       <div className="flex items-end justify-between py-1">
         <div className="leading-[1.4]">
           <p className="text-[18px] font-semibold">Gesamt</p>
-          <p className="text-[13px]">inkl. {taxText || `${formatEur(snapshot.taxCents)} MwSt.`}</p>
+          <p className="text-[13px]">
+            Zahlbetrag inkl. Pfand und MwSt. (darin{" "}
+            {taxText || `${formatEur(snapshot.taxCents)} MwSt.`})
+          </p>
         </div>
         <p className="text-[24px] leading-[1.2] font-bold">{formatEur(snapshot.totalCents)}</p>
       </div>

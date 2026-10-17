@@ -15,8 +15,9 @@ import { ArrowRightIcon, Blob, CartLineIcon, CupIcon, ShirtIcon } from "./icons"
  * "grid" = klein, ab 768 px standard; "list" = kompakt, ab 768 px standard; "compact" = immer
  * kompakt (Suche). Das Raster dafür steht im Block "Katalog" in globals.css.
  *
- * Preise nach Entscheidung H11: Hauptpreis ist der Packpreis "ab 26,10 €" mit "9 Dosen",
- * darunter Preis je Dose, Pfand je Dose und Grundpreis (PAngV).
+ * Preise nach Entscheidung H11 und H22: Hauptpreis ist der Packpreis ohne Pfand "ab 23,85 €" mit
+ * "9 Dosen", darunter Preis je Dose, Pfand je Dose und Grundpreis (PAngV). Pfand wird nie in den
+ * Preis eingerechnet (§ 7 PAngV), Bundles zeigen "zzgl. X Pfand" aus den Komponenten (H1).
  */
 export type ProductCardLayout = "grid" | "list" | "compact";
 
@@ -48,6 +49,9 @@ export function ProductCard({
   const { type, defaultVariant: v } = product;
   const isDrink = type === "sorte" || type === "mixed";
   const pack = product.variants.find((x) => x.unitCount === 9);
+  const drink = pack ?? v;
+  const mainCents = isDrink ? drink.goodsPriceCents : product.priceFromGoodsCents;
+  const depositCents = isDrink ? drink.depositCents : product.priceFromDepositCents;
 
   return (
     <article
@@ -79,32 +83,32 @@ export function ProductCard({
       <p className="pvc-price">
         <span className="pvc-price-main">
           {product.hasPriceRange ? "ab " : ""}
-          {formatEur(isDrink ? (pack ?? v).priceCents : product.priceFromCents)}
+          {formatEur(mainCents)}
         </span>
-        {isDrink ? <span className="pvc-price-unit">{(pack ?? v).unitCount} Dosen</span> : null}
+        {isDrink ? <span className="pvc-price-unit">{drink.unitCount} Dosen</span> : null}
       </p>
 
       <p className="pvc-fine">
         {isDrink ? (
           <>
-            <span className="pvc-nowrap">{formatEur((pack ?? v).perUnitCents)} je Dose</span>
-            {(pack ?? v).depositPerUnitCents > 0 ? (
+            <span className="pvc-nowrap">{formatEur(drink.perUnitCents)} je Dose</span>
+            {drink.depositPerUnitCents > 0 ? (
               <>
                 <span className="pvc-sep"> · </span>
                 <span className="pvc-nowrap">
-                  zzgl. {formatEur((pack ?? v).depositPerUnitCents)} Pfand je Dose
+                  zzgl. {formatEur(drink.depositPerUnitCents)} Pfand je Dose
                 </span>
               </>
             ) : null}
-            {(pack ?? v).basePriceText ? (
+            {drink.basePriceText ? (
               <>
                 <span className="pvc-sep"> · </span>
-                <span className="pvc-nowrap">{(pack ?? v).basePriceText}</span>
+                <span className="pvc-nowrap">{drink.basePriceText}</span>
               </>
             ) : null}
           </>
-        ) : type === "bundle" && v.depositCents > 0 ? (
-          <>inkl. {formatEur(v.depositCents)} Pfand</>
+        ) : depositCents > 0 ? (
+          <>zzgl. {formatEur(depositCents)} Pfand</>
         ) : (
           <>inkl. MwSt., zzgl. Versand</>
         )}
@@ -185,7 +189,7 @@ function CardAction({ product }: { product: CatalogProduct }) {
       <AddToCartForm
         variantId={pack.id}
         label="In den Warenkorb"
-        ariaLabel={`${product.shortTitle}, 9er-Pack für ${formatEur(pack.priceCents)}: In den Warenkorb`}
+        ariaLabel={`${product.shortTitle}, 9er-Pack für ${priceForLabel(pack)}: In den Warenkorb`}
         buttonClassName="pvc-btn"
         icon={<CartLineIcon className="pvc-btn-icon" />}
       />
@@ -197,7 +201,7 @@ function CardAction({ product }: { product: CatalogProduct }) {
       <AddToCartForm
         variantId={defaultVariant.id}
         label="In den Warenkorb"
-        ariaLabel={`${product.shortTitle} für ${formatEur(defaultVariant.priceCents)}: In den Warenkorb`}
+        ariaLabel={`${product.shortTitle} für ${priceForLabel(defaultVariant)}: In den Warenkorb`}
         buttonClassName="pvc-btn"
         icon={<CartLineIcon className="pvc-btn-icon" />}
       />
@@ -215,6 +219,13 @@ function CardAction({ product }: { product: CatalogProduct }) {
       <ArrowRightIcon className="pvc-btn-arrow" />
     </SiteLink>
   );
+}
+
+/** Preis für Screenreader-Labels: Preis ohne Pfand, Pfand getrennt (H22). */
+function priceForLabel(v: CatalogProduct["defaultVariant"]): string {
+  return v.depositCents > 0
+    ? `${formatEur(v.goodsPriceCents)} zzgl. ${formatEur(v.depositCents)} Pfand`
+    : formatEur(v.goodsPriceCents);
 }
 
 export default ProductCard;

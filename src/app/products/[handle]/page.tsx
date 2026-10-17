@@ -339,7 +339,7 @@ function ShippingNote({
 }) {
   const v = product.defaultVariant;
   const overThreshold =
-    shipping.freeAboveCents !== null && v.priceCents - v.depositCents >= shipping.freeAboveCents;
+    shipping.freeAboveCents !== null && v.goodsPriceCents >= shipping.freeAboveCents;
   const free =
     shipping.freeAboveCents !== null ? formatEur(shipping.freeAboveCents).replace(",00", "") : null;
   return (
@@ -378,7 +378,7 @@ function defaultFaq(product: ProductDetail, shipping: ShippingInfo): { q: string
   if (v.depositPerUnitCents > 0) {
     out.push({
       q: "Wie funktioniert das Pfand?",
-      a: `Auf jede Dose kommen ${formatEur(v.depositPerUnitCents)} Pfand. Das Pfand ist im Packpreis enthalten und wird getrennt ausgewiesen, beim ${v.unitCount}er-Pack sind das ${formatEur(v.depositCents)}. Die leeren Dosen gibst du wie andere Pfanddosen im Handel zurück.`,
+      a: `Auf jede Dose kommen ${formatEur(v.depositPerUnitCents)} Pfand. Das Pfand kommt zum Packpreis hinzu und wird getrennt ausgewiesen, beim ${v.unitCount}er-Pack sind das ${formatEur(v.depositCents)}. Die leeren Dosen gibst du wie andere Pfanddosen im Handel zurück.`,
     });
   }
   const days = shipping.deliveryTimeText.endsWith("Werktage")
