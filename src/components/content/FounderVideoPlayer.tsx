@@ -92,86 +92,88 @@ export function FounderVideoPlayer({
   };
 
   return (
-    <div className="pv-video" data-playing={playing ? "true" : "false"}>
-      <video
-        ref={ref}
-        className="pv-video-el"
-        poster={poster}
-        preload="metadata"
-        loop
-        muted
-        playsInline
-        controls={!enhanced}
-        aria-label={label}
-      >
-        {sources.map((s) => (
-          <source key={s.src} src={s.src} type={s.type} />
-        ))}
-        <p>
-          Dein Browser kann dieses Video nicht abspielen.{" "}
-          <a href={sources[sources.length - 1].src}>Video herunterladen</a>
-        </p>
-      </video>
+    <div className="pv-video-wrap" data-playing={playing ? "true" : "false"}>
+      <div className="pv-video">
+        <video
+          ref={ref}
+          className="pv-video-el"
+          poster={poster}
+          preload="metadata"
+          loop
+          muted
+          playsInline
+          controls={!enhanced}
+          aria-label={label}
+        >
+          {sources.map((s) => (
+            <source key={s.src} src={s.src} type={s.type} />
+          ))}
+          <p>
+            Dein Browser kann dieses Video nicht abspielen.{" "}
+            <a href={sources[sources.length - 1].src}>Video herunterladen</a>
+          </p>
+        </video>
+
+        {enhanced && !playing ? (
+          // Große Fläche zum Antippen; für Tastatur und Screenreader steht "Abspielen" in der Leiste.
+          <button
+            type="button"
+            className="pv-video-play"
+            onClick={togglePlay}
+            aria-hidden="true"
+            tabIndex={-1}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
+            </svg>
+          </button>
+        ) : null}
+      </div>
 
       {enhanced ? (
-        <>
-          {!playing ? (
-            // Große Fläche zum Antippen; für Tastatur und Screenreader steht "Abspielen" in der Leiste.
-            <button
-              type="button"
-              className="pv-video-play"
-              onClick={togglePlay}
-              aria-hidden="true"
-              tabIndex={-1}
-            >
+        // Bedienleiste außerhalb des organischen Rahmens, an der Stelle der Bildunterschrift
+        <div className="pv-video-bar">
+          <button type="button" className="pv-video-btn" onClick={togglePlay}>
+            {playing ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" />
+              </svg>
+            ) : (
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
               </svg>
-            </button>
-          ) : null}
-          <div className="pv-video-bar">
-            <button type="button" className="pv-video-btn" onClick={togglePlay}>
-              {playing ? (
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" />
-                </svg>
+            )}
+            <span>{playing ? "Anhalten" : "Abspielen"}</span>
+          </button>
+          <button
+            type="button"
+            className="pv-video-btn"
+            onClick={toggleSound}
+            aria-pressed={!muted}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" />
+              {muted ? (
+                <path
+                  d="M15.5 9.5l5 5m0-5l-5 5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
               ) : (
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path d="M8 5.5v13l10.5-6.5z" fill="currentColor" />
-                </svg>
+                <path
+                  d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
               )}
-              <span>{playing ? "Anhalten" : "Abspielen"}</span>
-            </button>
-            <button
-              type="button"
-              className="pv-video-btn"
-              onClick={toggleSound}
-              aria-pressed={!muted}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" />
-                {muted ? (
-                  <path
-                    d="M15.5 9.5l5 5m0-5l-5 5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                ) : (
-                  <path
-                    d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                )}
-              </svg>
-              <span>Ton</span>
-            </button>
-          </div>
-        </>
+            </svg>
+            <span>{muted ? "Ton an" : "Ton aus"}</span>
+          </button>
+        </div>
       ) : null}
     </div>
   );

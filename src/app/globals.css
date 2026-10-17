@@ -7604,33 +7604,72 @@ html[data-motion] [data-pv-zoom] {
   }
 }
 
-/* --- Über uns: Video (nur wenn public/videos/ueber-uns.mp4 existiert) -------- */
+/* --- Über uns: Video, gestaltet wie das Porträt (organischer Rahmen, Blob, Sticker) ------- */
 .pv-founder-video {
+  position: relative;
+  overflow-x: clip;
+  padding: 44px 0 12px;
+}
+.pv-founder-video-grid {
   display: grid;
-  gap: 20px;
-  padding-top: 40px;
-  padding-bottom: 12px;
+  gap: 36px;
+  align-items: center;
 }
-.pv-founder-video-head {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.pv-founder-video-figure {
+  position: relative;
+  width: min(100%, 320px);
+  margin: 0 auto;
+  padding: 20px 20px 0;
 }
+.pv-founder-video-blob {
+  top: 12%;
+  left: -18%;
+  width: 132%;
+  height: auto;
+}
+.pv-founder-video-blob-2 {
+  top: -3%;
+  right: -12%;
+  width: 44%;
+  height: auto;
+}
+.pv-founder-video-badge {
+  top: 4px;
+  right: auto;
+  left: -6px;
+  transform: rotate(-8deg);
+}
+.pv-video-wrap {
+  position: relative;
+}
+/* Hochkant-Rahmen in der Art des Porträts: Cream-Rand, unregelmäßiger Radius, leicht gedreht */
 .pv-video {
   position: relative;
+  z-index: 1;
   overflow: hidden;
   margin: 0 auto;
-  border-radius: 28px;
+  border: 6px solid var(--pv-cream);
+  border-radius: 52% 48% 50% 50% / 27% 25% 22% 24%;
   background: var(--pv-wildberry);
   box-shadow: 0 28px 48px -18px var(--pv-ui-shadow-strong);
+  transform: rotate(2deg);
 }
 .pv-founder-video--hoch .pv-video {
-  width: min(100%, 420px);
+  width: 100%;
   aspect-ratio: 9 / 16;
+}
+.pv-founder-video--quer .pv-founder-video-figure {
+  width: 100%;
 }
 .pv-founder-video--quer .pv-video {
   width: 100%;
   aspect-ratio: 16 / 9;
+  border-radius: 46% 54% 50% 50% / 60% 58% 42% 40%;
+}
+/* Ohne JavaScript zeigt der Browser seine eigene Leiste; dafür ein ruhiger Rahmen ohne Drehung */
+html:not([data-js]) .pv-video {
+  border-radius: 28px;
+  transform: none;
 }
 .pv-video-el {
   display: block;
@@ -7659,14 +7698,20 @@ html[data-motion] [data-pv-zoom] {
   height: 34px;
   margin-left: 4px;
 }
+/* Bedienleiste als schwebende Karte an der Stelle der Bildunterschrift */
 .pv-video-bar {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  left: 12px;
+  position: relative;
+  z-index: 2;
   display: flex;
-  justify-content: flex-end;
+  width: fit-content;
+  max-width: 100%;
+  margin: -24px auto 0;
+  padding: 8px;
   gap: 8px;
+  border-radius: 100px;
+  background: var(--pv-white);
+  box-shadow: 0 10px 24px -8px var(--pv-ui-shadow-strong);
+  transform: rotate(-1.5deg);
 }
 .pv-video-btn {
   display: inline-flex;
@@ -7690,12 +7735,28 @@ html[data-motion] [data-pv-zoom] {
 .pv-video-btn[aria-pressed="true"] {
   background: var(--pv-lime-raspberry);
 }
+.pv-founder-video-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 @media (min-width: 861px) {
   .pv-founder-video {
+    padding: 80px 0 24px;
+  }
+  .pv-founder-video-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
     gap: 96px;
-    padding-top: 72px;
+  }
+  .pv-founder-video-figure {
+    width: min(100%, 380px);
+    padding: 28px 28px 0;
+  }
+  .pv-founder-video-badge {
+    top: 8px;
+  }
+  .pv-video-bar {
+    margin-top: -30px;
   }
 }
 /* Ende Motion Unterseiten */

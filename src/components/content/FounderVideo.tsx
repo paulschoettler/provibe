@@ -1,31 +1,35 @@
 import fs from "node:fs";
 import path from "node:path";
-import { Eyebrow } from "./Decor";
+import { FruitSticker } from "@/components/brand/FruitSticker";
+import { Blob, Eyebrow } from "./Decor";
 import { FounderVideoPlayer, type VideoSource } from "./FounderVideoPlayer";
 
 /**
- * Video-Slot auf "Über uns". Rendert nur, wenn die Datei im Repo liegt, sonst nichts.
+ * Video von Celine auf "Über uns", gestaltet wie das Porträt darüber: organischer Rahmen mit
+ * Blob dahinter, Sticker, schwebende Bedienleiste an der Stelle der Bildunterschrift.
  *
- * Ablage (siehe docs/handbuch.md, Abschnitt "Video auf Über uns"):
- *   public/videos/ueber-uns.mp4   H.264 (MP4), AAC-Ton, höchstens 1080p, unter 15 MB
- *   public/videos/ueber-uns.webm  optional zusätzlich (VP9), wird dann zuerst angeboten
+ * Quelle (siehe docs/handbuch.md, Abschnitt "Video auf Über uns"):
+ *   1. REMOTE_VIDEO_URL: öffentliche Datei im Supabase-Speicher (Bucket product-media, Ordner
+ *      videos). So liegt das Video heute, große Dateien gehören nicht ins Git.
+ *   2. Sonst public/videos/ueber-uns.mp4 (H.264, AAC) und optional ueber-uns.webm im Repo.
+ * Ohne Quelle rendert die Sektion nichts.
+ *
  * Eine .mov vom Telefon vorher umwandeln, zum Beispiel:
  *   ffmpeg -i celine.mov -vf "scale='min(1080,iw)':-2" -c:v libx264 -crf 24 -preset slow \
  *     -profile:v high -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart ueber-uns.mp4
  *
- * Die Prüfung läuft beim Rendern auf dem Server, also im Build und bei jeder stündlichen
+ * Die Dateiprüfung läuft beim Rendern auf dem Server, also im Build und bei jeder stündlichen
  * Erneuerung. Die Pfade sind feste Zeichenketten, damit das Build-Tracing die Datei mit in die
- * Server-Funktion übernimmt; so sieht auch die Erneuerung auf Netlify dieselbe Datei.
+ * Server-Funktion übernimmt.
  */
 
-/** Seitenverhältnis des gelieferten Videos. Hochkant vom Telefon ist am wahrscheinlichsten. */
+/** Seitenverhältnis des gelieferten Videos: about_video.mp4 ist 1080 × 1920, also hochkant. */
 const FORMAT: "hoch" | "quer" = "hoch";
-/**
- * Alternative zur Datei im Repo: öffentliche URL aus dem Supabase-Speicher (Bucket product-media,
- * Ordner videos). Große Videos gehören nicht ins Git. Leer lassen, solange keine URL vorliegt.
- */
-const REMOTE_VIDEO_URL: string = "";
+const REMOTE_VIDEO_URL: string =
+  "https://ajscwnbgaijknmdrtihn.supabase.co/storage/v1/object/public/product-media/videos/about_video.mp4";
 const POSTER = "/images/team/celine.jpg";
+
+const VIDEO_FACTS = ["26 Sekunden", "Startet stumm", "Ton per Tipp"];
 
 function videoSources(): VideoSource[] {
   const list: VideoSource[] = [];
@@ -48,23 +52,53 @@ function videoSources(): VideoSource[] {
 export function FounderVideo({ founder }: { founder: string }) {
   const sources = videoSources();
   if (sources.length === 0) return null;
+  const firstName = founder.split(" ")[0] || founder;
   return (
     <section
-      className={`pv-container pv-founder-video pv-founder-video--${FORMAT}`}
+      className={`pv-founder-video pv-founder-video--${FORMAT}`}
       aria-labelledby="video-titel"
     >
-      <div className="pv-founder-video-head" data-pv-reveal="">
-        <Eyebrow>Im Video</Eyebrow>
-        <h2 id="video-titel" className="pv-h2">
-          {founder} und provibe
-        </h2>
-      </div>
-      <div data-pv-reveal="">
-        <FounderVideoPlayer
-          sources={sources}
-          poster={POSTER}
-          label={`Video mit ${founder}, Gründerin von provibe`}
-        />
+      <div className="pv-container pv-founder-video-grid">
+        <figure className="pv-founder-video-figure" data-pv-reveal="">
+          <Blob name="bild-a" parallax={-18} className="pv-founder-video-blob" />
+          <Blob name="zitat" parallax={14} className="pv-founder-video-blob-2" />
+          <FounderVideoPlayer
+            sources={sources}
+            poster={POSTER}
+            label={`Video mit ${founder}, Gründerin von provibe`}
+          />
+          <span className="pv-founder-badge pv-founder-video-badge" aria-hidden="true">
+            Im Video
+          </span>
+          <FruitSticker
+            kind="himbeere"
+            rotate={14}
+            parallax={-16}
+            className="right-[-10px] bottom-[48px] w-[60px] lg:right-[-30px] lg:bottom-[60px] lg:w-[80px]"
+          />
+          <figcaption className="sr-only">{founder}, Gründerin von provibe, im Video</figcaption>
+        </figure>
+        <div className="pv-founder-video-copy">
+          <Eyebrow>Im Video</Eyebrow>
+          <h2 id="video-titel" className="pv-h2" data-pv-reveal="">
+            {firstName} erzählt, warum es provibe gibt.
+          </h2>
+          <p className="pv-lead" data-pv-reveal="">
+            Ein kurzer Blick hinter die Dose: wie aus der Idee im Studium ein Eistee mit 15 g
+            Protein wurde. Das Video läuft stumm los, den Ton schaltest du mit einem Tipp an.
+          </p>
+          <ul className="flex flex-wrap gap-2" aria-label="Kurz zum Video" data-pv-stagger="">
+            {VIDEO_FACTS.map((fact, i) => (
+              <li
+                key={fact}
+                className={`pv-pill ${i === 2 ? "pv-pill--pink" : ""}`}
+                data-pv-reveal="pop"
+              >
+                {fact}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
