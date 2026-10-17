@@ -178,3 +178,7 @@ Analyse und Plan stehen in `docs/design-startseite.md`. Vor dem Bau brauche ich 
 **H7. FAQ und Pre-Sale-Hinweis.** Drei FAQ-Antworten (Versand, Pfand, Protein) sind aus Repo-Daten neu formuliert. Der Pre-Sale-Hinweis (6 bis 8 Wochen) fehlt. Annahme: Pre-Sale ist vorbei, der Hinweis entfällt; FAQ-Texte bitte beim Abnahmedurchgang gegenlesen.
 
 **H8. LUCID.** Die Registrierungsnummer fehlt weiterhin im Impressum. Platzhalter bleibt leer, bis sie vorliegt.
+
+**H9. Fehlerfarbe.** Die Marke hat kein Rot. Fehler zeigen wir mit Magenta-Rahmen, Berry-Text und Icon. Annahme: so lassen, kein Signalrot.
+
+**H10. Checkout-Texte.** Eigene Formulierungen wie "Wohin geht dein Vibe?", "Wie willst du zahlen?", "Schön, dass du da bist.", "Wir packen schon …" sind Vorschläge; bitte beim Abnahmedurchgang gegenlesen. Zustellfenster wird aus Bestelldatum plus 3 bis 5 Werktage dynamisch berechnet.
