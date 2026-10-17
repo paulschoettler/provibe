@@ -1,3 +1,4 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
@@ -6,8 +7,10 @@ import { NextResponse, type NextRequest } from "next/server";
  *    Webhooks (/api/webhooks/*) und der Health-Check bleiben erreichbar, weil externe Dienste
  *    keine Zugangsdaten mitschicken.
  * 2. /admin ist immer noindex (zusätzlich zum Header in netlify.toml).
+ * 3. Supabase-Session auffrischen, wenn ein Auth-Cookie da ist (Server Components können
+ *    erneuerte Tokens nicht speichern, sonst fliegen Kunden nach einer Stunde raus).
  */
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const user = process.env.SITE_PROTECT_USER;
   const password = process.env.SITE_PROTECT_PASSWORD;
@@ -31,7 +34,26 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.next();
+  let response = NextResponse.next({ request });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const hasAuthCookie = request.cookies.getAll().some((c) => c.name.startsWith("sb-"));
+  if (hasAuthCookie && supabaseUrl && supabaseKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (toSet) => {
+          toSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    });
+    await supabase.auth.getUser();
+  }
+  if (pathname.startsWith("/account") || pathname.startsWith("/auth")) {
+    response.headers.set("Cache-Control", "private, no-store");
+  }
   if (pathname.startsWith("/admin")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
     response.headers.set("Cache-Control", "no-store");

@@ -6,7 +6,8 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { CartIconButton } from "./CartIconButton";
 import { HeaderScrollEffect } from "./HeaderScrollEffect";
 import { MobileMenu } from "./MobileMenu";
-import { AccountIcon, SearchIcon } from "./icons";
+import { AccountMenu } from "@/components/account/AccountMenu";
+import { SearchIcon } from "./icons";
 import { MAIN_MENU_FALLBACK } from "./social";
 
 export interface HeaderProps {
@@ -75,9 +76,7 @@ export function Header({ menus, announcements, variant = "default" }: HeaderProp
             <SiteLink href="/search" className="pv-header-icon" aria-label="Suche">
               <SearchIcon className="h-6 w-6" />
             </SiteLink>
-            <SiteLink href="/account" className="pv-header-icon" aria-label="Konto">
-              <AccountIcon className="h-6 w-6" />
-            </SiteLink>
+            <AccountMenu />
             <CartIconButton />
             <MobileMenu menus={items} />
           </div>
