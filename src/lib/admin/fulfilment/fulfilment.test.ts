@@ -5,7 +5,7 @@ import {
   paymentTermsLabel,
 } from "@/lib/admin/invoices/lines";
 import { placeholderPdf } from "@/lib/admin/invoices/pdf";
-import { renderPackingSlipHtml } from "./packing-slip-html";
+import { renderPackingSlipHtml, renderPackingSlipsHtml } from "./packing-slip-html";
 import {
   carrierLabel,
   isValidTrackingNumber,
@@ -169,5 +169,33 @@ describe("Rechnung", () => {
   it("escaped Klammern im PDF-Text", () => {
     const text = placeholderPdf({ title: "A (B) \\ C", lines: [] }).toString("latin1");
     expect(text).toContain("(A \\(B\\) \\\\ C) Tj");
+  });
+});
+
+describe("Lieferscheine im Sammeldruck", () => {
+  const slip = (orderNumber: string) => ({
+    orderNumber,
+    placedAt: "2026-10-17T12:31:00Z",
+    shippingAddressLines: ["Test Kunde", "Musterstraße 1", "86150 Augsburg"],
+    billingAddressLines: null,
+    email: "test-orders@provibe-drinks.de",
+    shippingName: "DHL Paket",
+    items: [
+      { title: "Peach", variantTitle: "9 Dosen", sku: "PV-PE-9", quantity: 1, components: null },
+    ],
+    customerNote: null,
+    isTest: true,
+    entity: null,
+  });
+
+  it("legt jede Bestellung auf eine eigene Seite in einem Dokument", () => {
+    const html = renderPackingSlipsHtml([slip("PV-10001"), slip("PV-10002")]);
+    expect(html.match(/<!doctype html>/g)).toHaveLength(1);
+    expect(html.match(/<main class="sheet">/g)).toHaveLength(2);
+    expect(html).toContain("<title>Lieferscheine (2)</title>");
+    expect(html).toContain("break-before: page");
+    expect(renderPackingSlipsHtml([slip("PV-10003")])).toContain(
+      "<title>Lieferschein PV-10003</title>",
+    );
   });
 });

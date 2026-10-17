@@ -67,6 +67,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "protokoll",
     visible: (s) => hasRole(s, "admin"),
   },
+  {
+    href: "/admin/jobs",
+    label: "Jobs",
+    icon: "liste",
+    visible: (s) => hasRole(s, "admin"),
+  },
 ];
 
 export function navFor(

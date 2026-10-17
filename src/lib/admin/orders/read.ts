@@ -11,6 +11,7 @@ import {
   parseOrderFilter,
   rangeEnd,
   rangeStart,
+  selectedIds,
   sortColumn,
   type OrderFilter,
   type OrderFilterInput,
@@ -108,6 +109,8 @@ export function applyOrderFilter<Q extends { [k: string]: any }>(
   if (filter.to) q = q.lte("placed_at", rangeEnd(filter.to));
   if (filter.test === "only") q = q.eq("is_test", true);
   if (filter.test === "exclude") q = q.eq("is_test", false);
+  const ids = selectedIds(filter);
+  if (ids.length > 0) q = q.in("id", ids);
   const search = classifySearch(filter.search);
   if (search.kind === "order_number") {
     q = q.or(`order_number.ilike.%${search.value}%,shopify_order_name.ilike.%${search.value}%`);
@@ -223,6 +226,19 @@ export async function listOrders(
     counts,
     filter,
   };
+}
+
+/** Anzahl der Bestellungen für einen Filter (zum Beispiel Zähler des Tabs "Test"). */
+export async function countOrders(
+  input: OrderFilterInput | Record<string, unknown> = {},
+): Promise<number> {
+  const filter = parseOrderFilter(input as Record<string, unknown>);
+  const { count, error } = await applyOrderFilter(
+    ordersDb().from("orders").select("id", { count: "exact", head: true }),
+    filter,
+  );
+  if (error) throw new Error(`Bestellungen konnten nicht gezählt werden: ${error.message}`);
+  return count ?? 0;
 }
 
 // ---------------------------------------------------------------------------------------------

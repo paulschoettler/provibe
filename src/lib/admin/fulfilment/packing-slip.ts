@@ -3,7 +3,11 @@ import { loadLegalEntity, ordersDb, resolveOrderId } from "@/lib/admin/orders/db
 import { AdminOrderError } from "@/lib/admin/orders/errors";
 import { readAddress } from "@/lib/checkout/session";
 import { formatAddressLines } from "@/lib/checkout/snapshot";
-import { renderPackingSlipHtml } from "./packing-slip-html";
+import {
+  renderPackingSlipHtml,
+  renderPackingSlipsHtml,
+  type PackingSlipData,
+} from "./packing-slip-html";
 
 /**
  * Lieferschein einer Bestellung als druckfertiges HTML. Welle 2 liefert es aus einer Route unter
@@ -15,6 +19,39 @@ export async function renderPackingSlip(
 ): Promise<{ html: string; filename: string; orderNumber: string }> {
   const orderId = await resolveOrderId(idOrNumber);
   if (!orderId) throw new AdminOrderError("not_found", "Bestellung nicht gefunden.");
+  const data = await loadPackingSlipData(orderId);
+  return {
+    html: renderPackingSlipHtml(data),
+    filename: `Lieferschein-${data.orderNumber}.html`,
+    orderNumber: data.orderNumber,
+  };
+}
+
+/**
+ * Sammeldruck aus der Bestellliste: mehrere Lieferscheine in einem Dokument (Seitenumbruch je
+ * Bestellung), in der übergebenen Reihenfolge. Unbekannte IDs werden übersprungen.
+ */
+export async function renderPackingSlips(
+  orderIds: string[],
+): Promise<{ html: string; count: number; orderNumbers: string[] }> {
+  const ids = [...new Set(orderIds)].slice(0, 200);
+  const list: PackingSlipData[] = [];
+  for (const id of ids) {
+    try {
+      list.push(await loadPackingSlipData(id));
+    } catch (error) {
+      if (!(error instanceof AdminOrderError)) throw error;
+    }
+  }
+  if (list.length === 0) throw new AdminOrderError("not_found", "Keine Bestellung gefunden.");
+  return {
+    html: renderPackingSlipsHtml(list),
+    count: list.length,
+    orderNumbers: list.map((d) => d.orderNumber),
+  };
+}
+
+async function loadPackingSlipData(orderId: string): Promise<PackingSlipData> {
   const db = ordersDb();
   const [{ data: order }, { data: items }, entity] = await Promise.all([
     db
@@ -35,7 +72,7 @@ export async function renderPackingSlip(
   const shipping = readAddress(order.shipping_address);
   const billing = readAddress(order.billing_address);
 
-  const html = renderPackingSlipHtml({
+  return {
     orderNumber: order.order_number,
     placedAt: order.placed_at,
     shippingAddressLines: shipping ? formatAddressLines(shipping) : [],
@@ -60,10 +97,5 @@ export async function renderPackingSlip(
     customerNote: order.customer_note,
     isTest: order.is_test,
     entity,
-  });
-  return {
-    html,
-    filename: `Lieferschein-${order.order_number}.html`,
-    orderNumber: order.order_number,
   };
 }

@@ -209,7 +209,17 @@ function toShipmentAddress(value: unknown, email: string, phone: string | null):
 const labelSchema = z.object({
   product: z.enum(["V01PAK", "V62KP"]).default("V01PAK"),
   withReturnLabel: z.boolean().default(false),
+  /** Paketgewicht in Gramm (gewogen); ohne Angabe Summe der Positionsgewichte, mindestens 500 g */
+  weightGrams: z
+    .number()
+    .int()
+    .min(100, "Mindestens 100 g")
+    .max(31_500, "Höchstens 31,5 kg")
+    .optional(),
 });
+
+/** DHL-Produkte für das Label (Auswahl im Backoffice). */
+export const DHL_PRODUCTS = { V01PAK: "DHL Paket", V62KP: "DHL Kleinpaket" } as const;
 
 export interface DhlLabelResult {
   shipmentId: string;
@@ -232,7 +242,9 @@ export async function createDhlLabel(
     PERMISSIONS.fulfil(actor),
     "Labels dürfen Owner, Admin und Fulfillment erstellen.",
   );
-  const opts = labelSchema.parse(options);
+  const parsedOpts = labelSchema.safeParse(options);
+  if (!parsedOpts.success) throw validationError(parsedOpts.error.issues);
+  const opts = parsedOpts.data;
   const db = ordersDb();
   const { data: order } = await db
     .from("orders")
@@ -254,10 +266,12 @@ export async function createDhlLabel(
   }
   const recipient = toShipmentAddress(order.shipping_address, order.email, order.phone);
   const items = await loadItems(orderId);
-  const weightGrams = Math.max(
-    items.reduce((s, i) => s + (i.weight_grams ?? 0), 0),
-    500,
-  );
+  const weightGrams =
+    opts.weightGrams ??
+    Math.max(
+      items.reduce((s, i) => s + (i.weight_grams ?? 0), 0),
+      500,
+    );
 
   const { data: shipment, error } = await db
     .from("shipments")
@@ -414,4 +428,13 @@ export async function markDelivered(
     .eq("is_return", false)
     .in("status", ["shipped", "in_transit", "manual"]);
   await applyTransition(order, "delivered", actor, { extra: { delivered_at: deliveredAt } });
+}
+
+/** Vorschlag für das Paketgewicht im Label-Dialog: Summe der Positionsgewichte, mindestens 500 g. */
+export async function suggestedParcelWeightGrams(orderId: string): Promise<number> {
+  const items = await loadItems(orderId);
+  return Math.max(
+    items.reduce((s, i) => s + (i.weight_grams ?? 0), 0),
+    500,
+  );
 }

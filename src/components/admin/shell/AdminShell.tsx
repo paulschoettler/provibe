@@ -1,7 +1,8 @@
 import "server-only";
 import type { ReactNode } from "react";
-import { PERMISSIONS, type StaffSession } from "@/lib/admin/auth";
+import { hasRole, PERMISSIONS, type StaffSession } from "@/lib/admin/auth";
 import { countOpenOrders } from "@/lib/admin/dashboard/queries";
+import { deadJobCount } from "@/lib/admin/jobs/admin";
 import { countPendingReviews } from "@/lib/admin/reviews/queries";
 import { countSubscriptionAlerts } from "@/lib/subscriptions/admin-queries";
 import { initials, ROLE_LABELS } from "@/lib/admin/staff/rules";
@@ -21,7 +22,7 @@ export async function AdminShell({
   session: StaffSession;
   children: ReactNode;
 }) {
-  const [openOrders, aboAlerts, pendingReviews] = await Promise.all([
+  const [openOrders, aboAlerts, pendingReviews, deadJobs] = await Promise.all([
     countOpenOrders(),
     // überfällige Abos plus ungeklärte Kündigungen ohne Login; Fulfillment ohne Zähler
     PERMISSIONS.viewCustomers(session)
@@ -29,11 +30,14 @@ export async function AdminShell({
       : Promise.resolve({ pastDue: 0, unmatchedCancellations: 0, total: 0 }),
     // offene Bewertungen nur für Rollen mit Kundendaten
     PERMISSIONS.viewCustomers(session) ? countPendingReviews() : Promise.resolve(0),
+    // tote Hintergrundjobs, nur Owner und Admin sehen /admin/jobs
+    hasRole(session, "admin") ? deadJobCount() : Promise.resolve(0),
   ]);
   const items = navFor(session, {
     "/admin/bestellungen": openOrders,
     "/admin/abos": aboAlerts.total,
     "/admin/bewertungen": pendingReviews,
+    "/admin/jobs": deadJobs,
   });
   const user: ShellUser = {
     name: session.displayName,

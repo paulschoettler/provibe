@@ -48,6 +48,15 @@ export const orderFilterSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(25),
   sort: z.enum(ORDER_SORTS).default("placed_desc"),
+  /** Auswahl aus der Liste (Sammelaktionen, CSV der Auswahl): kommagetrennte UUIDs, höchstens 500 */
+  ids: z
+    .string()
+    .trim()
+    .regex(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(,[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}){0,499}$/i,
+      "Ungültige Auswahl",
+    )
+    .optional(),
 });
 
 export type OrderFilterInput = z.input<typeof orderFilterSchema>;
@@ -55,6 +64,11 @@ export type OrderFilter = z.output<typeof orderFilterSchema> & {
   status?: (typeof ORDER_STATUSES)[number];
   paymentMethod?: PaymentMethodFilter;
 };
+
+/** Ausgewählte IDs aus dem Filter (leer ohne Auswahl). */
+export function selectedIds(filter: Pick<OrderFilter, "ids">): string[] {
+  return filter.ids ? [...new Set(filter.ids.split(",").map((v) => v.toLowerCase()))] : [];
+}
 
 /** Tolerant parsen: ungültige Einzelwerte werden verworfen statt die ganze Liste zu verweigern. */
 export function parseOrderFilter(input: Record<string, unknown>): OrderFilter {

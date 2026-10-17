@@ -9,9 +9,11 @@ import { currentLegalVersions, legalVersionsSnapshot } from "@/lib/checkout/lega
 import { buildAmountsSnapshot, buildOrderItems, orderTaxLines } from "@/lib/checkout/snapshot";
 import type { StoredAddress } from "@/lib/checkout/types";
 import { serverEnv } from "@/lib/env/server";
+import { formatEur } from "@/lib/money";
 import { addOrderEvent, asJson, ordersDb, requirePermission } from "./db";
 import { AdminOrderError, validationError } from "./errors";
 import { MANUAL_PAYMENT_METHOD, MANUAL_PAYMENT_PROVIDER } from "./status";
+import { markManualPaymentReceived } from "./transition";
 
 /**
  * Manuelle Bestellung (Telefon, B2B, Messe). Einzige Stelle im Backoffice, an der Preise aus dem
@@ -24,7 +26,7 @@ import { MANUAL_PAYMENT_METHOD, MANUAL_PAYMENT_PROVIDER } from "./status";
  * Positionen exakt wie im Checkout aufgelöst werden (Bundles, Pfand, Grundpreis, Steuerklasse).
  */
 
-const addressSchema = z.object({
+export const addressSchema = z.object({
   first_name: z.string().trim().min(1, "Vorname fehlt").max(80),
   last_name: z.string().trim().min(1, "Nachname fehlt").max(80),
   company: z.string().trim().max(120).nullish(),
@@ -64,6 +66,20 @@ export const manualOrderSchema = z.object({
   customerNote: z.string().trim().max(1000).nullish(),
   /** Testbestellung; vor dem Go-live ohnehin immer */
   isTest: z.boolean().default(false),
+  /** Bestehender Kunde (Suche im Formular); ohne Angabe wird per E-Mail gefunden oder angelegt */
+  customerId: z.uuid().nullish(),
+  /**
+   * Rabatt als fester Betrag in Cent mit Grund (Kulanz, Messe, B2B). Läuft durch dieselbe
+   * Preislogik wie ein Rabattcode (fixed_amount, nur auf den Warenwert, nie auf Pfand oder Versand).
+   */
+  discount: z
+    .object({
+      amountCents: z.number().int().min(1, "Rabatt muss größer als 0 sein").max(10_000_000),
+      reason: z.string().trim().min(3, "Bitte gib einen Grund für den Rabatt an").max(200),
+    })
+    .nullish(),
+  /** Zahlungsweise: Rechnung (offen) oder bereits bezahlt (Zahlungseingang wird sofort verbucht) */
+  payment: z.enum(["invoice", "paid"]).default("invoice"),
 });
 
 export type ManualOrderInput = z.input<typeof manualOrderSchema>;
@@ -73,9 +89,16 @@ export interface ManualOrderResult {
   orderNumber: string;
   totalCents: number;
   isTest: boolean;
+  /** Rabatt, der tatsächlich angewendet wurde (höchstens der Warenwert) */
+  discountCents?: number;
+  /** Zahlungseingang bei Anlage verbucht ("bereits bezahlt") */
+  paid?: boolean;
 }
 
-function toStored(a: z.output<typeof addressSchema>): StoredAddress {
+/** Code, unter dem ein manueller Rabatt in orders.discount_code steht (kein echter Rabattcode). */
+export const MANUAL_DISCOUNT_CODE = "MANUELL";
+
+export function toStored(a: z.output<typeof addressSchema>): StoredAddress {
   return {
     first_name: a.first_name,
     last_name: a.last_name,
@@ -133,6 +156,7 @@ export async function createManualOrder(
 
   const reservationId = randomUUID();
   let reserved = false;
+  let sessionCreated = false;
   let orderId: string | null = null;
   try {
     const { error: itemsError } = await db
@@ -162,13 +186,36 @@ export async function createManualOrder(
     if (data.shipping.waive) shippingRates = shippingRates.map((r) => ({ ...r, priceCents: 0 }));
     const { snapshot } = buildAmountsSnapshot({
       lines,
-      discount: null,
+      discount: data.discount
+        ? {
+            id: MANUAL_DISCOUNT_CODE,
+            code: MANUAL_DISCOUNT_CODE,
+            kind: "fixed_amount",
+            value: data.discount.amountCents,
+            minSubtotalCents: 0,
+            usageCount: 0,
+            isActive: true,
+          }
+        : null,
       shippingRates,
       depositTaxRateBp: taxRates.get("standard") ?? 1900,
     });
     if (!snapshot.shipping && !data.shipping.waive) {
       throw new AdminOrderError("validation", "Für diese Bestellung passt kein Versandtarif.");
     }
+
+    // Reservierungen hängen per Fremdschlüssel an einer Checkout-Session: eine eigene Session
+    // für diese manuelle Bestellung anlegen (Herkunft admin, wird mit der Bestellung abgeschlossen)
+    const { error: sessionError } = await db.from("checkout_sessions").insert({
+      id: reservationId,
+      cart_id: cart.id,
+      email: data.customer.email,
+      status: "processing",
+      payment_provider: MANUAL_PAYMENT_PROVIDER,
+      attribution: asJson({ source: "admin", created_by: actor.userId }),
+    });
+    if (sessionError) throw new Error(`Checkout-Session nicht angelegt: ${sessionError.message}`);
+    sessionCreated = true;
 
     // Bestand reservieren (prüft Verfügbarkeit, wirft INSUFFICIENT_STOCK)
     const { error: reserveError } = await db.rpc("reserve_stock", {
@@ -182,23 +229,36 @@ export async function createManualOrder(
     }
     reserved = true;
 
-    // Kunde anlegen oder finden (wie im Checkout)
+    // Kunde anlegen oder finden (wie im Checkout); mit customerId der ausgewählte Kunde
     const ship = toStored(data.customer.shippingAddress);
-    await db.from("customers").upsert(
-      {
-        email: data.customer.email,
-        first_name: ship.first_name,
-        last_name: ship.last_name,
-        phone: data.customer.phone ?? ship.phone,
-        acquisition_source: "admin",
-      },
-      { onConflict: "email", ignoreDuplicates: true },
-    );
-    const { data: customer } = await db
-      .from("customers")
-      .select("id")
-      .eq("email", data.customer.email)
-      .maybeSingle();
+    let customer: { id: string } | null = null;
+    if (data.customerId) {
+      const { data: chosen } = await db
+        .from("customers")
+        .select("id")
+        .eq("id", data.customerId)
+        .maybeSingle();
+      if (!chosen)
+        throw new AdminOrderError("validation", "Der ausgewählte Kunde existiert nicht.");
+      customer = chosen;
+    } else {
+      await db.from("customers").upsert(
+        {
+          email: data.customer.email,
+          first_name: ship.first_name,
+          last_name: ship.last_name,
+          phone: data.customer.phone ?? ship.phone,
+          acquisition_source: "admin",
+        },
+        { onConflict: "email", ignoreDuplicates: true },
+      );
+      const { data: found } = await db
+        .from("customers")
+        .select("id")
+        .eq("email", data.customer.email)
+        .maybeSingle();
+      customer = found;
+    }
 
     const isTest = data.isTest || env.APP_STAGE !== "production";
     const legal = legalVersionsSnapshot(await currentLegalVersions());
@@ -217,6 +277,7 @@ export async function createManualOrder(
         tax_cents: snapshot.taxCents,
         total_cents: snapshot.totalCents,
         tax_lines: asJson(orderTaxLines(snapshot)),
+        discount_code: snapshot.discountCents > 0 ? MANUAL_DISCOUNT_CODE : null,
         shipping_address: asJson(ship),
         billing_address: data.customer.billingAddress
           ? asJson(toStored(data.customer.billingAddress))
@@ -228,6 +289,7 @@ export async function createManualOrder(
         payment_provider: MANUAL_PAYMENT_PROVIDER,
         payment_method_type: MANUAL_PAYMENT_METHOD,
         cart_id: cart.id,
+        checkout_session_id: reservationId,
         legal_versions: asJson(legal),
         attribution: asJson({ source: "admin" }),
         customer_note: data.customerNote ?? null,
@@ -254,6 +316,10 @@ export async function createManualOrder(
     reserved = false;
 
     await db.from("carts").update({ converted_order_id: order.id }).eq("id", cart.id);
+    await db
+      .from("checkout_sessions")
+      .update({ status: "completed", completed_at: new Date().toISOString(), order_id: order.id })
+      .eq("id", reservationId);
     await addOrderEvent(order.id, {
       kind: "created",
       message: `Bestellung ${order.order_number} manuell angelegt (Rechnung)`,
@@ -262,12 +328,17 @@ export async function createManualOrder(
         lines: lines.length,
         total_cents: snapshot.totalCents,
         waive_shipping: data.shipping.waive,
+        discount_cents: snapshot.discountCents,
+        ...(data.discount ? { discount_reason: data.discount.reason } : {}),
       },
       actor,
       visibleToCustomer: true,
     });
     const notes = [
       ...(isTest ? ["TEST (manuelle Testbestellung)"] : []),
+      ...(data.discount && snapshot.discountCents > 0
+        ? [`Rabatt ${formatEur(snapshot.discountCents)}: ${data.discount.reason}`]
+        : []),
       ...(data.note ? [data.note] : []),
     ];
     if (notes.length > 0) {
@@ -285,9 +356,25 @@ export async function createManualOrder(
         lines: lines.map((l) => ({ variant_id: l.variantId, quantity: l.quantity })),
         shipping_rate_id: snapshot.shipping?.id ?? null,
         waive_shipping: data.shipping.waive,
+        discount_cents: snapshot.discountCents,
+        discount_reason: data.discount?.reason ?? null,
+        payment: data.payment,
+        customer_id: customer?.id ?? null,
         is_test: isTest,
       },
     });
+
+    // "bereits bezahlt": Zahlungseingang sofort verbuchen (offen → bezahlt, Verlauf und Audit)
+    let paid = false;
+    if (data.payment === "paid") {
+      try {
+        await markManualPaymentReceived(order.id, actor, "Bei Anlage als bereits bezahlt erfasst");
+        paid = true;
+      } catch (error) {
+        // Bestellung bleibt bestehen; der Zahlungseingang lässt sich im Detail nachtragen
+        console.error("[admin/orders] Zahlung bei Anlage nicht verbucht", error);
+      }
+    }
 
     // Rechnung (Entwurf bis LEXWARE_INVOICE_MODE=final), Zahlungsziel 14 Tage
     await enqueueAndRun({
@@ -303,11 +390,20 @@ export async function createManualOrder(
       orderNumber: order.order_number,
       totalCents: snapshot.totalCents,
       isTest,
+      discountCents: snapshot.discountCents,
+      paid,
     };
   } catch (error) {
     // Aufräumen: nur die gerade angelegten Zeilen (enges WHERE auf die neuen IDs)
     if (reserved) await db.rpc("release_reservations", { p_checkout_session_id: reservationId });
     if (orderId) await db.from("orders").delete().eq("id", orderId).eq("source", "admin");
+    if (sessionCreated) {
+      await db
+        .from("checkout_sessions")
+        .delete()
+        .eq("id", reservationId)
+        .eq("payment_provider", MANUAL_PAYMENT_PROVIDER);
+    }
     await db.from("carts").delete().eq("id", cart.id).eq("status", "converted");
     throw error;
   }

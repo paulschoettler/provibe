@@ -13,7 +13,15 @@ import { MANUAL_PAYMENT_PROVIDER } from "./status";
  * Versandmail über shipments.customer_notified_at, Erstattungsmail über email_messages.metadata.
  */
 
-export async function sendShippingMail(shipmentId: string): Promise<void> {
+export interface MailSendOptions {
+  /** Erneut senden (Backoffice "Mail erneut senden"): ignoriert die Idempotenz-Sperre */
+  force?: boolean;
+}
+
+export async function sendShippingMail(
+  shipmentId: string,
+  options: MailSendOptions = {},
+): Promise<void> {
   const db = ordersDb();
   const { data: shipment } = await db
     .from("shipments")
@@ -21,7 +29,7 @@ export async function sendShippingMail(shipmentId: string): Promise<void> {
     .eq("id", shipmentId)
     .maybeSingle();
   if (!shipment) throw new Error(`Sendung ${shipmentId} nicht gefunden`);
-  if (shipment.customer_notified_at) return;
+  if (shipment.customer_notified_at && !options.force) return;
   if (!shipment.tracking_number) throw new Error(`Sendung ${shipmentId} ohne Trackingnummer`);
 
   const [{ data: order }, { data: items }, entity] = await Promise.all([
@@ -63,12 +71,14 @@ export async function sendShippingMail(shipmentId: string): Promise<void> {
       text: mail.text,
       category: "transactional",
       template: "shipping_confirmation",
-      idempotencyKey: `shipping_confirmation:${shipment.id}`,
+      idempotencyKey: `shipping_confirmation:${shipment.id}${options.force ? `:erneut:${Date.now()}` : ""}`,
     },
     {
       orderId: order.id,
       customerId: order.customer_id,
-      eventMessage: "Versandbestätigung an Kunden gesendet",
+      eventMessage: options.force
+        ? "Versandbestätigung erneut gesendet"
+        : "Versandbestätigung an Kunden gesendet",
       metadata: { shipment_id: shipment.id },
     },
   );
@@ -80,7 +90,10 @@ export async function sendShippingMail(shipmentId: string): Promise<void> {
   }
 }
 
-export async function sendRefundMail(refundId: string): Promise<void> {
+export async function sendRefundMail(
+  refundId: string,
+  options: MailSendOptions = {},
+): Promise<void> {
   const db = ordersDb();
   const { data: refund } = await db
     .from("refunds")
@@ -89,7 +102,10 @@ export async function sendRefundMail(refundId: string): Promise<void> {
     .maybeSingle();
   if (!refund) throw new Error(`Erstattung ${refundId} nicht gefunden`);
   if (refund.status === "failed" || refund.status === "cancelled") return;
-  if (await mailAlreadySent(refund.order_id, "refund_confirmation", { refund_id: refund.id }))
+  if (
+    !options.force &&
+    (await mailAlreadySent(refund.order_id, "refund_confirmation", { refund_id: refund.id }))
+  )
     return;
 
   const [{ data: order }, { data: items }, { data: paid }, entity] = await Promise.all([
@@ -154,12 +170,14 @@ export async function sendRefundMail(refundId: string): Promise<void> {
       text: mail.text,
       category: "transactional",
       template: "refund_confirmation",
-      idempotencyKey: `refund_confirmation:${refund.id}`,
+      idempotencyKey: `refund_confirmation:${refund.id}${options.force ? `:erneut:${Date.now()}` : ""}`,
     },
     {
       orderId: order.id,
       customerId: order.customer_id,
-      eventMessage: "Erstattungsbestätigung an Kunden gesendet",
+      eventMessage: options.force
+        ? "Erstattungsbestätigung erneut gesendet"
+        : "Erstattungsbestätigung an Kunden gesendet",
       metadata: { refund_id: refund.id },
     },
   );
