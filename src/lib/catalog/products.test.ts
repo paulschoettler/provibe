@@ -71,6 +71,23 @@ describe("shortTitleOf und sortRankOf", () => {
   });
 });
 
+describe("Lagereinheit Dose (H24)", () => {
+  it("Packs bleiben einfache Varianten: Typ Sorte/Mixed, kein Einzeln-Streichpreis", () => {
+    // Packs haben bundle_components (Dosen), das Produkt bleibt kind = 'simple'
+    expect(productTypeOf({ kind: "simple", tags: ["eistee"], attributes: {} })).toBe("mixed");
+    const v = buildVariantView({
+      variant: variant(12, 3460),
+      depositCentsPerUnit: 25,
+      netContentPerUnit: 0.33,
+      measure: "l",
+    });
+    expect(v.componentsSumCents).toBeNull();
+    expect(v.componentsSumGoodsCents).toBeNull();
+    expect(v.goodsPriceCents).toBe(3160);
+    expect(v.available).toBe(true);
+  });
+});
+
 describe("buildVariantView", () => {
   it("rechnet Preis je Dose und Grundpreis ohne Pfand (9er: 26,10 € → 2,65 € und 8,03 €/l)", () => {
     const v = buildVariantView({

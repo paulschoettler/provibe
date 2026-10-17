@@ -2,6 +2,13 @@
 
 Kurzform: Kontext, Entscheidung, Konsequenz. Neue Einträge oben anfügen.
 
+## ADR-018: Lagereinheit Dose
+
+- Datum: 2026-10-17
+- Kontext: Bisher führte jede Packvariante (9 bis 48 Dosen, je Sorte und Mixed) ihren eigenen Bestand, nur die Founder Bundles buchten Komponenten ab. Im Lager liegen aber Dosen, nicht Packs: ein 12er Mixed und ein 9er Wildberry greifen auf dieselben Wildberry-Dosen zu. Mit getrennten Packbeständen wären Überverkauf oder künstlich ausverkaufte Packs die Folge (Entscheidungen H14 und H24).
+- Entscheidung: Lagereinheit ist die einzelne Dose je Sorte, eine inaktive Variante mit `unit_count` 1 (SKU `PV-WB-01`, `PV-RL-01`, `PV-PE-01`, die Founder Bundles zeigten schon darauf), dazu Merch mit eigenem Bestand. Jede Packvariante besteht über `bundle_components` aus `unit_count` Dosen, Mixed aus je einem Drittel je Sorte; die Produkte bleiben `kind = 'simple'`, damit Katalog, Warenkorb, Bestell-Snapshot und Preisanzeige (kein "Einzeln"-Streichpreis für Packs) unverändert bleiben. `available_quantity` und `reserve_stock` lösen jede Variante mit Komponenten über `stock_units` rekursiv auf (Bundle, Pack, Dose); die Verfügbarkeit eines Packs ist das Minimum über `floor(verfügbar / Menge)`, sind alle Lagereinheiten unbegrenzt (Bestandsführung aus bis zum Import, C5/H3), ist es das Pack auch (999999). Reservierung, Abbuchung, Freigabe, Storno und Erstattung laufen damit in Dosen. Migration `20261017211000_lagereinheit_dose.sql` mit Rückweg im Kopf.
+- Konsequenz: Gebucht wird im Backoffice nur auf Lagereinheiten (`admin_adjust_inventory` lehnt Packs mit `PACK_STOCK_DERIVED` ab), Warnschwellen gelten in Dosen (Annahme: 48 Dosen je Sorte, solange der Standard 10 eingetragen war). `/admin/bestand` zeigt Dosen und Merch als Lagereinheiten und Packs und Bundles darunter als abgeleitet. Neue oder geänderte Packs bekommen ihre Dosen beim Speichern automatisch im Verhältnis der vorhandenen Packs. Rückbuchungen für Bestellungen von vor der Umstellung gehen weiter auf das Pack, weil dort der Abgang gebucht wurde. Der Bestandsimport (H3) bucht nur Dosen je Sorte und Merch; alte Packbestände ungleich 0 rechnet die Migration in Dosen um (Bewegung mit Notiz "H24 Umstellung"). Der Warenkorb (`src/lib/checkout/cart-data.ts`) und der Bestellimport übernehmen Komponenten nur noch von echten Bundles in den Snapshot.
+
 ## ADR-017: 404 bei dynamischen Segmenten über den Proxy
 
 - Datum: 2026-10-17

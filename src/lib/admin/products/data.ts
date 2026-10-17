@@ -299,6 +299,14 @@ export interface VariantEditView {
     allowBackorder: boolean;
   } | null;
   components: BundleComponentView[];
+  /**
+   * Lagereinheit Dose (H24, ADR-018): Packs einer Sorte und von Mixed bestehen aus Einzeldosen.
+   * Hier die Dosen je Pack (leer bei Lagereinheiten, Merch und Bundles); der Bestand des Packs
+   * ergibt sich daraus, eine eigene Bestandsbuchung gibt es nicht.
+   */
+  stockUnits: BundleComponentView[];
+  /** true, wenn Packs oder Bundles diese Variante als Lagereinheit nutzen (Einzeldose) */
+  isStockUnit: boolean;
 }
 
 export interface ImageEditView {
@@ -428,6 +436,14 @@ export async function getProductForEdit(
   const levels = await loadLevels(variantRows.map((v) => v.id));
   const components =
     p.kind === "bundle" ? await loadComponents(variantRows.map((v) => v.id)) : new Map();
+  // Packs (einfache Produkte mit Komponenten) und Lagereinheiten (von Packs/Bundles genutzt)
+  const [packUnits, usedAsUnit] =
+    p.kind === "bundle"
+      ? [new Map<string, BundleComponentView[]>(), new Set<string>()]
+      : await Promise.all([
+          loadComponents(variantRows.map((v) => v.id)),
+          loadUsedAsComponent(variantRows.map((v) => v.id)),
+        ]);
 
   const perVariant = await Promise.all(
     variantRows.map(async (v) => {
@@ -487,6 +503,8 @@ export async function getProductForEdit(
           }
         : null,
       components: components.get(v.id) ?? [],
+      stockUnits: packUnits.get(v.id) ?? [],
+      isStockUnit: usedAsUnit.has(v.id),
     };
   });
 
@@ -628,6 +646,16 @@ function toFormInput(
     faq: t?.faq ?? [],
     collectionIds: collections.filter((c) => c.member && c.kind === "manual").map((c) => c.id),
   };
+}
+
+/** Varianten, die irgendwo als Komponente stecken (Einzeldosen als Lagereinheit, Merch). */
+async function loadUsedAsComponent(variantIds: string[]): Promise<Set<string>> {
+  if (!variantIds.length) return new Set();
+  const { data } = await db()
+    .from("bundle_components")
+    .select("component_variant_id")
+    .in("component_variant_id", variantIds);
+  return new Set((data ?? []).map((r) => r.component_variant_id));
 }
 
 async function loadComponents(

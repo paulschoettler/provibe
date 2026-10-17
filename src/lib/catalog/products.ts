@@ -659,6 +659,9 @@ const loadRawCatalog = cache(async (locale: string): Promise<RawCatalog> => {
   for (const list of variantMap.values())
     list.sort((a, b) => a.unit_count - b.unit_count || a.position - b.position);
 
+  // Nur echte Bundles (kind = 'bundle'): Packs haben seit H24 auch bundle_components (Dosen als
+  // Lagereinheit), sind für die Anzeige aber keine Bundles, also kein "Einzeln"-Streichpreis und
+  // keine Komponentenliste. Die Einzeldosen selbst sind inaktiv und fehlen in variantMap.
   const bundleVariantIds = productRows
     .filter((p) => p.kind === "bundle")
     .flatMap((p) => (variantMap.get(p.id) ?? []).map((v) => v.id));
@@ -1077,7 +1080,8 @@ export async function getProductByHandle(
   const t = raw.translations.get(p.id);
   if (!base || !t) return null;
 
-  // Verfügbarkeit je Variante (Bundles lösen auf Komponenten auf; ohne Bestandsführung 999999)
+  // Verfügbarkeit je Variante: Packs und Bundles lösen auf ihre Lagereinheiten auf (H24: Dosen je
+  // Sorte, Merch), Minimum über floor(verfügbar / Menge); ohne Bestandsführung 999999
   const db = catalogDb();
   const availability = await Promise.all(
     base.variants.map(async (v) => {

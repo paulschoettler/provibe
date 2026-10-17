@@ -39,6 +39,7 @@ const STATUS_TONE: Record<StockStatus, { tone: BadgeTone; hollow?: boolean }> = 
   untracked: { tone: "gray", hollow: true },
   backorder: { tone: "blue" },
   bundle: { tone: "gray", hollow: true },
+  pack: { tone: "gray", hollow: true },
 };
 
 const FILTERS = [
@@ -64,15 +65,29 @@ function available(row: InventoryRow) {
   return row.available === null ? "unbegrenzt" : formatNumber(row.available);
 }
 
+/** Lagereinheit Dose: Einzeldose, die in Packs oder Bundles steckt (H24, ADR-018). */
+function isCan(row: InventoryRow) {
+  return row.stockRole === "unit" && row.usedInDerived;
+}
+
+function unitTitle(row: InventoryRow) {
+  return isCan(row) ? "Dose" : row.variantTitle;
+}
+
+function unitHint(row: InventoryRow) {
+  return isCan(row) ? "Einzelne Dosen, zum Beispiel +240 für zehn 24er-Kartons" : undefined;
+}
+
 function delta(n: number) {
   return `${n > 0 ? "+" : ""}${formatNumber(n)}`;
 }
 
 /**
- * /admin/bestand: Bestand je Variante (Sorte, Pack, SKU, verfügbar, reserviert, Warnschwelle),
- * Buchung mit Grund, Historie und Einstellungen im Drawer (?variante=), Filter "Unter Schwelle",
- * aktive Reservierungen mit Ablauf. Buchen: Owner, Admin, Fulfillment. Warnschwelle und
- * Bestandsführung: Owner und Admin. Hinweis auf H24 (Dose als Lagereinheit folgt).
+ * /admin/bestand: Lagereinheiten (Einzeldose je Sorte, Merch) mit Bestand, verfügbar, reserviert
+ * und Warnschwelle; darunter Packs und Bundles als abgeleitete Zeilen mit berechneter
+ * Verfügbarkeit (Lagereinheit Dose, H24, ADR-018). Buchung mit Grund, Historie und Einstellungen
+ * im Drawer (?variante=), Filter "Unter Schwelle", aktive Reservierungen mit Ablauf. Buchen:
+ * Owner, Admin, Fulfillment. Warnschwelle und Bestandsführung: Owner und Admin.
  */
 export default async function InventoryPage({
   searchParams,
@@ -85,18 +100,19 @@ export default async function InventoryPage({
   const sp = await searchParams;
   const status = (FILTERS.find((f) => f.key === firstParam(sp.status))?.key ?? "all") as FilterKey;
   const q = firstParam(sp.q)?.trim();
-  const bundles = firstParam(sp.bundles) !== "nein";
+  const derivedOn = firstParam(sp.abgeleitet) !== "nein";
   const variantId = firstParam(sp.variante);
 
   let overview: InventoryOverview = {
     rows: [],
-    counts: { total: 0, low: 0, out: 0, untracked: 0 },
+    derived: [],
+    counts: { total: 0, low: 0, out: 0, untracked: 0, derived: 0 },
   };
   let reservations: ReservationView[] = [];
   let failed = false;
   try {
     [overview, reservations] = await Promise.all([
-      getInventoryOverview({ q, status, includeBundles: bundles }),
+      getInventoryOverview({ q, status, includeDerived: derivedOn }),
       listActiveReservations({ limit: 100 }),
     ]);
   } catch (error) {
@@ -104,7 +120,10 @@ export default async function InventoryPage({
     failed = true;
   }
 
-  const selected = variantId ? overview.rows.find((r) => r.variantId === variantId) : undefined;
+  const selected = variantId
+    ? [...overview.rows, ...overview.derived].find((r) => r.variantId === variantId)
+    : undefined;
+  const unitById = new Map(overview.rows.map((r) => [r.variantId, r]));
   let movements: MovementView[] = [];
   if (selected) {
     movements = await getMovements(selected.variantId, { limit: 50 }).catch(() => []);
@@ -113,37 +132,32 @@ export default async function InventoryPage({
     ? reservations.filter((r) => r.variantId === selected.variantId)
     : [];
   const reservedTotal = reservations.reduce((s, r) => s + r.quantity, 0);
-  const filtered = Boolean(q || status !== "all" || !bundles);
+  const filtered = Boolean(q || status !== "all" || !derivedOn);
 
   return (
     <>
       <PageHeader
         title="Bestand"
-        description="Bestand je Variante, Buchungen mit Grund, Historie und Warnschwellen."
+        description="Bestand in Dosen je Sorte und Merch, Buchungen mit Grund, Historie und Warnschwellen. Packs und Bundles rechnen sich aus den Dosen."
       />
       {failed ? (
         <FormMessage tone="error">Der Bestand konnte gerade nicht geladen werden.</FormMessage>
       ) : null}
-      <FormMessage tone="info">
-        Lagereinheit (Entscheidung H24): Heute führt jede Packvariante ihren eigenen Bestand,
-        Bundles buchen ihre Komponenten ab. In der nächsten Welle wird die einzelne Dose je Sorte
-        zur Lagereinheit, Packs werden dann als Vielfache gebucht. Bis zum Import bleiben alle
-        Bestände bei 0 und die Bestandsführung aus (H3).
-      </FormMessage>
 
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Varianten" value={formatNumber(overview.counts.total)} />
+        <Stat label="Lagereinheiten" value={formatNumber(overview.counts.total)} />
         <Stat label="Unter Schwelle" value={formatNumber(overview.counts.low)} />
         <Stat label="Ausverkauft" value={formatNumber(overview.counts.out)} />
         <Stat
           label="Reserviert"
           value={formatNumber(reservedTotal)}
-          hint={`${reservations.length} aktive Reservierungen`}
+          hint={`${reservations.length} aktive Reservierungen, in Dosen und Stück`}
         />
       </div>
 
+      <h2 className="mb-2 text-[16px] font-semibold">Lagereinheiten</h2>
       <Table
-        caption="Bestand je Variante"
+        caption="Bestand je Lagereinheit"
         rows={overview.rows}
         rowKey={(r) => r.variantId}
         rowHref={(r) => withParams(PATH, sp, { variante: r.variantId })}
@@ -175,13 +189,13 @@ export default async function InventoryPage({
             resetHref={filtered ? PATH : undefined}
           >
             <Select
-              name="bundles"
-              label="Bundles"
+              name="abgeleitet"
+              label="Packs und Bundles"
               hideLabel
-              defaultValue={bundles ? "" : "nein"}
+              defaultValue={derivedOn ? "" : "nein"}
               options={[
-                { value: "", label: "Mit Bundles" },
-                { value: "nein", label: "Ohne Bundles" },
+                { value: "", label: "Mit Packs und Bundles" },
+                { value: "nein", label: "Nur Lagereinheiten" },
               ]}
             />
           </FilterBar>
@@ -189,7 +203,7 @@ export default async function InventoryPage({
         empty={
           <EmptyState
             icon="bestand"
-            title={filtered ? "Keine Varianten für diese Filter" : "Keine Varianten"}
+            title={filtered ? "Keine Lagereinheiten für diese Filter" : "Keine Lagereinheiten"}
           >
             {filtered ? "Ändere die Filter oder setze sie zurück." : "Lege zuerst Produkte an."}
           </EmptyState>
@@ -201,15 +215,15 @@ export default async function InventoryPage({
             cell: (r) => (
               <span className="flex flex-col">
                 <span>{r.productTitle}</span>
-                {r.productKind === "bundle" || !r.variantActive ? (
+                {isCan(r) || !r.variantActive ? (
                   <span className="text-admin-text-2 text-[12px] font-normal">
-                    {r.productKind === "bundle" ? "Bundle" : "inaktive Variante"}
+                    {isCan(r) ? "Lagereinheit für Packs und Bundles" : "inaktive Variante"}
                   </span>
                 ) : null}
               </span>
             ),
           },
-          { key: "pack", header: "Pack", width: "120px", cell: (r) => r.variantTitle },
+          { key: "einheit", header: "Einheit", width: "120px", cell: (r) => unitTitle(r) },
           {
             key: "sku",
             header: "SKU",
@@ -230,11 +244,7 @@ export default async function InventoryPage({
             width: "90px",
             align: "right",
             hideBelowLg: true,
-            cell: (r) => (
-              <span className="tabular-nums">
-                {r.productKind === "bundle" ? "–" : formatNumber(r.onHand)}
-              </span>
-            ),
+            cell: (r) => <span className="tabular-nums">{formatNumber(r.onHand)}</span>,
           },
           {
             key: "reserviert",
@@ -259,25 +269,95 @@ export default async function InventoryPage({
         ]}
         rowActions={
           canAdjust
-            ? (r) =>
-                r.productKind === "simple" ? (
-                  <AdjustStockDialog
-                    variantId={r.variantId}
-                    label={`${r.productTitle} · ${r.variantTitle}`}
-                  />
-                ) : null
+            ? (r) => (
+                <AdjustStockDialog
+                  variantId={r.variantId}
+                  label={`${r.productTitle} · ${unitTitle(r)}`}
+                  unitHint={unitHint(r)}
+                />
+              )
             : undefined
         }
         renderCard={(r) => (
           <CardRow
             primary={r.productTitle}
             aside={available(r)}
-            secondary={`${r.variantTitle}${r.sku ? ` · ${r.sku}` : ""}`}
+            secondary={`${unitTitle(r)}${r.sku ? ` · ${r.sku}` : ""}`}
             secondaryAside={`reserviert ${formatNumber(r.reserved)} · Schwelle ${formatNumber(r.lowStockThreshold)}`}
             badges={<StatusBadgeFor status={r.status} />}
           />
         )}
       />
+
+      {derivedOn ? (
+        <>
+          <h2 className="mt-6 mb-1 text-[16px] font-semibold">Packs und Bundles</h2>
+          <p className="text-admin-text-2 mb-2 text-[13px]">
+            Kein eigener Bestand. Verfügbar ist, was die enthaltenen Dosen und Merch-Artikel
+            hergeben (kleinster Wert über alle Bestandteile). Gebucht wird oben bei den
+            Lagereinheiten.
+          </p>
+          <Table
+            caption="Packs und Bundles, Verfügbarkeit aus den Lagereinheiten"
+            rows={overview.derived}
+            rowKey={(r) => r.variantId}
+            rowHref={(r) => withParams(PATH, sp, { variante: r.variantId })}
+            empty={
+              <EmptyState
+                compact
+                icon="bestand"
+                title="Keine Packs oder Bundles für diese Filter"
+              />
+            }
+            columns={[
+              {
+                key: "produkt",
+                header: "Produkt",
+                cell: (r) => (
+                  <span className="flex flex-col">
+                    <span>{r.productTitle}</span>
+                    <span className="text-admin-text-2 text-[12px] font-normal">
+                      {r.stockRole === "bundle" ? "Bundle" : "Pack"}
+                      {r.variantActive ? "" : ", inaktive Variante"}
+                    </span>
+                  </span>
+                ),
+              },
+              { key: "pack", header: "Variante", width: "120px", cell: (r) => r.variantTitle },
+              {
+                key: "aus",
+                header: "Besteht aus",
+                hideBelowLg: true,
+                cell: (r) => (
+                  <span className="text-admin-text-2 text-[13px]">{r.componentsText || "–"}</span>
+                ),
+              },
+              {
+                key: "verfuegbar",
+                header: "Verfügbar",
+                width: "100px",
+                align: "right",
+                cell: (r) => <span className="font-semibold tabular-nums">{available(r)}</span>,
+              },
+              {
+                key: "status",
+                header: "Status",
+                width: "140px",
+                cell: (r) => <StatusBadgeFor status={r.status} />,
+              },
+            ]}
+            renderCard={(r) => (
+              <CardRow
+                primary={r.productTitle}
+                aside={available(r)}
+                secondary={`${r.variantTitle}${r.sku ? ` · ${r.sku}` : ""}`}
+                secondaryAside={r.componentsText}
+                badges={<StatusBadgeFor status={r.status} />}
+              />
+            )}
+          />
+        </>
+      ) : null}
 
       <Card
         className="mt-4"
@@ -300,7 +380,7 @@ export default async function InventoryPage({
                     Menge
                   </th>
                   <th scope="col" className="px-4 font-medium">
-                    Über Bundle
+                    Über Pack oder Bundle
                   </th>
                   <th scope="col" className="px-4 font-medium">
                     Läuft ab
@@ -337,7 +417,7 @@ export default async function InventoryPage({
       <Drawer
         open={Boolean(selected)}
         closeHref={withParams(PATH, sp, { variante: null })}
-        title={selected ? `${selected.productTitle} · ${selected.variantTitle}` : "Variante"}
+        title={selected ? `${selected.productTitle} · ${unitTitle(selected)}` : "Variante"}
         description={selected?.sku ? `SKU ${selected.sku}` : undefined}
         width="lg"
       >
@@ -348,18 +428,22 @@ export default async function InventoryPage({
                 <dt className="text-admin-text-2 text-[13px]">Verfügbar</dt>
                 <dd className="text-[20px] font-semibold tabular-nums">{available(selected)}</dd>
               </div>
-              <div>
-                <dt className="text-admin-text-2 text-[13px]">Bestand</dt>
-                <dd className="text-[20px] font-semibold tabular-nums">
-                  {formatNumber(selected.onHand)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-admin-text-2 text-[13px]">Reserviert</dt>
-                <dd className="text-[20px] font-semibold tabular-nums">
-                  {formatNumber(selected.reserved)}
-                </dd>
-              </div>
+              {selected.stockRole === "unit" ? (
+                <>
+                  <div>
+                    <dt className="text-admin-text-2 text-[13px]">Bestand</dt>
+                    <dd className="text-[20px] font-semibold tabular-nums">
+                      {formatNumber(selected.onHand)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-admin-text-2 text-[13px]">Reserviert</dt>
+                    <dd className="text-[20px] font-semibold tabular-nums">
+                      {formatNumber(selected.reserved)}
+                    </dd>
+                  </div>
+                </>
+              ) : null}
               <div>
                 <dt className="text-admin-text-2 text-[13px]">Status</dt>
                 <dd className="mt-1">
@@ -368,17 +452,42 @@ export default async function InventoryPage({
               </div>
             </dl>
 
-            {selected.productKind === "bundle" ? (
-              <FormMessage tone="info" className="mb-0">
-                Bundles haben keinen eigenen Bestand. Die Verfügbarkeit ergibt sich aus den
-                Komponenten; buche dort.
-              </FormMessage>
+            {selected.stockRole !== "unit" ? (
+              <section className="flex flex-col gap-2">
+                <FormMessage tone="info" className="mb-0">
+                  {selected.stockRole === "bundle" ? "Bundles" : "Packs"} haben keinen eigenen
+                  Bestand. Die Verfügbarkeit ergibt sich aus den Lagereinheiten; buche dort.
+                </FormMessage>
+                {selected.components.length > 0 ? (
+                  <ul className="flex flex-col gap-1 text-[14px]">
+                    {selected.components.map((c) => {
+                      const unit = unitById.get(c.variantId);
+                      return (
+                        <li key={c.variantId} className="flex items-baseline justify-between gap-3">
+                          <a
+                            href={withParams(PATH, sp, { variante: c.variantId })}
+                            className="text-admin-akzent hover:underline"
+                          >
+                            {formatNumber(c.quantity)} × {c.productTitle}
+                            {unit && isCan(unit) ? ", Dose" : ` · ${c.variantTitle}`}
+                          </a>
+                          <span className="text-admin-text-2 text-[13px] tabular-nums">
+                            {unit ? `verfügbar ${available(unit)}` : null}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </section>
             ) : (
               <>
                 {canAdjust ? (
                   <section>
-                    <h3 className="mb-2 text-[15px] font-semibold">Bestand buchen</h3>
-                    <AdjustStockForm variantId={selected.variantId} />
+                    <h3 className="mb-2 text-[15px] font-semibold">
+                      {isCan(selected) ? "Dosen buchen" : "Bestand buchen"}
+                    </h3>
+                    <AdjustStockForm variantId={selected.variantId} unitHint={unitHint(selected)} />
                   </section>
                 ) : null}
                 {canEdit ? (
@@ -387,6 +496,7 @@ export default async function InventoryPage({
                     <ThresholdForm
                       variantId={selected.variantId}
                       value={selected.lowStockThreshold}
+                      unitHint={isCan(selected) ? "in Dosen" : undefined}
                     />
                     <TrackingForm
                       variantId={selected.variantId}

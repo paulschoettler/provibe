@@ -24,6 +24,16 @@ Bitte immer **"Einfache CSV-Datei" (Plain CSV)** wählen, nicht die Excel-Varian
 
 Produkte und Varianten sind bereits über den Shopify-Snapshot im Seed (`assets/source/data/shopify-snapshot/`, `product_variants.shopify_variant_id`). Bestände (C5, H3) sind nicht Teil dieser Skripte.
 
+**Bestände in Dosen (H24, ADR-018).** Seit der Migration `20261017211000_lagereinheit_dose.sql` ist die einzelne Dose je Sorte die Lagereinheit (SKU `PV-WB-01`, `PV-RL-01`, `PV-PE-01`, inaktive Varianten), Merch (Becher `PV-CUP`, Shirts `PV-SHIRT-S/M/L`) hat eigenen Bestand. Packs, Mixed und Founder Bundles haben keinen eigenen Bestand, ihre Verfügbarkeit rechnet sich aus den Dosen. Für den Bestandsimport gilt deshalb:
+
+1. Gezählt und gebucht werden nur Dosen je Sorte und Merch-Stück, nie Packs. Shopify führt den Bestand je Packvariante; diese Zahlen sind für den Import unbrauchbar (ein 24er Karton im Lager zählt als 24 Dosen, Mixed-Kartons je Sorte aufgeteilt). Grundlage ist eine Inventur in Dosen.
+2. Gebucht wird über `/admin/bestand` (Lagereinheit, Grund "Wareneingang" oder "Korrektur" mit Notiz "Import Anfangsbestand") oder per SQL mit `apply_inventory_movement(<Dose>, <Anzahl>, 'import', 'import', '<Laufname>', 'Anfangsbestand')`, damit jede Zahl eine Bewegung hat.
+3. Danach die Bestandsführung je Lagereinheit einschalten (`track_inventory`, Drawer "Einstellungen" auf `/admin/bestand`). Erst dann blockieren Packs bei zu wenig Dosen; vorher gilt alles als unbegrenzt (C5).
+4. Warnschwellen in Dosen prüfen. Die Migration setzt 48 Dosen je Sorte als Annahme, Merch bleibt bei 10 Stück.
+5. Sollten Packvarianten vor der Umstellung Bestand gehabt haben, hat die Migration ihn in Dosen umgerechnet (Bewegungen mit Notiz "H24 Umstellung", `reference_id` `20261017211000`).
+
+Ein eigenes Skript für den Bestandsimport gibt es nicht; bei drei Sorten und vier Merch-Artikeln reichen die sieben Buchungen im Backoffice.
+
 ## 2. Reihenfolge
 
 1. **Kunden** (`import:customers`): legt die Kunden an, auf die sich Bestellungen und Newsletter beziehen.
@@ -209,4 +219,5 @@ Spaltennamen werden ohne Groß/Kleinschreibung erkannt, Trennzeichen Komma, Semi
 - **Pfand in Altbestellungen:** Angenommen ist, dass alle Shopify-Preise das Pfand von 0,25 € je Dose enthielten (so stand es im Shop). Gab es Zeiträume ohne Pfand, bitte Bescheid geben.
 - **Newsletter-Zeitstempel:** Ohne Admin-API-Abfrage oder Export-App wird kein Kontakt versandfähig (Abschnitt 1). Empfehlung: Token mit `read_customers` für einen einmaligen Abruf.
 - **Aktivierungslink bei Massenversand (erledigt, 17.10.2026):** Magic Links gelten 15 Minuten und wären bei einer Massenmail meist abgelaufen. `--send-activation` nutzt deshalb die Vorlage "Konto aktivieren (Massenversand)" ohne Ablaufhinweis mit Link auf `/account/konto-aktivieren?email=…` (Abschnitt 5).
+- **Bestände (H3, H24):** Inventur in Dosen je Sorte und Merch-Stück, nicht je Pack (Abschnitt 1). Die Shopify-Packbestände werden nicht übernommen.
 - **Rabattlimits je Kunde:** Einlösungen aus Shopify zählen nur, wenn die Bestellung importiert ist und der Code in `discount_codes` existiert.

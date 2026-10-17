@@ -8,7 +8,6 @@ import { ActionForm, ActionFormMessage } from "@/components/admin/ui/ActionForm"
 import { Dialog, DialogBody, DialogClose, DialogFooter } from "@/components/admin/ui/Dialog";
 import { Field, Select, Switch, Textarea } from "@/components/admin/ui/fields";
 import { SubmitButton } from "@/components/admin/ui/SubmitButton";
-import { RemountOnError } from "@/components/admin/orders/RemountOnError";
 
 /**
  * Formulare der Bestandsseite: Buchung mit Grund (Korrektur, Wareneingang, Schwund, Retoure),
@@ -21,9 +20,10 @@ const REASON_OPTIONS = ADJUST_REASONS.map((r) => ({
   label: `${r.label}${r.sign === "positive" ? " (+)" : r.sign === "negative" ? " (−)" : " (±)"}`,
 }));
 
-function AdjustFields({ variantId }: { variantId: string }) {
+/** Einheit der Buchung: bei der Einzeldose (Lagereinheit, H24) Dosen, sonst Stück der Variante. */
+function AdjustFields({ variantId, unitHint }: { variantId: string; unitHint?: string }) {
   return (
-    <RemountOnError className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       <input type="hidden" name="variantId" value={variantId} />
       <div className="grid grid-cols-[120px_1fr] gap-3">
         <Field
@@ -32,7 +32,7 @@ function AdjustFields({ variantId }: { variantId: string }) {
           inputMode="numeric"
           placeholder="+24 oder -3"
           required
-          hint="Stück dieser Variante"
+          hint={unitHint ?? "Stück dieser Variante"}
         />
         <Select
           name="reason"
@@ -49,14 +49,14 @@ function AdjustFields({ variantId }: { variantId: string }) {
         maxLength={500}
         hint="Bei Korrektur Pflicht, zum Beispiel Inventur vom 17.10."
       />
-    </RemountOnError>
+    </div>
   );
 }
 
-export function AdjustStockForm({ variantId }: { variantId: string }) {
+export function AdjustStockForm({ variantId, unitHint }: { variantId: string; unitHint?: string }) {
   return (
     <ActionForm action={adjustStockAction} className="flex flex-col gap-3">
-      <AdjustFields variantId={variantId} />
+      <AdjustFields variantId={variantId} unitHint={unitHint} />
       <div className="flex justify-end">
         <SubmitButton pendingLabel="Wird gebucht …">Buchen</SubmitButton>
       </div>
@@ -64,7 +64,15 @@ export function AdjustStockForm({ variantId }: { variantId: string }) {
   );
 }
 
-export function AdjustStockDialog({ variantId, label }: { variantId: string; label: string }) {
+export function AdjustStockDialog({
+  variantId,
+  label,
+  unitHint,
+}: {
+  variantId: string;
+  label: string;
+  unitHint?: string;
+}) {
   return (
     <Dialog
       title="Bestand buchen"
@@ -74,7 +82,7 @@ export function AdjustStockDialog({ variantId, label }: { variantId: string; lab
       <ActionForm action={adjustStockAction} closeDialogOnSuccess hideMessage>
         <DialogBody>
           <ActionFormMessage />
-          <AdjustFields variantId={variantId} />
+          <AdjustFields variantId={variantId} unitHint={unitHint} />
         </DialogBody>
         <DialogFooter>
           <DialogClose />
@@ -85,7 +93,15 @@ export function AdjustStockDialog({ variantId, label }: { variantId: string; lab
   );
 }
 
-export function ThresholdForm({ variantId, value }: { variantId: string; value: number }) {
+export function ThresholdForm({
+  variantId,
+  value,
+  unitHint,
+}: {
+  variantId: string;
+  value: number;
+  unitHint?: string;
+}) {
   return (
     <ActionForm action={setThresholdAction} className="flex items-end gap-2" resetOnSuccess={false}>
       <input type="hidden" name="variantId" value={variantId} />
@@ -94,6 +110,7 @@ export function ThresholdForm({ variantId, value }: { variantId: string; value: 
         label="Warnschwelle"
         inputMode="numeric"
         defaultValue={String(value)}
+        hint={unitHint}
         className="w-32"
       />
       <SubmitButton variant="secondary" pendingLabel="…">

@@ -112,7 +112,9 @@ export async function loadCheckoutLines(cartId: string): Promise<CheckoutRawLine
     const product = productById.get(variant.product_id);
     if (!product || product.status !== "active") continue;
     const translation = translationById.get(product.id);
-    const bundle = components.get(variant.id) ?? null;
+    // Nur echte Bundles: Packs haben seit H24 auch Komponenten (Dosen als Lagereinheit), bleiben
+    // in Anzeige, Pfand und Bestell-Snapshot aber einfache Positionen (ADR-018).
+    const bundle = product.kind === "bundle" ? (components.get(variant.id) ?? null) : null;
 
     // Bundles tragen ihr Pfand nicht am Produkt, sondern in den enthaltenen Dosen (Frage H1).
     const ownDeposit = product.deposit_cents_per_unit;

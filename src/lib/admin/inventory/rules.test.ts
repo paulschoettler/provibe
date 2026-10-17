@@ -4,6 +4,7 @@ import {
   adjustInputSchema,
   canAdjustNegative,
   checkAdjustment,
+  componentsText,
   displayAvailable,
   stockStatus,
   thresholdSchema,
@@ -58,6 +59,12 @@ describe("Buchungsregeln", () => {
     expect(checkAdjustment({ delta: 5, reason: "purchase" }, ctx({ isBundle: true })).ok).toBe(
       false,
     );
+  });
+
+  it("Packs haben keinen eigenen Bestand (H24), gebucht wird die Dose", () => {
+    const r = checkAdjustment({ delta: 24, reason: "purchase" }, ctx({ isPack: true }));
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.error).toContain("Dosen");
   });
 
   it("ohne Bestandsführung erlaubt, mit Hinweis", () => {
@@ -116,6 +123,12 @@ describe("Status", () => {
     expect(stockStatus({ ...row, kind: "bundle", available: 0 })).toBe("out");
     expect(stockStatus({ ...row, kind: "bundle", available: 3 })).toBe("low");
   });
+  it("Packs aus Dosen: ausverkauft oder abgeleitet, Warnschwelle gilt an der Dose", () => {
+    expect(stockStatus({ ...row, role: "pack", available: 999999 })).toBe("pack");
+    expect(stockStatus({ ...row, role: "pack", available: 3 })).toBe("pack");
+    expect(stockStatus({ ...row, role: "pack", available: 0 })).toBe("out");
+    expect(stockStatus({ ...row, role: "unit", available: 40, lowStockThreshold: 48 })).toBe("low");
+  });
   it("unbegrenzt wird null", () => {
     expect(displayAvailable(999999)).toBeNull();
     expect(displayAvailable(499999)).toBeNull();
@@ -124,6 +137,38 @@ describe("Status", () => {
   it("Fehlercodes der Datenbank", () => {
     expect(adjustErrorMessage('ERROR: NEGATIVE_STOCK {"on_hand":1}')).toContain("negativ");
     expect(adjustErrorMessage("BUNDLE_STOCK_DERIVED")).toContain("Bundles");
+    expect(adjustErrorMessage("PACK_STOCK_DERIVED")).toContain("Dosen");
     expect(adjustErrorMessage("irgendwas")).toContain("fehlgeschlagen");
+  });
+});
+
+describe("Zusammensetzung aus Lagereinheiten (H24)", () => {
+  const can = (title: string, quantity: number) => ({
+    variantId: title,
+    sku: null,
+    productTitle: `${title} Eistee`,
+    variantTitle: "1 Dose (Bundle-Komponente)",
+    quantity,
+  });
+  it("Sorten-Pack, Mixed und Founder Bundle", () => {
+    expect(componentsText([can("Wildberry", 9)])).toBe("9 Dosen Wildberry");
+    expect(componentsText([can("Wildberry", 4), can("Raspberry Lime", 4), can("Peach", 4)])).toBe(
+      "je 4 Dosen Wildberry, Raspberry Lime und Peach",
+    );
+    expect(
+      componentsText([
+        can("Peach", 2),
+        can("Wildberry", 2),
+        can("Raspberry Lime", 2),
+        {
+          variantId: "cup",
+          sku: "PV-CUP",
+          productTitle: "provibe Clear Cup",
+          variantTitle: "Standard",
+          quantity: 1,
+        },
+      ]),
+    ).toBe("je 2 Dosen Peach, Wildberry und Raspberry Lime + 1 × provibe Clear Cup");
+    expect(componentsText([])).toBe("");
   });
 });

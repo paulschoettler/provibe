@@ -17,6 +17,7 @@ import {
   adjustErrorMessage,
   adjustInputSchema,
   checkAdjustment,
+  componentsText,
   displayAvailable,
   overviewFilterSchema,
   REASON_LABELS,
@@ -25,12 +26,17 @@ import {
   type AdjustReason,
   type InventoryReason,
   type OverviewFilter,
+  type StockRole,
   type StockStatus,
+  type StockUnitComponent,
 } from "./rules";
 
 /**
  * Bestand im Backoffice: Übersicht, Buchungen mit Grund (inventory_movements), Warnschwellen,
- * Bestandsführung je Variante, Historie.
+ * Bestandsführung je Lagereinheit, Historie.
+ *
+ * Lagereinheit Dose (H24, ADR-018): gebucht wird nur auf Lagereinheiten (Einzeldose je Sorte,
+ * Merch). Packs und Bundles erscheinen als abgeleitete Zeilen mit berechneter Verfügbarkeit.
  *
  * Rechte: Buchen dürfen Owner, Admin und Fulfillment (Wareneingang, Schwund, Retoure);
  * Warnschwelle und Bestandsführung ändern Owner und Admin (editProducts).
@@ -56,6 +62,14 @@ export interface InventoryRow {
   allowBackorder: boolean;
   status: StockStatus;
   updatedAt: string | null;
+  /** unit = Lagereinheit, pack = Pack aus Dosen, bundle = Bundle */
+  stockRole: StockRole;
+  /** Lagereinheiten je Stück (nur Packs und Bundles) */
+  components: StockUnitComponent[];
+  /** z.B. "9 Dosen Wildberry" oder "je 4 Dosen Wildberry, Raspberry Lime und Peach" */
+  componentsText: string;
+  /** Lagereinheit, die in Packs oder Bundles steckt (Einzeldose) */
+  usedInDerived: boolean;
 }
 
 interface OverviewDbRow {
@@ -76,11 +90,32 @@ interface OverviewDbRow {
   track_inventory: boolean;
   allow_backorder: boolean;
   updated_at: string | null;
+  /** ab Migration 20261017211000; davor fehlen beide Felder */
+  stock_role?: StockRole | null;
+  components?:
+    | {
+        variant_id: string;
+        sku: string | null;
+        product_title: string;
+        variant_title: string;
+        quantity: number;
+      }[]
+    | null;
 }
 
 export interface InventoryOverview {
+  /** Lagereinheiten (Dosen je Sorte, Merch) */
   rows: InventoryRow[];
-  counts: { total: number; low: number; out: number; untracked: number };
+  /** abgeleitet: Packs und Bundles mit berechneter Verfügbarkeit */
+  derived: InventoryRow[];
+  /** Zähler über die Lagereinheiten, derived = Anzahl abgeleiteter Zeilen */
+  counts: { total: number; low: number; out: number; untracked: number; derived: number };
+}
+
+/** Rolle einer Zeile; vor der Migration (ohne stock_role) zählt jedes Bundle als abgeleitet. */
+export function roleOf(r: Pick<OverviewDbRow, "stock_role" | "product_kind">): StockRole {
+  if (r.stock_role) return r.stock_role;
+  return r.product_kind === "bundle" ? "bundle" : "unit";
 }
 
 export async function getInventoryOverview(
@@ -89,52 +124,73 @@ export async function getInventoryOverview(
   const f = overviewFilterSchema.parse(filter);
   const { data, error } = await rpcUntyped<OverviewDbRow[]>("admin_inventory_overview", {});
   if (error) throw new Error(`Bestandsübersicht: ${error.message}`);
-  const all: InventoryRow[] = (data ?? []).map((r) => ({
-    variantId: r.variant_id,
-    productId: r.product_id,
-    productHandle: r.product_handle,
-    productTitle: r.product_title,
-    productStatus: r.product_status,
-    productKind: r.product_kind,
-    variantTitle: r.variant_title,
-    sku: r.sku,
-    unitCount: r.unit_count,
-    variantActive: r.variant_active,
-    onHand: r.on_hand,
-    reserved: r.reserved,
-    available: displayAvailable(r.available),
-    lowStockThreshold: r.low_stock_threshold,
-    trackInventory: r.track_inventory,
-    allowBackorder: r.allow_backorder,
-    status: stockStatus({
-      kind: r.product_kind,
+  const dbRows = data ?? [];
+  const componentIds = new Set(
+    dbRows.flatMap((r) => (r.components ?? []).map((c) => c.variant_id)),
+  );
+  const all: InventoryRow[] = dbRows.map((r) => {
+    const role = roleOf(r);
+    const components: StockUnitComponent[] = (r.components ?? []).map((c) => ({
+      variantId: c.variant_id,
+      sku: c.sku,
+      productTitle: c.product_title,
+      variantTitle: c.variant_title,
+      quantity: c.quantity,
+    }));
+    return {
+      variantId: r.variant_id,
+      productId: r.product_id,
+      productHandle: r.product_handle,
+      productTitle: r.product_title,
+      productStatus: r.product_status,
+      productKind: r.product_kind,
+      variantTitle: r.variant_title,
+      sku: r.sku,
+      unitCount: r.unit_count,
+      variantActive: r.variant_active,
+      onHand: r.on_hand,
+      reserved: r.reserved,
+      available: displayAvailable(r.available),
+      lowStockThreshold: r.low_stock_threshold,
       trackInventory: r.track_inventory,
       allowBackorder: r.allow_backorder,
-      available: r.available,
-      lowStockThreshold: r.low_stock_threshold,
-    }),
-    updatedAt: r.updated_at,
-  }));
+      status: stockStatus({
+        kind: r.product_kind,
+        role,
+        trackInventory: r.track_inventory,
+        allowBackorder: r.allow_backorder,
+        available: r.available,
+        lowStockThreshold: r.low_stock_threshold,
+      }),
+      updatedAt: r.updated_at,
+      stockRole: role,
+      components,
+      componentsText: componentsText(components),
+      usedInDerived: componentIds.has(r.variant_id),
+    };
+  });
 
   const q = f.q ? escapeSearch(f.q).toLowerCase() : "";
   const visible = all.filter(
     (r) =>
       (f.includeArchived || r.productStatus !== "archived") &&
-      (f.includeInactive || r.variantActive) &&
-      (f.includeBundles || r.productKind !== "bundle") &&
+      (f.includeInactive || r.variantActive || r.usedInDerived) &&
+      (f.includeDerived || r.stockRole === "unit") &&
       (!q ||
         r.productTitle.toLowerCase().includes(q) ||
         r.productHandle.includes(q) ||
         r.variantTitle.toLowerCase().includes(q) ||
         (r.sku ?? "").toLowerCase().includes(q)),
   );
+  const units = visible.filter((r) => r.stockRole === "unit");
   const counts = {
-    total: visible.length,
-    low: visible.filter((r) => r.status === "low").length,
-    out: visible.filter((r) => r.status === "out").length,
-    untracked: visible.filter((r) => r.status === "untracked").length,
+    total: units.length,
+    low: units.filter((r) => r.status === "low").length,
+    out: units.filter((r) => r.status === "out").length,
+    untracked: units.filter((r) => r.status === "untracked").length,
+    derived: visible.length - units.length,
   };
-  const rows = visible.filter((r) => {
+  const matches = (r: InventoryRow) => {
     switch (f.status) {
       case "low":
         return r.status === "low";
@@ -143,12 +199,17 @@ export async function getInventoryOverview(
       case "untracked":
         return r.status === "untracked";
       case "tracked":
-        return r.productKind === "simple" && r.trackInventory;
+        return r.stockRole === "unit" && r.trackInventory;
       default:
         return true;
     }
-  });
-  return { rows, counts };
+  };
+  // Lagereinheiten zuerst die Dosen (in Packs und Bundles enthalten), dann Merch
+  const rows = units
+    .filter(matches)
+    .sort((a, b) => Number(b.usedInDerived) - Number(a.usedInDerived));
+  const derived = visible.filter((r) => r.stockRole !== "unit").filter(matches);
+  return { rows, derived, counts };
 }
 
 async function loadVariant(variantId: string) {
@@ -159,13 +220,35 @@ async function loadVariant(variantId: string) {
     .maybeSingle();
   if (!data) return null;
   const p = data.products as unknown as { handle: string; kind: "simple" | "bundle" };
+  // Pack (hat Komponenten) oder Lagereinheit, die in Packs oder Bundles steckt
+  const [{ count: ownComponents }, { count: usedIn }] = await Promise.all([
+    db()
+      .from("bundle_components")
+      .select("bundle_variant_id", { count: "exact", head: true })
+      .eq("bundle_variant_id", variantId),
+    db()
+      .from("bundle_components")
+      .select("bundle_variant_id", { count: "exact", head: true })
+      .eq("component_variant_id", variantId),
+  ]);
   return {
     id: data.id,
     title: data.title,
     productId: data.product_id,
     handle: p.handle,
     kind: p.kind,
+    isPack: p.kind !== "bundle" && (ownComponents ?? 0) > 0,
+    usedInDerived: (usedIn ?? 0) > 0,
   };
+}
+
+const PACK_NO_STOCK =
+  "Packs haben keinen eigenen Bestand. Stelle Warnschwelle und Bestandsführung bei den Dosen der Sorte ein (Lagereinheit).";
+
+/** Verfügbarkeit hängt an dieser Variante: eigene Seite, bei Dosen auch alle Packs und Bundles. */
+function revalidateStock(variant: { handle: string; usedInDerived: boolean }): void {
+  if (variant.usedInDerived) revalidateCatalog({ allProducts: true, allCollections: true });
+  else revalidateCatalog({ productHandles: [variant.handle], allCollections: true });
 }
 
 /**
@@ -196,6 +279,7 @@ export async function adjustInventory(
     role: actor.role,
     onHand: level?.on_hand ?? 0,
     isBundle: variant.kind === "bundle",
+    isPack: variant.isPack,
     trackInventory: level?.track_inventory ?? false,
   });
   if (!check.ok) return fail(check.error, check.field ? { [check.field]: check.error } : {});
@@ -227,7 +311,7 @@ export async function adjustInventory(
     },
   });
   // Verfügbarkeit auf Produktseiten und in Kollektionen (ausverkauft/verfügbar)
-  revalidateCatalog({ productHandles: [variant.handle], allCollections: true });
+  revalidateStock(variant);
   return ok(
     { onHand: row.new_on_hand, reserved: row.current_reserved, movementId: row.movement_id },
     check.warnings,
@@ -244,6 +328,7 @@ export async function setThreshold(
   if (!parsed.success) return fail(INVALID_INPUT, { threshold: parsed.error.issues[0].message });
   const variant = await loadVariant(variantId);
   if (!variant) return fail(NOT_FOUND);
+  if (variant.isPack) return fail(PACK_NO_STOCK);
   const client = db();
   const { data: before } = await client
     .from("inventory_levels")
@@ -271,7 +356,7 @@ export async function setThreshold(
 
 /**
  * Bestandsführung je Variante ein- oder ausschalten, Nachbestellung (Verkauf bei 0) erlauben.
- * Bundles: nicht möglich, ihre Verfügbarkeit kommt aus den Komponenten.
+ * Bundles und Packs: nicht möglich, ihre Verfügbarkeit kommt aus den Komponenten (Dosen).
  */
 export async function setTracking(
   variantId: string,
@@ -286,6 +371,7 @@ export async function setTracking(
     return fail(
       "Bundles haben keinen eigenen Bestand. Stelle die Bestandsführung bei den Komponenten ein.",
     );
+  if (variant.isPack) return fail(PACK_NO_STOCK);
   const client = db();
   const { data: before } = await client
     .from("inventory_levels")
@@ -308,11 +394,13 @@ export async function setTracking(
       : null,
     after: { track_inventory: trackInventory, allow_backorder: allowBackorder },
   });
-  revalidateCatalog({ productHandles: [variant.handle], allCollections: true });
+  revalidateStock(variant);
   const warnings =
     trackInventory && !allowBackorder && (before?.on_hand ?? 0) <= 0
       ? [
-          "Der Bestand ist 0. Die Variante ist jetzt im Shop ausverkauft, bis du einen Wareneingang buchst.",
+          variant.usedInDerived
+            ? "Der Bestand ist 0. Alle Packs und Bundles mit dieser Dose sind jetzt im Shop ausverkauft, bis du einen Wareneingang buchst."
+            : "Der Bestand ist 0. Die Variante ist jetzt im Shop ausverkauft, bis du einen Wareneingang buchst.",
         ]
       : [];
   return ok({ trackInventory, allowBackorder }, warnings);

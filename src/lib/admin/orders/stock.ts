@@ -1,10 +1,14 @@
 /**
  * Bestandsrückbuchung (Erstattung mit Rückbuchung, Storno). Reine Funktionen.
  *
- * Die Auflösung spiegelt reserve_stock/commit_reservations (0004): eine einfache Variante bucht
- * sich selbst, ein Bundle seine Komponenten (Snapshot order_items.components, Menge × Komponenten-
- * menge). Zurückgebucht wird höchstens, was für diese Bestellung als Abgang (reason sale) gebucht
- * und noch nicht zurückgebucht wurde, damit Storno und Erstattung nie doppelt einbuchen.
+ * Die Auflösung spiegelt reserve_stock/commit_reservations: gebucht wird immer auf Lagereinheiten
+ * (H24, ADR-018: die einzelne Dose je Sorte, Merch mit eigenem Bestand). Ein Bundle löst über
+ * seinen Snapshot order_items.components auf, ein Pack (und eine Bundle-Komponente, die selbst ein
+ * Pack ist) über seine aktuellen bundle_components. Bestellungen von vor der Umstellung haben den
+ * Abgang noch auf dem Pack gebucht; für Varianten mit eigenem Abgang in dieser Bestellung bleibt
+ * es deshalb bei der Variante. Zurückgebucht wird höchstens, was für diese Bestellung als Abgang
+ * (reason sale) gebucht und noch nicht zurückgebucht wurde, damit Storno und Erstattung nie
+ * doppelt einbuchen.
  */
 
 export interface StockComponent {
@@ -18,22 +22,60 @@ export interface StockItem {
   quantity: number;
 }
 
-/** Varianten-Mengen für die angegebenen Positionsmengen. */
-export function expandStock(items: StockItem[]): Map<string, number> {
+export interface ExpandOptions {
+  /** Lagereinheiten je Pack (bundle_components der Packs), Menge je 1 Pack */
+  packUnits?: Map<string, StockComponent[]>;
+  /** Varianten, auf die in dieser Bestellung direkt ein Abgang gebucht wurde (vor H24) */
+  bookedDirectly?: Set<string>;
+}
+
+/** Lagereinheiten-Mengen für die angegebenen Positionsmengen. */
+export function expandStock(items: StockItem[], options: ExpandOptions = {}): Map<string, number> {
   const out = new Map<string, number>();
   const add = (variantId: string, qty: number) => {
     if (qty <= 0) return;
     out.set(variantId, (out.get(variantId) ?? 0) + qty);
   };
+  // Ein Pack eine Ebene tiefer auflösen, außer sein Abgang steht noch auf ihm selbst
+  const addResolved = (variantId: string, qty: number) => {
+    const units = options.packUnits?.get(variantId);
+    if (units && units.length > 0 && !options.bookedDirectly?.has(variantId)) {
+      for (const u of units) add(u.variant_id, qty * u.quantity);
+    } else {
+      add(variantId, qty);
+    }
+  };
   for (const item of items) {
     if (item.quantity <= 0) continue;
     if (item.components && item.components.length > 0) {
-      for (const c of item.components) add(c.variant_id, item.quantity * c.quantity);
+      for (const c of item.components) addResolved(c.variant_id, item.quantity * c.quantity);
     } else if (item.variantId) {
-      add(item.variantId, item.quantity);
+      addResolved(item.variantId, item.quantity);
     }
   }
   return out;
+}
+
+/** Varianten mit eigenem Abgang (sale) in den Bewegungen einer Bestellung. */
+export function directlyBookedVariants(movements: StockMovementRow[]): Set<string> {
+  return new Set(
+    movements.filter((m) => m.reason === "sale" && m.delta < 0).map((m) => m.variant_id),
+  );
+}
+
+/** bundle_components-Zeilen zu einer Map Pack → Lagereinheiten. */
+export function packUnitsFrom(
+  rows: { bundle_variant_id: string; component_variant_id: string; quantity: number }[],
+): Map<string, StockComponent[]> {
+  const map = new Map<string, StockComponent[]>();
+  for (const r of rows) {
+    if (r.quantity <= 0) continue;
+    map.set(r.bundle_variant_id, [
+      ...(map.get(r.bundle_variant_id) ?? []),
+      { variant_id: r.component_variant_id, quantity: r.quantity },
+    ]);
+  }
+  return map;
 }
 
 export interface StockMovementRow {

@@ -137,14 +137,25 @@ export interface LowStockResult {
   tracking: boolean;
 }
 
+/**
+ * Niedrige Bestände je Lagereinheit (H24, ADR-018): die Einzeldose je Sorte (inaktive Variante,
+ * steckt in Packs und Bundles) und Merch, Warnschwelle in Dosen beziehungsweise Stück. Packs
+ * haben keinen eigenen Bestand und fehlen hier.
+ */
 async function loadLowStock(): Promise<LowStockResult> {
-  const { data, error } = await supabaseAdmin()
-    .from("inventory_levels")
-    .select(
-      "variant_id, on_hand, reserved, low_stock_threshold, track_inventory, product_variants!inner(title, is_active, product_id, products!inner(status, product_translations(title, locale)))",
-    )
-    .eq("track_inventory", true);
+  const admin = supabaseAdmin();
+  const [{ data, error }, { data: links }] = await Promise.all([
+    admin
+      .from("inventory_levels")
+      .select(
+        "variant_id, on_hand, reserved, low_stock_threshold, track_inventory, product_variants!inner(title, is_active, product_id, products!inner(status, product_translations(title, locale)))",
+      )
+      .eq("track_inventory", true),
+    admin.from("bundle_components").select("bundle_variant_id, component_variant_id"),
+  ]);
   if (error) throw new Error(`Dashboard Bestand: ${error.message}`);
+  const packs = new Set((links ?? []).map((l) => l.bundle_variant_id));
+  const units = new Set((links ?? []).map((l) => l.component_variant_id));
   type Row = {
     variant_id: string;
     on_hand: number;
@@ -158,7 +169,10 @@ async function loadLowStock(): Promise<LowStockResult> {
     };
   };
   const rows = ((data ?? []) as unknown as Row[]).filter(
-    (r) => r.product_variants.is_active && r.product_variants.products.status === "active",
+    (r) =>
+      !packs.has(r.variant_id) &&
+      (r.product_variants.is_active || units.has(r.variant_id)) &&
+      r.product_variants.products.status === "active",
   );
   const meta = new Map(
     rows.map((r) => [
@@ -169,7 +183,11 @@ async function loadLowStock(): Promise<LowStockResult> {
           r.product_variants.products.product_translations.find((t) => t.locale === "de")?.title ??
           r.product_variants.products.product_translations[0]?.title ??
           "Produkt",
-        variantTitle: r.product_variants.title,
+        // Einzeldose als Lagereinheit: "Wildberry Eistee · Dosen" statt des Variantentitels
+        variantTitle:
+          units.has(r.variant_id) && /\bdose\b/i.test(r.product_variants.title)
+            ? "Dosen"
+            : r.product_variants.title,
       },
     ]),
   );

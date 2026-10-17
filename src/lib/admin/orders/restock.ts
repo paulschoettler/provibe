@@ -3,7 +3,9 @@ import type { StaffSession } from "@/lib/admin/auth";
 import { ordersDb } from "./db";
 import {
   capRestock,
+  directlyBookedVariants,
   expandStock,
+  packUnitsFrom,
   readComponents,
   restockableByVariant,
   type CappedRestock,
@@ -11,7 +13,9 @@ import {
 
 /**
  * Bestand einer Bestellung zurückbuchen (inventory_movements über apply_inventory_movement).
- * Höchstens das, was für diese Bestellung als Abgang gebucht und noch nicht zurückgebucht wurde.
+ * Gebucht wird auf Lagereinheiten (H24: Dosen je Sorte, Merch), Packs lösen über ihre
+ * bundle_components auf. Höchstens das, was für diese Bestellung als Abgang gebucht und noch nicht
+ * zurückgebucht wurde.
  * reason: refund_restock (Erstattung) oder correction (Storno).
  */
 export async function restockOrderItems(input: {
@@ -35,16 +39,32 @@ export async function restockOrderItems(input: {
       .eq("reference_id", input.orderId),
   ]);
   const byId = new Map((items ?? []).map((i) => [i.id, i]));
-  const requested = expandStock(
-    input.lines.map((l) => {
-      const item = byId.get(l.orderItemId);
-      return {
-        variantId: item?.variant_id ?? null,
-        components: readComponents(item?.components),
-        quantity: item ? l.quantity : 0,
-      };
-    }),
-  );
+  const stockItems = input.lines.map((l) => {
+    const item = byId.get(l.orderItemId);
+    return {
+      variantId: item?.variant_id ?? null,
+      components: readComponents(item?.components),
+      quantity: item ? l.quantity : 0,
+    };
+  });
+  // Packs (auch als Bundle-Komponente) auf ihre Lagereinheiten auflösen
+  const candidates = [
+    ...new Set(
+      stockItems.flatMap((i) =>
+        i.components ? i.components.map((c) => c.variant_id) : i.variantId ? [i.variantId] : [],
+      ),
+    ),
+  ];
+  const { data: packRows } = candidates.length
+    ? await db
+        .from("bundle_components")
+        .select("bundle_variant_id, component_variant_id, quantity")
+        .in("bundle_variant_id", candidates)
+    : { data: [] };
+  const requested = expandStock(stockItems, {
+    packUnits: packUnitsFrom(packRows ?? []),
+    bookedDirectly: directlyBookedVariants(movements ?? []),
+  });
   const capped = capRestock(requested, restockableByVariant(movements ?? []));
 
   for (const m of capped.apply) {

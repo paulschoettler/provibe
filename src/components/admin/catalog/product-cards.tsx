@@ -325,17 +325,29 @@ export function ShippingCard({ input }: { input: ProductInput }) {
 /* ------------------------------------------------------------------------------------------ */
 
 function stockLabel(v: VariantEditView): { text: string; tone: string } {
+  // Lagereinheit Dose (H24): Packs haben keinen eigenen Bestand, er kommt aus den Einzeldosen
+  if (v.stockUnits.length > 0) {
+    const a = v.inventory?.available;
+    if (a == null || a >= UNLIMITED)
+      return { text: "Bestand aus Dosen, nicht geführt", tone: "text-admin-text-2" };
+    return {
+      text: `Bestand aus Dosen: ${a} ${a === 1 ? "Pack" : "Packs"}`,
+      tone: a <= 0 ? "text-admin-rot" : "text-admin-text-2",
+    };
+  }
+  const prefix = v.isStockUnit ? "Lagereinheit, Bestand" : "Bestand";
   if (
     !v.inventory ||
     !v.inventory.trackInventory ||
     v.inventory.available == null ||
     v.inventory.available >= UNLIMITED
   )
-    return { text: "nicht geführt", tone: "text-admin-text-2" };
+    return { text: `${prefix} –`, tone: "text-admin-text-2" };
   const a = v.inventory.available;
-  if (a <= 0) return { text: "0", tone: "text-admin-rot" };
-  if (a <= v.inventory.lowStockThreshold) return { text: String(a), tone: "text-admin-gelb-text" };
-  return { text: String(a), tone: "" };
+  if (a <= 0) return { text: `${prefix} 0`, tone: "text-admin-rot" };
+  if (a <= v.inventory.lowStockThreshold)
+    return { text: `${prefix} ${a}`, tone: "text-admin-gelb-text" };
+  return { text: `${prefix} ${a}`, tone: "" };
 }
 
 export function VariantsCard({
@@ -464,11 +476,7 @@ export function VariantsCard({
                         label={<L>Variante</L>}
                         defaultValue={v.title}
                         maxLength={120}
-                        hint={
-                          <span className={stock.tone}>
-                            Bestand {stock.text === "nicht geführt" ? "–" : stock.text}
-                          </span>
-                        }
+                        hint={<span className={stock.tone}>{stock.text}</span>}
                       />
                     </td>
                     <td className="px-1.5 max-md:px-0">

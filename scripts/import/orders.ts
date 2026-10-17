@@ -180,9 +180,14 @@ async function loadCatalog(db: RunContext["db"]): Promise<CatalogVariant[]> {
     select c.bundle_variant_id, c.component_variant_id, c.quantity, cv.sku, cv.title, cv.unit_count,
            cp.deposit_cents_per_unit, coalesce(ct.title, cp.handle) as product_title
     from public.bundle_components c
+    join public.product_variants bv on bv.id = c.bundle_variant_id
+    join public.products bp on bp.id = bv.product_id
     join public.product_variants cv on cv.id = c.component_variant_id
     join public.products cp on cp.id = cv.product_id
-    left join public.product_translations ct on ct.product_id = cp.id and ct.locale = 'de'`);
+    left join public.product_translations ct on ct.product_id = cp.id and ct.locale = 'de'
+    -- nur echte Bundles: Packs haben seit H24 Dosen als Komponenten, bleiben im Snapshot aber
+    -- einfache Positionen wie im Checkout (ADR-018)
+    where bp.kind = 'bundle'`);
 
   const bundles = new Map<
     string,

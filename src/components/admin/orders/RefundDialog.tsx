@@ -124,7 +124,7 @@ function RefundForm(props: RefundDialogProps) {
       ) + (shipping ? props.refundableShippingCents : 0);
   const amountCents = calc.ok ? calc.value.amountCents : 0;
   const remaining = Math.max(0, props.totalCents - props.refundedCents);
-  // Lagereinheit ist bis H24 die Variante (Pack), Bundles buchen ihre Komponenten
+  // Lagereinheit ist in Dosen (H24)
   const restockUnits = props.items.reduce((s, i) => s + (qty[i.id] ?? 0), 0);
   const restockText = props.items
     .filter((i) => (qty[i.id] ?? 0) > 0)

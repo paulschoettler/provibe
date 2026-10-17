@@ -16,6 +16,7 @@ import {
   type AdminResult,
   type FieldErrors,
 } from "./result";
+import { planPackComponents, type PackComponent } from "./packs";
 import { revalidateCatalog } from "./revalidate";
 import {
   bundleComponentErrors,
@@ -454,6 +455,14 @@ export async function saveVariants(
 
   await syncOptions(productId);
 
+  // Lagereinheit Dose (H24): neue oder geänderte Packs bekommen ihre Dosen als Komponenten
+  if (product.kind === "simple") {
+    const pack = await syncPackComponents(productId, actor);
+    warnings.push(...pack.warnings);
+    if (pack.changed && !auditChanges.length)
+      revalidateCatalog({ productHandles: [product.handle], allCollections: true });
+  }
+
   if (auditChanges.length) {
     await writeAudit(actor, {
       action: "product.variants.update",
@@ -493,6 +502,82 @@ async function defaultTracking(productId: string): Promise<boolean> {
     .eq("track_inventory", true)
     .limit(1);
   return !!any?.length;
+}
+
+/**
+ * Pack-Komponenten eines einfachen Produkts nachziehen (planPackComponents): ein neues 6er-Pack
+ * Wildberry besteht aus 6 Einzeldosen, ein Mixed-Pack aus je einem Drittel je Sorte. Produkte
+ * ohne Packs mit Komponenten (Merch) bleiben unverändert.
+ */
+async function syncPackComponents(
+  productId: string,
+  actor: StaffSession,
+): Promise<{ changed: boolean; warnings: string[] }> {
+  const client = db();
+  const { data: variants } = await client
+    .from("product_variants")
+    .select("id, unit_count, title")
+    .eq("product_id", productId);
+  const ids = (variants ?? []).map((v) => v.id);
+  if (!ids.length) return { changed: false, warnings: [] };
+  const { data: rows } = await client
+    .from("bundle_components")
+    .select("bundle_variant_id, component_variant_id, quantity")
+    .in("bundle_variant_id", ids);
+  const current = new Map<string, PackComponent[]>();
+  for (const r of rows ?? []) {
+    current.set(r.bundle_variant_id, [
+      ...(current.get(r.bundle_variant_id) ?? []),
+      { componentVariantId: r.component_variant_id, quantity: r.quantity },
+    ]);
+  }
+  const plan = planPackComponents(
+    (variants ?? []).map((v) => ({ id: v.id, unitCount: v.unit_count, title: v.title })),
+    current,
+  );
+  for (const p of plan.set) {
+    const { error } = await client.from("bundle_components").upsert(
+      p.items.map((c) => ({
+        bundle_variant_id: p.variantId,
+        component_variant_id: c.componentVariantId,
+        quantity: c.quantity,
+      })),
+      { onConflict: "bundle_variant_id,component_variant_id" },
+    );
+    if (error) throw new Error(`Pack-Komponenten: ${error.message}`);
+    const keep = p.items.map((c) => c.componentVariantId);
+    const stale = (current.get(p.variantId) ?? []).filter(
+      (c) => !keep.includes(c.componentVariantId),
+    );
+    if (stale.length)
+      await client
+        .from("bundle_components")
+        .delete()
+        .eq("bundle_variant_id", p.variantId)
+        .in(
+          "component_variant_id",
+          stale.map((c) => c.componentVariantId),
+        );
+  }
+  if (plan.set.length) {
+    await writeAudit(actor, {
+      action: "product.pack_components.sync",
+      entityType: "product",
+      entityId: productId,
+      before: plan.set.map((p) => ({
+        id: p.variantId,
+        components: current.get(p.variantId) ?? [],
+      })),
+      after: plan.set.map((p) => ({ id: p.variantId, components: p.items })),
+    });
+  }
+  return {
+    changed: plan.set.length > 0,
+    warnings: plan.skipped.map(
+      (s) =>
+        `„${s.title ?? s.unitCount}“ passt mit ${s.unitCount} Einheiten nicht zur Aufteilung der übrigen Packs und hat keine Dosen als Komponenten. Bitte Einheiten prüfen.`,
+    ),
+  };
 }
 
 /** product_options aus den Optionswerten der Varianten ableiten (Name, Reihenfolge, Werte). */
@@ -726,7 +811,8 @@ export async function duplicateProduct(
       await client.from("bundle_components").insert(
         comps.data.map((c) => ({
           bundle_variant_id: variantMap.get(c.bundle_variant_id)!,
-          component_variant_id: c.component_variant_id,
+          // Packs einer kopierten Sorte zeigen auf die kopierte Einzeldose (H24)
+          component_variant_id: variantMap.get(c.component_variant_id) ?? c.component_variant_id,
           quantity: c.quantity,
         })),
       );

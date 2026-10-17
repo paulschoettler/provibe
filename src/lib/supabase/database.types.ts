@@ -4093,6 +4093,7 @@ export type Database = {
         Returns: {
           allow_backorder: boolean
           available: number
+          components: Json
           low_stock_threshold: number
           on_hand: number
           product_handle: string
@@ -4102,6 +4103,7 @@ export type Database = {
           product_title: string
           reserved: number
           sku: string
+          stock_role: string
           track_inventory: boolean
           unit_count: number
           updated_at: string
@@ -4342,6 +4344,14 @@ export type Database = {
       }
       sha256_hex: { Args: { p_input: string }; Returns: string }
       slugify: { Args: { p_input: string }; Returns: string }
+      stock_unit_available: { Args: { p_variant_id: string }; Returns: number }
+      stock_units: {
+        Args: { p_variant_id: string }
+        Returns: {
+          quantity: number
+          variant_id: string
+        }[]
+      }
       subscription_apply: {
         Args: {
           p_actor_id?: string

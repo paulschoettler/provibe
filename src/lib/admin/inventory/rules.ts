@@ -4,9 +4,61 @@ import { z } from "zod";
  * Reine Regeln für die Bestandsführung im Backoffice (Paket Admin-Katalog).
  * Die Datenbank prüft dieselben Regeln noch einmal atomar (admin_adjust_inventory).
  *
- * Lagereinheit (H14): Bestand wird je Variante geführt; Bundles haben keinen eigenen Bestand,
- * ihre Verfügbarkeit ergibt sich aus den Komponenten (available_quantity).
+ * Lagereinheit (H14/H24, ADR-018): Bestand wird nur auf Lagereinheiten geführt, das ist die
+ * einzelne Dose je Sorte (inaktive Variante, SKU PV-WB-01, PV-RL-01, PV-PE-01) und Merch.
+ * Packs (9 bis 48 Dosen, auch Mixed) und Bundles haben keinen eigenen Bestand; ihre
+ * Verfügbarkeit ergibt sich aus den Lagereinheiten (available_quantity: Minimum über
+ * floor(verfügbar / Menge)). Warnschwellen gelten in Dosen beziehungsweise Stück.
  */
+
+/** unit = Lagereinheit (Dose, Merch), pack = Pack aus Dosen, bundle = Bundle (admin_inventory_overview) */
+export type StockRole = "unit" | "pack" | "bundle";
+
+export interface StockUnitComponent {
+  variantId: string;
+  sku: string | null;
+  productTitle: string;
+  variantTitle: string;
+  quantity: number;
+}
+
+/** Kurzname einer Sorte aus dem Produkttitel, z.B. "Wildberry Eistee" → "Wildberry". */
+export function flavorName(productTitle: string): string {
+  return productTitle.replace(/\s+Eistee$/i, "").trim() || productTitle;
+}
+
+/**
+ * Zusammensetzung eines Packs oder Bundles aus Lagereinheiten als Text, z.B.
+ * "9 Dosen Wildberry" oder "je 4 Dosen Wildberry, Raspberry Lime und Peach".
+ * Dosen erkennt die Funktion am Variantentitel ("1 Dose …"), alles andere ist Stück.
+ */
+export function componentsText(components: StockUnitComponent[]): string {
+  if (components.length === 0) return "";
+  const isCan = (c: StockUnitComponent) => /\bdose\b/i.test(c.variantTitle);
+  const cans = components.filter(isCan);
+  const others = components.filter((c) => !isCan(c));
+  const parts: string[] = [];
+  const names = (list: string[]) =>
+    list.length <= 1
+      ? (list[0] ?? "")
+      : `${list.slice(0, -1).join(", ")} und ${list[list.length - 1]}`;
+  if (cans.length > 1 && cans.every((c) => c.quantity === cans[0].quantity)) {
+    const q = cans[0].quantity;
+    parts.push(
+      `je ${q} ${q === 1 ? "Dose" : "Dosen"} ${names(cans.map((c) => flavorName(c.productTitle)))}`,
+    );
+  } else {
+    for (const c of cans)
+      parts.push(
+        `${c.quantity} ${c.quantity === 1 ? "Dose" : "Dosen"} ${flavorName(c.productTitle)}`,
+      );
+  }
+  for (const o of others) {
+    const size = /^(standard|default)/i.test(o.variantTitle) ? "" : ` ${o.variantTitle}`;
+    parts.push(`${o.quantity} × ${o.productTitle}${size}`);
+  }
+  return parts.join(" + ");
+}
 
 export type StaffRoleName = "owner" | "admin" | "support" | "fulfillment";
 
@@ -83,6 +135,8 @@ export interface AdjustContext {
   role: StaffRoleName;
   onHand: number;
   isBundle: boolean;
+  /** Pack aus Dosen (H24): Bestand kommt aus der Einzeldose */
+  isPack?: boolean;
   trackInventory: boolean;
 }
 
@@ -96,7 +150,7 @@ export function canAdjustNegative(role: StaffRoleName): boolean {
 
 /**
  * Regeln einer Bestandsbuchung:
- * - Bundles haben keinen eigenen Bestand.
+ * - Bundles und Packs haben keinen eigenen Bestand (gebucht wird die Lagereinheit).
  * - Wareneingang und Retoure nur positiv, Schwund nur negativ, Korrektur in beide Richtungen.
  * - Negativer Bestand nur mit Grund Korrektur und nur für Owner oder Admin.
  * - Ohne Bestandsführung ist die Buchung erlaubt, wirkt aber erst nach dem Einschalten.
@@ -110,6 +164,13 @@ export function checkAdjustment(
       ok: false,
       error:
         "Bundles haben keinen eigenen Bestand. Buche die Komponenten (zum Beispiel die Dosen).",
+    };
+  }
+  if (ctx.isPack) {
+    return {
+      ok: false,
+      error:
+        "Packs haben keinen eigenen Bestand. Buche die Dosen der Sorte (Lagereinheit), das Pack rechnet sich daraus.",
     };
   }
   const def = ADJUST_REASONS.find((r) => r.value === input.reason)!;
@@ -149,10 +210,11 @@ export function checkAdjustment(
   return { ok: true, allowNegative, newOnHand, warnings };
 }
 
-export type StockStatus = "bundle" | "untracked" | "backorder" | "out" | "low" | "ok";
+export type StockStatus = "bundle" | "pack" | "untracked" | "backorder" | "out" | "low" | "ok";
 
 export const STOCK_STATUS_LABELS: Record<StockStatus, string> = {
   bundle: "Aus Komponenten",
+  pack: "Aus Dosen",
   untracked: "Nicht geführt",
   backorder: "Nachbestellbar",
   out: "Ausverkauft",
@@ -162,11 +224,16 @@ export const STOCK_STATUS_LABELS: Record<StockStatus, string> = {
 
 export function stockStatus(row: {
   kind: "simple" | "bundle";
+  /** pack: abgeleitet aus Dosen; die Warnschwelle gilt an der Dose, nicht am Pack */
+  role?: StockRole;
   trackInventory: boolean;
   allowBackorder: boolean;
   available: number;
   lowStockThreshold: number;
 }): StockStatus {
+  if (row.role === "pack" && row.kind !== "bundle") {
+    return row.available <= 0 ? "out" : "pack";
+  }
   if (row.kind === "bundle") {
     if (row.available >= UNLIMITED_FROM) return "bundle";
     if (row.available <= 0) return "out";
@@ -194,6 +261,8 @@ export function adjustErrorMessage(dbMessage: string): string {
   if (dbMessage.includes("INVALID_REASON"))
     return "Dieser Grund kann im Backoffice nicht gebucht werden.";
   if (dbMessage.includes("BUNDLE_STOCK_DERIVED")) return "Bundles haben keinen eigenen Bestand.";
+  if (dbMessage.includes("PACK_STOCK_DERIVED"))
+    return "Packs haben keinen eigenen Bestand. Buche die Dosen der Sorte.";
   if (dbMessage.includes("VARIANT_NOT_FOUND")) return "Die Variante gibt es nicht mehr.";
   if (dbMessage.includes("INVALID_DELTA")) return "Die Änderung darf nicht 0 sein.";
   return "Die Buchung ist fehlgeschlagen. Bitte versuche es noch einmal.";
@@ -202,9 +271,10 @@ export function adjustErrorMessage(dbMessage: string): string {
 export const overviewFilterSchema = z.object({
   q: z.string().trim().max(100).optional(),
   status: z.enum(["all", "low", "out", "untracked", "tracked"]).default("all"),
-  /** Standard an: die Einzeldosen der Bundles sind inaktive Varianten und tragen den Bestand */
+  /** Standard an: die Einzeldosen (Lagereinheit, H24) sind inaktive Varianten und tragen den Bestand */
   includeInactive: z.boolean().default(true),
   includeArchived: z.boolean().default(false),
-  includeBundles: z.boolean().default(true),
+  /** abgeleitete Zeilen (Packs und Bundles) mit berechneter Verfügbarkeit */
+  includeDerived: z.boolean().default(true),
 });
 export type OverviewFilter = z.input<typeof overviewFilterSchema>;
