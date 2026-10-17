@@ -5629,14 +5629,16 @@ html:not([data-js]) .pvc-stepper input {
   gap: 4px;
   padding: 14px;
   border-radius: 22px;
-  background: var(--pv-cream);
+  /* Weiß wie die übrigen Konto-Karten: Cream auf Cream hob sich nicht ab (Feedback 17.10.2026) */
+  background: var(--pv-white);
   color: var(--pv-wildberry);
+  box-shadow: 0 12px 32px -6px var(--pv-ui-shadow-color);
   transition:
     transform 0.2s ease,
-    background-color 0.2s ease;
+    box-shadow 0.2s ease;
 }
 .pv-acc-tile:hover {
-  background: var(--pv-cream);
+  box-shadow: 0 16px 36px -6px var(--pv-ui-shadow-strong);
   transform: translateY(-2px);
 }
 @media (min-width: 1024px) {
