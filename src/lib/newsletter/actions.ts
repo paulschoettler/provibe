@@ -80,7 +80,7 @@ export async function subscribeToNewsletter(
       {
         email,
         status: "pending",
-        source: "footer",
+        source: String(formData.get("source") ?? "footer").slice(0, 20),
         confirm_token_hash: hashToken(token),
         opt_in_sent_at: now,
         consent_text: CONSENT_TEXT,

@@ -187,7 +187,7 @@ function safePath(value: string): string {
 function finishForm(result: CartActionResult, path: string): void {
   revalidatePath("/cart");
   if (!result.ok) redirect(`${path}?fehler=${encodeURIComponent(result.error)}` as Route);
-  if (path !== "/cart") redirect(path as Route);
+  redirect(path as Route);
 }
 
 /* Interne Helfer */
