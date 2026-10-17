@@ -689,74 +689,590 @@ html[data-js] .pvshop-card.reveal.is-visible {
   }
 }
 
-/* --- Logo-Zoom mit einfliegenden Dosen (#pvlogo) ----------------------------- */
-.pvlogo {
-  --footer-p: 0;
+/* --- Finale: Logo-Zoom mit drei Dosen und CTA (#pvlogo) -------------------- */
+/* Figma "Finale / Mobil" (390 × 460 Bühne) und "Finale / Desktop" (1440 × 740).
+   Positionen stehen in Entwurfspixeln (--l, --t, --w, --h) und werden über --u in
+   Containerbreite umgerechnet, damit die Komposition bei jeder Breite gleich bleibt.
+   Endzustand = CSS. Die Bewegung schreibt LogoZoomMotion als Inline-Styles. */
+.finale {
   position: relative;
-  height: 160vh;
   background: var(--color-cream);
+  /* Hereinfliegende Dosen und schräges Laufband erzeugen keinen Scrollbalken.
+     clip statt hidden: kein eigener Scrollcontainer, sticky bleibt intakt. */
+  overflow: clip;
 }
-.pvlogo-sticky {
+.finale-pin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.finale-layer {
+  grid-area: 1 / 1;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: var(--finale-top, 61px);
+  justify-self: center;
+  width: 100%;
+}
+.finale-pin-space {
+  grid-area: 2 / 1;
+  height: 0;
+}
+html[data-js] .finale-pin-space {
+  height: 90vh;
+}
+
+/* Bühne mit festem Seitenverhältnis. Mobil passt sie samt Headline und Subline
+   unter den Header (230 px Reserve für den Text). */
+.finale-box {
+  position: relative;
+  width: min(100%, 480px, calc((100svh - var(--finale-top, 61px) - 230px) * 390 / 460));
+  aspect-ratio: 390 / 460;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+.finale-box > * {
+  --u: calc(100cqw / 390);
+  position: absolute;
+  left: calc(var(--l) * var(--u));
+  top: calc(var(--t) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: auto;
+  margin: 0;
+}
+
+/* Hintere Ebene ----------------------------------------------------------- */
+.finale-blob {
+  height: calc(var(--h) * var(--u));
+  transform: rotate(var(--rot));
+  pointer-events: none;
+}
+.finale-blob--pink {
+  display: none;
+}
+.finale-blob--peach {
+  --l: -41;
+  --t: 393;
+  --w: 130;
+  --h: 118;
+  --rot: -12deg;
+}
+.finale-blob--butter {
+  --l: 292;
+  --t: 113;
+  --w: 120;
+  --h: 110;
+  --rot: 20deg;
+}
+.finale-blob--stage {
+  --l: 10;
+  --t: 135;
+  --w: 370;
+  --h: 330;
+  --rot: 6deg;
+}
+.finale-logo {
+  --l: 25;
+  --t: 64;
+  --w: 340;
+  transform-origin: 50% 50%;
+}
+
+/* Vordere Ebene ----------------------------------------------------------- */
+.finale-front {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 8px;
+}
+.finale-eyebrow.pv-eyebrow {
+  --t: 36;
+  left: 0;
+  width: 100%;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  white-space: nowrap;
+}
+.finale-eyebrow.pv-eyebrow::before {
+  width: 7px;
+  height: 7px;
+}
+.finale-can {
+  transform-origin: 50% 50%;
+}
+.finale-can__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 calc(21.6 * var(--u)) calc(27.8 * var(--u)) rgba(74, 46, 56, 0.28));
+}
+.finale-can--wildberry {
+  --l: 33.13;
+  --t: 202;
+  --w: 123.73;
+  transform: rotate(-9deg);
+}
+.finale-can--peach {
+  --l: 233.13;
+  --t: 202;
+  --w: 123.73;
+  transform: rotate(9deg);
+}
+.finale-can--raspberry-lime {
+  --l: 120.07;
+  --t: 157.5;
+  --w: 149.87;
+}
+/* Runder Magenta-Sticker "15 g Protein" (A/Sticker Protein). */
+.finale-sticker {
+  --l: 281;
+  --t: 155;
+  --w: 82;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  aspect-ratio: 1;
+  border: calc(2.4 * var(--u)) solid var(--color-cream);
+  border-radius: 50%;
+  background: var(--color-magenta);
+  color: #fff;
+  white-space: nowrap;
+  filter: drop-shadow(0 calc(4.7 * var(--u)) calc(4.7 * var(--u)) rgba(74, 46, 56, 0.22));
+  transform: rotate(12deg);
+  transform-origin: 50% 50%;
 }
-.pvlogo-img {
-  width: min(62vw, 680px);
-  height: auto;
-  transform-origin: center;
-  transform: scale(calc(0.5 + 0.95 * var(--footer-p)));
-  will-change: transform;
+.finale-sticker__value {
+  font-size: calc(25.2 * var(--u));
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
-.pvlogo-can {
-  position: absolute;
-  bottom: 2vh;
-  width: 28vw;
-  height: auto;
+.finale-sticker__label {
+  font-size: calc(8.7 * var(--u));
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.finale-fruit {
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+.finale-fruit__float {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(var(--rot));
+}
+.finale-fruit__float svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.finale-fruit--brombeere {
+  --l: 20;
+  --t: 396;
+  --w: 48;
+  --rot: -12deg;
+}
+.finale-fruit--erdbeere {
+  display: none;
+  --rot: 14deg;
+}
+.finale-fruit--pfirsich {
+  --l: 327;
+  --t: 401;
+  --w: 46;
+  --rot: 10deg;
+}
+
+/* Text, CTA und Pills. Positioniert, damit sie in der vorderen Ebene über den
+   (absolut positionierten) Dosen liegen. */
+.finale-copy,
+.finale-cta {
+  position: relative;
+}
+.finale-copy {
+  width: min(100% - 32px, 520px);
+  margin-top: 10px;
+  text-align: center;
+}
+.finale-title {
+  margin: 0;
+  color: var(--color-wine);
+  font-size: clamp(40px, 14.4vw, 60px);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+.finale-title__line {
+  display: block;
+}
+.finale-title__line--accent {
+  color: var(--color-magenta);
+}
+.finale-sub {
+  margin: 18px 0 0;
+  color: var(--color-aubergine);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.finale-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: min(100% - 32px, 520px);
+  margin-top: 24px;
+}
+.finale-btn {
+  width: 100%;
+  min-height: 48px;
+  padding-block: 0;
+  font-size: 14px;
+}
+.btn-primary.finale-btn {
+  box-shadow: none;
+}
+.finale-btn--outline {
+  border: 2px solid var(--color-aubergine);
+  background: transparent;
+  color: var(--color-aubergine);
+}
+.finale-btn--outline:hover {
+  background: rgba(74, 47, 57, 0.06);
+}
+.finale-price {
+  margin: 0;
+  color: var(--color-aubergine);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+.finale-nowrap {
+  white-space: nowrap;
+}
+.finale-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+}
+.finale-pill {
+  padding: 7px 14px;
+  border: 2px solid var(--color-aubergine);
+  border-radius: var(--radius-pill);
+  color: var(--color-aubergine);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.finale-pill--butter {
+  background: var(--color-butter);
+}
+.finale-pill--pink {
+  background: var(--color-pink-light);
+}
+.finale-pill--cream {
+  background: var(--color-cream-2);
+}
+
+/* Laufband mit den Sortennamen */
+.finale-marquee {
+  position: relative;
   z-index: 2;
-  filter: var(--shadow-can);
-  will-change: transform;
+  margin: 0 0 36px;
+  padding-block: 16px;
+  overflow: clip;
+  pointer-events: none;
 }
-.pvlogo-can--left {
-  left: 2vw;
-  transform: translateX(calc(-120% + 120% * var(--footer-p)))
-    translateY(calc(150px - 150px * var(--footer-p))) rotate(calc(-18deg + 12deg * var(--footer-p)));
+.finale-marquee__band {
+  width: 130%;
+  margin-left: -15%;
+  border-block: 2px solid var(--color-aubergine);
+  background: var(--color-butter);
+  transform: rotate(-3deg);
+  overflow: clip;
 }
-.pvlogo-can--right {
-  right: 2vw;
-  transform: translateX(calc(120% - 120% * var(--footer-p)))
-    translateY(calc(150px - 150px * var(--footer-p))) rotate(calc(18deg - 12deg * var(--footer-p)));
+.finale-marquee__track {
+  display: flex;
+  width: max-content;
 }
-/* Die PNG-Dosen sind der Fallback: sobald die 3D-Szene läuft, übernimmt sie.
-   Dann muss die Sektion durchsichtig sein, damit die fixe Canvas dahinter sichtbar wird
-   (der Seitenhintergrund ist ohnehin Creme). */
-html[data-tier="3d"] .pvlogo-can {
-  opacity: 0;
+.finale-marquee__group {
+  --gap: 18px;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  padding: 12px var(--gap) 12px 0;
 }
-html[data-tier="3d"] .pvlogo {
+.finale-marquee__word {
+  color: var(--color-aubergine);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.finale-marquee__dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-magenta);
+}
+@keyframes finale-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes finale-float {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -6px;
+  }
+}
+html[data-js] .finale-marquee__track {
+  animation: finale-marquee 28s linear infinite;
+}
+html[data-js] .finale-fruit__float {
+  animation: finale-float 2s ease-in-out infinite alternate;
+}
+.finale[data-motion="on"]
+  :is(
+    .finale-logo,
+    .finale-blob--stage,
+    .finale-can,
+    .finale-copy,
+    .finale-sticker,
+    .finale-fruit
+  ) {
+  will-change: transform, opacity;
+}
+
+/* 3D-Stufe: Die Canvas (z-index 0) liegt zwischen hinterer und vorderer Ebene.
+   CanScene setzt data-canvas-ready, sobald die 3D-Dose an ihrem Platz gezeichnet
+   ist; erst dann verschwindet das PNG (Ladeplatzhalter). */
+html[data-tier="3d"] .finale {
   background: transparent;
 }
-html:not([data-js]) .pvlogo {
-  --footer-p: 1;
+html[data-tier="3d"] .finale-back {
+  z-index: -1;
 }
-@media (min-width: 861px) {
-  .pvlogo-can {
-    width: 18vw;
-    bottom: 8vh;
+html[data-tier="3d"] .finale-can[data-canvas-ready] .finale-can__img {
+  visibility: hidden;
+}
+
+/* Desktop ab 900 px und Querformat: Text links, CTA rechts, alles klebt 100vh. */
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  html[data-js] .finale-pin-space {
+    height: 100vh;
+  }
+  .finale-layer {
+    width: min(100%, 1440px, calc((100svh - var(--finale-top, 61px) - 24px) * 1440 / 740));
+  }
+  .finale-box {
+    width: 100%;
+    aspect-ratio: 1440 / 740;
+  }
+  .finale-box > * {
+    --u: calc(100cqw / 1440);
+  }
+  .finale-blob--pink {
+    display: block;
+    --l: 0;
+    --t: 35;
+    --w: 300;
+    --h: 270;
+    --rot: -14deg;
+  }
+  .finale-blob--peach {
+    --l: 1160;
+    --t: 175;
+    --w: 280;
+    --h: 250;
+    --rot: 18deg;
+  }
+  .finale-blob--butter {
+    --l: 270;
+    --t: 590;
+    --w: 220;
+    --h: 200;
+    --rot: -8deg;
+  }
+  .finale-blob--stage {
+    --l: 360;
+    --t: 190;
+    --w: 720;
+    --h: 560;
+  }
+  .finale-logo {
+    --l: 250;
+    --t: 60;
+    --w: 940;
+  }
+  /* Vordere Ebene als Raster: Bühne, Text und CTA liegen in derselben Zelle.
+     Wird der CTA auf kleineren Bildschirmen höher als die Bühne, wächst die Zelle
+     mit, statt dass die Pills über das Laufband ragen. */
+  .finale-front {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    padding-bottom: 0;
+    container-type: inline-size;
+  }
+  .finale-front > * {
+    grid-area: 1 / 1;
+  }
+  .finale-eyebrow.pv-eyebrow {
+    --l: 96;
+    --t: 396;
+    left: calc(var(--l) * var(--u));
+    width: auto;
+    justify-content: flex-start;
+    font-size: clamp(11px, calc(13 * 100cqw / 1440), 13px);
+  }
+  .finale-can--wildberry {
+    --l: 524;
+    --t: 339;
+    --w: 176;
+  }
+  .finale-can--peach {
+    --l: 742;
+    --t: 339;
+    --w: 176;
+  }
+  .finale-can--raspberry-lime {
+    --l: 613.33;
+    --t: 274;
+    --w: 213.33;
+  }
+  .finale-can__img {
+    filter: drop-shadow(0 calc(30.8 * var(--u)) calc(39.6 * var(--u)) rgba(74, 46, 56, 0.28));
+  }
+  .finale-sticker {
+    --l: 882;
+    --t: 246;
+    --w: 108;
+    border-width: calc(3.1 * var(--u));
+  }
+  .finale-sticker__value {
+    font-size: calc(33.2 * var(--u));
+  }
+  .finale-sticker__label {
+    font-size: calc(11.4 * var(--u));
+  }
+  .finale-fruit--brombeere {
+    --l: 488;
+    --t: 632;
+    --w: 64;
+  }
+  .finale-fruit--erdbeere {
+    display: block;
+    --l: 494;
+    --t: 324;
+    --w: 52;
+  }
+  .finale-fruit--pfirsich {
+    --l: 905;
+    --t: 659;
+    --w: 62;
+  }
+  .finale-copy {
+    justify-self: start;
+    width: max(calc(370 * 100cqw / 1440), 300px);
+    margin: calc(428 * 100cqw / 1440) 0 0 calc(96 * 100cqw / 1440);
+    text-align: left;
+  }
+  .finale-title {
+    font-size: clamp(40px, calc(64 * 100cqw / 1440), 64px);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+  }
+  .finale-sub {
+    max-width: 320px;
+    margin-top: 16px;
+    font-size: clamp(15px, calc(17 * 100cqw / 1440), 17px);
+  }
+  .finale-cta {
+    justify-self: start;
+    width: max(calc(320 * 100cqw / 1440), 272px);
+    margin: calc(420 * 100cqw / 1440) 0 24px calc(1000 * 100cqw / 1440);
+  }
+  .finale-price {
+    font-size: 14px;
+    text-align: left;
+  }
+  .finale-pills {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 8px;
+  }
+  .finale-marquee {
+    margin: -8px 0 40px;
+  }
+  .finale-marquee__band {
+    transform: rotate(2deg);
+  }
+  .finale-marquee__group {
+    --gap: 24px;
+    padding-block: 14px;
+  }
+  .finale-marquee__word {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+  .finale-marquee__dot {
+    width: 12px;
+    height: 12px;
   }
 }
+
+/* Reduzierte Bewegung: keine Pin-Strecke, keine Flugbahnen, kein Laufband.
+   LogoZoomMotion blendet die Bühne nur weich ein (data-fade). Der globale
+   Reduced-Motion-Block kürzt alle Übergänge, deshalb hier mit !important und
+   höherer Spezifität. */
 @media (prefers-reduced-motion: reduce) {
-  .pvlogo {
-    --footer-p: 1;
+  html[data-js] .finale-pin-space {
+    height: 0;
   }
-  .pvlogo-img {
-    transform: none;
+  html[data-js] .finale-marquee__track,
+  html[data-js] .finale-fruit__float {
+    animation: none;
+  }
+  .finale[data-fade]
+    :is(
+      .finale-logo,
+      .finale-blob--stage,
+      .finale-can,
+      .finale-copy,
+      .finale-sticker,
+      .finale-fruit
+    ) {
+    transition: opacity 0.9s ease !important;
+  }
+  .finale[data-fade="wait"]
+    :is(
+      .finale-logo,
+      .finale-blob--stage,
+      .finale-can,
+      .finale-copy,
+      .finale-sticker,
+      .finale-fruit
+    ) {
+    opacity: 0;
   }
 }
+/* Ende Finale */
 
 /* --- Footer ------------------------------------------------------------------ */
 .pv-footer {

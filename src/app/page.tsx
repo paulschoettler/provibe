@@ -41,7 +41,7 @@ export default async function HomePage() {
         <PurseBanner />
         <FounderBundles bundles={home.bundles} />
         <MoodSection />
-        <LogoZoom />
+        <LogoZoom flavors={flavors} />
       </main>
       <Footer quickLinks={home.menus.footerQuick} />
       <StickyAddToCart

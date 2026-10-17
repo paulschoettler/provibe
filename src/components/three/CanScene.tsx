@@ -36,7 +36,9 @@ import { CAN_FRONT_ROTATION_Y, prepareCanMaterial } from "./can-material";
  *   Position, Größe, Neigung und Deckkraft aus seinem aktuellen Ringwinkel, nicht
  *   aus seinem Index. Dadurch ist jede Bewegung automatisch weich und endlos.
  * - Sequenz: 0 bis 0,4 Kamerazoom, 0,4 bis 0,7 aktive Dose dreht 180 Grad, dann halten.
- * - Footer: zwei Dosen fliegen zum Logo-Zoom von außen ins Bild.
+ * - Finale (#pvlogo): drei Dosen fliegen zum Logo-Zoom ins Bild. Lage, Größe,
+ *   Winkel und Deckkraft kommen von den PNG-Platzhaltern im DOM
+ *   ([data-finale-can], siehe finaleCanPose), die LogoZoomMotion bewegt.
  *
  * Die Datei wird per next/dynamic mit ssr:false eingebunden und darf deshalb
  * three direkt importieren. Ohne tier "3d" rendert sie nichts.
@@ -88,6 +90,49 @@ function clamp01(value: number): number {
 /** Linearer Anteil zwischen zwei Schwellen, auf 0 bis 1 begrenzt. */
 function range(value: number, from: number, to: number): number {
   return clamp01((value - from) / (to - from));
+}
+
+/** Finale-Dosen in Zeichenreihenfolge, wie in LogoZoom.tsx (Raspberry Lime vorn). */
+const FINALE_CAN_SLUGS = ["wildberry", "peach", "raspberry-lime"] as const;
+
+interface FinaleCanPose {
+  x: number;
+  y: number;
+  /** Höhe in Welteinheiten (Modelle sind auf Höhe 1 normiert) */
+  height: number;
+  /** Winkel in Grad wie CSS rotate */
+  rotate: number;
+  /** Abstand zum Endwinkel in Grad, für die Drehung zur Bildmitte */
+  turn: number;
+  opacity: number;
+}
+
+/**
+ * Lage eines PNG-Platzhalters in der Ebene z = 0 der Szene. Die Mitte der
+ * Bounding Box bleibt bei einer Drehung gleich, die Höhe kommt aus offsetHeight
+ * (ohne Transform). Winkel und Deckkraft schreibt LogoZoomMotion als data-r und
+ * data-o, data-r-end ist der Endwinkel.
+ */
+function finaleCanPose(
+  anchor: HTMLElement,
+  viewport: { width: number; height: number },
+  distance: number,
+): FinaleCanPose | null {
+  if (viewport.width === 0 || viewport.height === 0) return null;
+  const rect = anchor.getBoundingClientRect();
+  const visibleHeight = visibleHeightAt(distance);
+  const visibleWidth = visibleHeight * (viewport.width / viewport.height);
+  const rotate = Number.parseFloat(anchor.dataset.r ?? "0") || 0;
+  const rotateEnd = Number.parseFloat(anchor.dataset.rEnd ?? "0") || 0;
+  const opacity = Number.parseFloat(anchor.dataset.o ?? "1");
+  return {
+    x: ((rect.left + rect.width / 2) / viewport.width - 0.5) * visibleWidth,
+    y: (0.5 - (rect.top + rect.height / 2) / viewport.height) * visibleHeight,
+    height: (anchor.offsetHeight / viewport.height) * visibleHeight,
+    rotate,
+    turn: rotate - rotateEnd,
+    opacity: Number.isFinite(opacity) ? clamp01(opacity) : 1,
+  };
 }
 
 /**
@@ -301,12 +346,20 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     return () => observer.disconnect();
   }, [invalidate]);
 
-  const halfVisibleWidth = visibleHeightAt(CAMERA_BASE_Z) * 0.5 * geometry.aspect;
-  // Desktop: Dosen neben dem Logo (Logo ist bis 680 px breit), nicht dahinter
-  const footerX = geometry.isMobile ? 1.1 : Math.max(1.6, halfVisibleWidth * 0.78);
-  const footerStartX = halfVisibleWidth + 1.4;
-  const footerScale = geometry.canHeight * (geometry.isMobile ? 0.42 : 0.54);
-  const footerY = geometry.isMobile ? -geometry.canHeight * 0.45 : -geometry.canHeight * 0.12;
+  /** Deckkraft und Bildzähler der Finale-Dosen, Platzhalter im DOM je Sorte. */
+  const footerOpacity = useRef<number[]>([]);
+  const footerFrames = useRef<number[]>([]);
+  const footerAnchors = useRef<Array<HTMLElement | null>>([]);
+
+  // Fällt die Szene weg, sind die PNG-Platzhalter wieder die Dosen.
+  useEffect(() => {
+    return () => {
+      const anchors = document.querySelectorAll<HTMLElement>(
+        "[data-finale-can][data-canvas-ready]",
+      );
+      for (const anchor of anchors) delete anchor.dataset.canvasReady;
+    };
+  }, []);
 
   /**
    * Sobald die aktive Sorte zwei Bilder lang wirklich gerendert wurde, verschwindet
@@ -403,20 +456,45 @@ function Scene({ flavors, mobileModels }: SceneProps) {
 
     markCanvasReady(slotRefs.current[store.flavorIndex]);
 
-    // Footer-Dosen: linear an footerProgress, die Glättung macht der Scrub des Aufrufers.
+    // Finale-Dosen: Sie folgen ihren PNG-Platzhaltern. footerProgress > 0 heißt nur
+    // "Sektion im Bild"; die Bewegung selbst steckt in Lage und data-r/data-o im DOM.
     const footer = store.footerProgress;
+    const distance = state.camera.position.z;
     for (let index = 0; index < footerRefs.current.length; index += 1) {
       const group = footerRefs.current[index];
       if (!group) continue;
-      const side = index === 0 ? -1 : 1;
-      group.visible = footer > 0;
-      group.position.x = side * THREE.MathUtils.lerp(footerStartX, footerX, footer);
-      group.position.y = footerY;
+      let anchor = footerAnchors.current[index] ?? null;
+      if (!anchor || !anchor.isConnected) {
+        anchor = document.querySelector<HTMLElement>(
+          `[data-finale-can="${FINALE_CAN_SLUGS[index]}"]`,
+        );
+        footerAnchors.current[index] = anchor;
+      }
+      const pose = footer > 0 && anchor ? finaleCanPose(anchor, size, distance) : null;
+      if (!pose) {
+        group.visible = false;
+        continue;
+      }
+      group.visible = pose.opacity > 0.01;
+      group.position.set(pose.x, pose.y, 0);
       group.rotation.order = CAN_EULER_ORDER;
-      group.rotation.z = -side * THREE.MathUtils.lerp(18, 6, footer) * DEG;
-      // Beim Einfliegen drehen sie sich zur Bildmitte und kommen fast frontal an.
-      group.rotation.y = CAN_BASE_ROTATION_Y - side * THREE.MathUtils.lerp(35, 10, footer) * DEG;
-      group.scale.setScalar(footerScale);
+      group.rotation.z = -pose.rotate * DEG;
+      // Im Flug drehen sich die Dosen zur Bildmitte, am Ziel stehen sie frontal.
+      group.rotation.y = CAN_BASE_ROTATION_Y - pose.turn * 1.2 * DEG;
+      group.scale.setScalar(pose.height);
+      if (group.children.length === 0) footerOpacity.current[index] = -1;
+      if (Math.abs((footerOpacity.current[index] ?? -1) - pose.opacity) > 0.004) {
+        footerOpacity.current[index] = pose.opacity;
+        setGroupOpacity(group, pose.opacity);
+      }
+      // Erst wenn das Modell zwei Bilder lang steht, verschwindet das PNG.
+      if (group.children.length === 0) {
+        footerFrames.current[index] = 0;
+      } else if ((footerFrames.current[index] ?? 0) < 2) {
+        footerFrames.current[index] = (footerFrames.current[index] ?? 0) + 1;
+      } else if (anchor && anchor.dataset.canvasReady !== "true") {
+        anchor.dataset.canvasReady = "true";
+      }
     }
   });
 
@@ -424,7 +502,7 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     if (index >= 0) useHomeStore.getState().setModelReady(index, true);
   }, []);
 
-  const footerFlavors = [flavors[0], flavors[flavors.length - 1]];
+  const footerFlavors = FINALE_CAN_SLUGS.map((slug) => flavors.find((f) => f.slug === slug));
 
   return (
     <>
@@ -450,7 +528,7 @@ function Scene({ flavors, mobileModels }: SceneProps) {
       {footerFlavors.map((flavor, index) =>
         flavor ? (
           <group
-            key={`footer-${flavor.slug}`}
+            key={`finale-${flavor.slug}`}
             ref={(node) => {
               footerRefs.current[index] = node;
             }}
