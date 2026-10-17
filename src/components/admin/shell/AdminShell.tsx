@@ -2,6 +2,7 @@ import "server-only";
 import type { ReactNode } from "react";
 import { PERMISSIONS, type StaffSession } from "@/lib/admin/auth";
 import { countOpenOrders } from "@/lib/admin/dashboard/queries";
+import { countPendingReviews } from "@/lib/admin/reviews/queries";
 import { countSubscriptionAlerts } from "@/lib/subscriptions/admin-queries";
 import { initials, ROLE_LABELS } from "@/lib/admin/staff/rules";
 import { ToastRegion } from "@/components/admin/ui/ToastRegion";
@@ -20,16 +21,19 @@ export async function AdminShell({
   session: StaffSession;
   children: ReactNode;
 }) {
-  const [openOrders, aboAlerts] = await Promise.all([
+  const [openOrders, aboAlerts, pendingReviews] = await Promise.all([
     countOpenOrders(),
     // überfällige Abos plus ungeklärte Kündigungen ohne Login; Fulfillment ohne Zähler
     PERMISSIONS.viewCustomers(session)
       ? countSubscriptionAlerts()
       : Promise.resolve({ pastDue: 0, unmatchedCancellations: 0, total: 0 }),
+    // offene Bewertungen nur für Rollen mit Kundendaten
+    PERMISSIONS.viewCustomers(session) ? countPendingReviews() : Promise.resolve(0),
   ]);
   const items = navFor(session, {
     "/admin/bestellungen": openOrders,
     "/admin/abos": aboAlerts.total,
+    "/admin/bewertungen": pendingReviews,
   });
   const user: ShellUser = {
     name: session.displayName,

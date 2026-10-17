@@ -29,13 +29,18 @@ export const shopSchema = z.object({
 
 export const legalEntitySchema = z.object({
   name: z.string().trim().min(2, "Bitte gib den Firmennamen ein.").max(200),
-  street: z.string().trim().min(3).max(200),
+  street: z.string().trim().min(3, "Bitte gib Straße und Hausnummer ein.").max(200),
   zip: z
     .string()
     .trim()
     .regex(/^\d{4,5}$/, "Bitte gib eine gültige Postleitzahl ein."),
-  city: z.string().trim().min(2).max(100),
-  country: z.string().trim().length(2).toUpperCase().default("DE"),
+  city: z.string().trim().min(2, "Bitte gib den Ort ein.").max(100),
+  country: z
+    .string()
+    .trim()
+    .length(2, "Ländercode mit zwei Buchstaben.")
+    .toUpperCase()
+    .default("DE"),
   managingDirector: z.string().trim().min(2, "Geschäftsführung ist Pflicht im Impressum.").max(200),
   vatId: opt(
     z
@@ -94,7 +99,16 @@ export const trackingSchema = z
         .regex(/^AW-\d{6,14}$/, "Format AW-123456789."),
     ),
     googleAdsLabels: z
-      .record(z.string().regex(/^[a-z_]{2,40}$/), z.string().trim().max(60))
+      .record(
+        z.string().regex(/^[a-z_]{2,40}$/),
+        z
+          .string()
+          .trim()
+          .regex(
+            /^[A-Za-z0-9_-]{2,60}$/,
+            "Conversion-Labels bestehen aus Buchstaben, Ziffern, _ und -.",
+          ),
+      )
       .default({}),
     tiktokEnabled: z.boolean().default(false),
     tiktokPixelId: opt(
@@ -109,9 +123,11 @@ export const trackingSchema = z
     message: "Ohne Pixel-ID lässt sich Meta nicht einschalten.",
     path: ["metaPixelId"],
   })
-  .refine((v) => !v.googleEnabled || v.ga4MeasurementId || v.googleAdsConversionId, {
-    message: "Ohne Mess-ID lässt sich Google nicht einschalten.",
-    path: ["ga4MeasurementId"],
+  // Geladen wird nur das Google-Ads-Tag (src/lib/tracking/config.ts); GA4 gehört zur Kategorie
+  // Statistik, für die es laut H25 noch keinen Anbieter gibt
+  .refine((v) => !v.googleEnabled || v.googleAdsConversionId, {
+    message: "Ohne Conversion-ID lässt sich Google Ads nicht einschalten.",
+    path: ["googleAdsConversionId"],
   })
   .refine((v) => !v.tiktokEnabled || v.tiktokPixelId, {
     message: "Ohne Pixel-ID lässt sich TikTok nicht einschalten.",
@@ -133,6 +149,25 @@ export const emailSchema = z.object({
   allowlistActive: z.boolean(),
 });
 
+/** Absender der Shop-Mails (intern). Wirksam wird er erst, wenn der Mailversand ihn liest. */
+export const senderSchema = z.object({
+  fromName: z.string().trim().min(2, "Bitte gib einen Absendernamen ein.").max(80),
+  fromEmail: email,
+  replyTo: opt(email),
+});
+
+/** Kontaktseite: Text zu Erreichbarkeit und Antwortzeit (öffentlich). */
+export const contactPageSchema = z.object({
+  openingText: z.string().trim().max(400).default(""),
+});
+
+/** Textvorlagen für Rechnungen (Lexware), intern. Nummern vergibt Lexware (H21). */
+export const invoicesSchema = z.object({
+  introduction: z.string().trim().max(500).default(""),
+  remark: z.string().trim().max(1000).default(""),
+  footer: z.string().trim().max(500).default(""),
+});
+
 export const SETTINGS_SECTIONS = {
   shop: shopSchema,
   legalEntity: legalEntitySchema,
@@ -142,6 +177,9 @@ export const SETTINGS_SECTIONS = {
   checkout: checkoutSchema,
   seo: seoSchema,
   email: emailSchema,
+  sender: senderSchema,
+  contactPage: contactPageSchema,
+  invoices: invoicesSchema,
 } as const;
 
 export type SettingsSection = keyof typeof SETTINGS_SECTIONS;
@@ -156,6 +194,9 @@ export const SECTION_LABELS: Record<SettingsSection, string> = {
   checkout: "Checkout",
   seo: "SEO",
   email: "E-Mail-Versand",
+  sender: "E-Mail-Absender",
+  contactPage: "Kontaktseite",
+  invoices: "Rechnungstexte",
 };
 
 /** Hinweise für die Oberfläche. */
@@ -263,6 +304,26 @@ export function sectionToRows<S extends SettingsSection>(
       ];
     case "email":
       return [{ key: "email.allowlist_active", value: v.allowlistActive, is_public: false }];
+    case "sender":
+      return [
+        {
+          key: "email.sender",
+          is_public: false,
+          value: { from_name: v.fromName, from_email: v.fromEmail, reply_to: v.replyTo },
+        },
+      ];
+    case "contactPage":
+      return [
+        { key: "shop.contact_page", is_public: true, value: { opening_text: v.openingText } },
+      ];
+    case "invoices":
+      return [
+        {
+          key: "invoice.texts",
+          is_public: false,
+          value: { introduction: v.introduction, remark: v.remark, footer: v.footer },
+        },
+      ];
   }
   return [];
 }
@@ -277,6 +338,9 @@ export function rowsToSettings(rows: { key: string; value: unknown }[]): {
   const so = rec(m.get("shop.social"));
   const t = rec(m.get("tracking"));
   const labels = rec(t.google_ads_labels);
+  const sender = rec(m.get("email.sender"));
+  const contactPage = rec(m.get("shop.contact_page"));
+  const invoiceTexts = rec(m.get("invoice.texts"));
   const deposit = Number(m.get("shop.deposit_default_cents"));
   return {
     shop: {
@@ -333,5 +397,21 @@ export function rowsToSettings(rows: { key: string; value: unknown }[]): {
       defaultDescription: s(m.get("seo.default_description")),
     },
     email: { allowlistActive: m.get("email.allowlist_active") !== false },
+    sender: {
+      fromName: s(sender.from_name, "provibe"),
+      fromEmail: s(sender.from_email, "bestellung@provibe-drinks.de"),
+      replyTo: s(sender.reply_to, s(c.email, "hello@provibe-drinks.de")),
+    },
+    contactPage: {
+      openingText: s(
+        contactPage.opening_text,
+        "Wir antworten dir innerhalb von 24 Stunden, montags bis freitags.",
+      ),
+    },
+    invoices: {
+      introduction: s(invoiceTexts.introduction),
+      remark: s(invoiceTexts.remark, "Vielen Dank für deine Bestellung."),
+      footer: s(invoiceTexts.footer),
+    },
   };
 }

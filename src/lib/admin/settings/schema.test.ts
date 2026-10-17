@@ -60,6 +60,20 @@ describe("rowsToSettings", () => {
   });
 });
 
+describe("neue Abschnitte", () => {
+  it("haben Standardwerte und laufen rund", () => {
+    const all = rowsToSettings(seedRows);
+    expect(all.sender.fromEmail).toBe("bestellung@provibe-drinks.de");
+    expect(all.contactPage.openingText).toContain("24 Stunden");
+    const rows = sectionToRows("invoices", { introduction: "", remark: "Danke", footer: "Fuß" });
+    expect(rows[0]).toMatchObject({ key: "invoice.texts", is_public: false });
+    expect(rowsToSettings(rows).invoices.footer).toBe("Fuß");
+    expect(SETTINGS_SECTIONS.sender.safeParse({ fromName: "p", fromEmail: "x" }).success).toBe(
+      false,
+    );
+  });
+});
+
 describe("Schema", () => {
   it("prüft LUCID, USt-IdNr. und Postleitzahl", () => {
     const base = rowsToSettings(seedRows).legalEntity;
@@ -81,7 +95,18 @@ describe("Schema", () => {
         googleEnabled: true,
         ga4MeasurementId: "g-abc123def",
       }).success,
+    ).toBe(false);
+    expect(
+      SETTINGS_SECTIONS.tracking.safeParse({
+        ...t,
+        googleEnabled: true,
+        googleAdsConversionId: "aw-123456789",
+        googleAdsLabels: { purchase: "AbC_d-1" },
+      }).success,
     ).toBe(true);
+    expect(
+      SETTINGS_SECTIONS.tracking.safeParse({ ...t, googleAdsLabels: { purchase: "x y" } }).success,
+    ).toBe(false);
     expect(SETTINGS_SECTIONS.tracking.safeParse({ ...t, metaPixelId: "abc" }).success).toBe(false);
   });
   it("erlaubt nur eindeutige Bestellbutton-Texte (§ 312j BGB)", () => {

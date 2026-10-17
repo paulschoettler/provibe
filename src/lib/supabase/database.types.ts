@@ -3161,7 +3161,10 @@ export type Database = {
           order_item_id: string | null
           product_id: string
           rating: number
+          rejection_reason: string | null
+          reply_at: string | null
           reply_body: string | null
+          reply_by: string | null
           status: Database["public"]["Enums"]["review_status"]
           title: string | null
           token_hash: string | null
@@ -3180,7 +3183,10 @@ export type Database = {
           order_item_id?: string | null
           product_id: string
           rating: number
+          rejection_reason?: string | null
+          reply_at?: string | null
           reply_body?: string | null
+          reply_by?: string | null
           status?: Database["public"]["Enums"]["review_status"]
           title?: string | null
           token_hash?: string | null
@@ -3199,7 +3205,10 @@ export type Database = {
           order_item_id?: string | null
           product_id?: string
           rating?: number
+          rejection_reason?: string | null
+          reply_at?: string | null
           reply_body?: string | null
+          reply_by?: string | null
           status?: Database["public"]["Enums"]["review_status"]
           title?: string | null
           token_hash?: string | null

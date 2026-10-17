@@ -50,6 +50,12 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/admin/emails", label: "E-Mails", icon: "emails" },
   { href: "/admin/inhalte", label: "Inhalte", icon: "inhalte" },
   {
+    href: "/admin/bewertungen",
+    label: "Bewertungen",
+    icon: "notiz",
+    visible: PERMISSIONS.viewCustomers,
+  },
+  {
     href: "/admin/einstellungen",
     label: "Einstellungen",
     icon: "einstellungen",

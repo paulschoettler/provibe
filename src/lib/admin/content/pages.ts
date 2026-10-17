@@ -5,6 +5,7 @@ import { writeAudit } from "@/lib/admin/audit";
 import { asJson, crmDb, dbError } from "@/lib/admin/customers/crm-db";
 import { assertPermission, parseInput } from "@/lib/admin/customers/guard";
 import { handleSchema, revalidatePage } from "./common";
+import { disableRedirectsFrom, revalidateRedirects } from "./redirects";
 import { sanitizeRichHtml } from "./sanitize";
 
 /**
@@ -15,6 +16,7 @@ import { sanitizeRichHtml } from "./sanitize";
 
 export const PAGE_TEMPLATES = [
   "default",
+  "shop",
   "contact",
   "partner",
   "about",
@@ -23,6 +25,7 @@ export const PAGE_TEMPLATES = [
 ] as const;
 export const PAGE_TEMPLATE_LABELS: Record<(typeof PAGE_TEMPLATES)[number], string> = {
   default: "Standard",
+  shop: "Shop-Übersicht",
   contact: "Kontakt",
   partner: "Partner (B2B)",
   about: "Über uns",
@@ -48,6 +51,14 @@ const pageSchema = z.object({
 });
 
 export type PageInput = z.input<typeof pageSchema>;
+
+/**
+ * Seiten mit eigener Vorlage haben in der Storefront eine feste Route (src/app/pages/<handle>),
+ * die die Seite über ihren Handle lädt. Ihr URL-Name und ihre Vorlage bleiben deshalb fest.
+ */
+export function hasFixedRoute(template: string): boolean {
+  return template !== "default";
+}
 
 export interface PageListItem {
   id: string;
@@ -171,6 +182,13 @@ export async function updatePage(id: string, input: PageInput, actor: StaffSessi
   const db = crmDb();
   const { data: before } = await db.from("pages").select("*").eq("id", pageId).maybeSingle();
   if (!before) throw new Error("Seite nicht gefunden");
+  if (
+    hasFixedRoute(before.template) &&
+    (d.handle !== before.handle || d.template !== before.template)
+  )
+    throw new Error(
+      "URL-Name und Vorlage dieser Seite sind fest, weil die Storefront eine eigene Route dafür hat",
+    );
   if (d.handle !== before.handle) await assertHandleFree(d.handle, pageId);
   const { error } = await db
     .from("pages")
@@ -200,6 +218,9 @@ export async function updatePage(id: string, input: PageInput, actor: StaffSessi
       },
       { onConflict: "from_path" },
     );
+    // Eine alte Weiterleitung vom neuen Pfad weg ergäbe jetzt eine Schleife
+    await disableRedirectsFrom(`/pages/${d.handle}`, actor);
+    revalidateRedirects();
     revalidatePage(before.handle);
   }
   if (before.status === "published") revalidatePage(d.handle);
@@ -246,6 +267,7 @@ async function setStatus(
     })
     .eq("id", pageId);
   if (error) throw dbError("Status speichern", error);
+  if (status === "published") await disableRedirectsFrom(`/pages/${before.handle}`, actor);
   revalidatePage(before.handle);
   await writeAudit(actor, {
     action: `page.${status === "published" ? "publish" : status === "draft" ? "unpublish" : "archive"}`,

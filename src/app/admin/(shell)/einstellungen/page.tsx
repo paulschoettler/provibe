@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/admin/auth";
 
-/** /admin/einstellungen führt zur ersten fertigen Unterseite (Welle 2 kann auf Shopdaten umstellen). */
+/** /admin/einstellungen führt zu den Shopdaten (erste Unterseite der Navigation). */
 export default async function SettingsIndexPage() {
   await requireStaff("support", { next: "/admin/einstellungen" });
-  redirect("/admin/einstellungen/benutzer");
+  redirect("/admin/einstellungen/shopdaten");
 }

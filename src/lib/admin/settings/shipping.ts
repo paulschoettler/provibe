@@ -14,7 +14,11 @@ import { formatEur } from "@/lib/money";
  */
 
 const uuid = z.string().uuid("Ungültige ID");
-const cents = z.coerce.number().int("Betrag in Cent").min(0).max(10_000_000);
+const cents = z.coerce
+  .number("Bitte gib einen gültigen Betrag ein.")
+  .int("Betrag in Cent")
+  .min(0, "Der Betrag darf nicht negativ sein.")
+  .max(10_000_000);
 const country = z
   .string()
   .trim()
@@ -114,7 +118,7 @@ const zoneSchema = z.object({
     .trim()
     .toLowerCase()
     .regex(/^[a-z0-9-]{2,20}$/, "Kurzname aus Kleinbuchstaben, z.B. de oder at."),
-  name: z.string().trim().min(2).max(80),
+  name: z.string().trim().min(2, "Bitte gib einen Namen ein.").max(80),
   countryCodes: z.array(country).min(1, "Mindestens ein Land.").max(30),
   isEnabled: z.boolean().default(false),
   position: z.coerce.number().int().min(0).max(1000).default(0),
@@ -209,7 +213,7 @@ export async function deleteShippingZone(id: string, actor: StaffSession): Promi
 const rateSchema = z
   .object({
     zoneId: uuid,
-    name: z.string().trim().min(2).max(80),
+    name: z.string().trim().min(2, "Bitte gib einen Namen für den Checkout ein.").max(80),
     description: z.string().trim().max(200).optional().nullable(),
     priceCents: cents,
     freeAboveSubtotalCents: cents.optional().nullable(),
@@ -384,7 +388,7 @@ const taxSchema = z
     countryCode: country,
     taxClass: z.enum(["standard", "reduced", "zero"]),
     rateBp: z.coerce.number().int().min(0).max(10_000),
-    name: z.string().trim().min(2).max(80),
+    name: z.string().trim().min(2, "Bitte gib einen Namen ein.").max(80),
     validFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Datum im Format JJJJ-MM-TT."),
     validTo: z
       .string()

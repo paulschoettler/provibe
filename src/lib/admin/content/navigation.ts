@@ -12,6 +12,8 @@ import { linkSchema, revalidateLayout } from "./common";
  */
 
 const uuid = z.string().uuid("Ungültige ID");
+/** Elektronische Widerrufsfunktion, muss dauerhaft erreichbar bleiben (Briefing 5) */
+export const WITHDRAWAL_URL = "/pages/widerruf-formular";
 
 /* Announcement-Bar ------------------------------------------------------------------------- */
 
@@ -298,6 +300,10 @@ export async function updateMenuItem(
   const db = crmDb();
   const { data: before } = await db.from("menu_items").select("*").eq("id", itemId).maybeSingle();
   if (!before) throw new Error("Menüpunkt nicht gefunden");
+  if (before.url === WITHDRAWAL_URL && (d.url !== WITHDRAWAL_URL || d.menuId !== before.menu_id))
+    throw new Error(
+      "„Vertrag widerrufen“ muss dauerhaft im Footer auf /pages/widerruf-formular zeigen (Widerrufsbutton)",
+    );
   const labels = { ...labelsOf(before.label), [d.locale]: d.label };
   const { error } = await db
     .from("menu_items")
@@ -327,7 +333,7 @@ export async function deleteMenuItem(id: string, actor: StaffSession): Promise<v
   const db = crmDb();
   const { data: before } = await db.from("menu_items").select("*").eq("id", itemId).maybeSingle();
   if (!before) return;
-  if (before.url === "/pages/widerruf-formular")
+  if (before.url === WITHDRAWAL_URL)
     throw new Error(
       "„Vertrag widerrufen“ muss dauerhaft erreichbar bleiben (Widerrufsbutton) und lässt sich nicht löschen",
     );
@@ -378,7 +384,7 @@ export async function createMenu(
         .trim()
         .toLowerCase()
         .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Nur Kleinbuchstaben, Ziffern und Bindestriche."),
-      name: z.string().trim().min(2).max(80),
+      name: z.string().trim().min(2, "Bitte gib einen Namen ein.").max(80),
     }),
     input,
   );
