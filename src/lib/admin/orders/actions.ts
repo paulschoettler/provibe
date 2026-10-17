@@ -214,8 +214,16 @@ export async function refundAction(_prev: ActionState, formData: FormData): Prom
   if (!PERMISSIONS.refund(session)) {
     return actionError("Erstattungen dürfen nur Owner und Admin auslösen.");
   }
-  // Der Dialog hält seine Eingaben selbst (kontrollierte Felder), deshalb keine values zurück
-  const values: Record<string, string> | undefined = undefined;
+  // Eingaben zurückgeben, damit Grund, Ergänzungstext und Mengen nach einem Fehler stehen bleiben
+  const values: Record<string, string> = {};
+  for (const [key, raw] of formData.entries()) {
+    if (
+      (key === "reasonKey" || key === "reasonText" || key.startsWith("qty_")) &&
+      typeof raw === "string"
+    ) {
+      values[key] = raw;
+    }
+  }
 
   const lines: { orderItemId: string; quantity: number }[] = [];
   for (const [key, raw] of formData.entries()) {

@@ -191,6 +191,19 @@ export async function eraseCustomer(
       .update({ shipping_address: null }, { count: "exact" })
       .eq("customer_id", customer.id),
   );
+  const { data: subscriptionRows } = await db
+    .from("subscriptions")
+    .select("id")
+    .eq("customer_id", customer.id);
+  const subscriptionIds = (subscriptionRows ?? []).map((r) => r.id);
+  if (subscriptionIds.length > 0) {
+    await step("subscription_notes", () =>
+      db
+        .from("subscription_notes")
+        .delete({ count: "exact" })
+        .in("subscription_id", subscriptionIds),
+    );
+  }
   await step("b2b_applications", () =>
     db
       .from("b2b_applications")

@@ -183,6 +183,12 @@ export const ERASURE_RULES: readonly ErasureRule[] = [
     detail: "Lieferadresse entfällt, Abo-Historie bleibt (laufende Abos verhindern die Löschung).",
   },
   {
+    table: "subscription_notes",
+    label: "Interne Abo-Notizen",
+    action: "löschen",
+    detail: "Notizen des Teams zu den Abos der Person werden gelöscht.",
+  },
+  {
     table: "b2b_applications",
     label: "B2B-Anträge",
     action: "pseudonymisieren",
