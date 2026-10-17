@@ -1,6 +1,6 @@
 # Plan: Kundenkonto, Login und Abo
 
-Stand: 17.10.2026. Auftrag: ein vollständiges Authentifizierungs- und Mitgliedersystem (Login optional, Bestellhistorie einsehbar) und die Vorbereitung eines Abos mit einstellbarem Rabatt. Dieser Plan ist zur Freigabe gedacht, gebaut wird davon zunächst nur das Konto (Teil A), weil es für Bestellhistorie, Rechnungsdownload und Shopify-Bestandskunden ohnehin gebraucht wird. Das Abo (Teil B) folgt nach Freigabe.
+Stand: 17.10.2026. Auftrag: ein vollständiges Authentifizierungs- und Mitgliedersystem (Login optional, Bestellhistorie einsehbar) und die Vorbereitung eines Abos mit einstellbarem Rabatt. Freigegeben am 17.10.2026: Teil A (Konto) entsteht mit den Unterseiten, Teil B (Abo) wird direkt nach dem Checkout gebaut, inklusive Figma-Screens für Abo-Checkout, Kundenportal und Backoffice.
 
 ## A. Konto und Login
 
@@ -58,4 +58,4 @@ Drei Arbeitspakete: (1) Datenmodell, Preislogik und Abo-Lauf mit Jobs und Mocks 
 ## C. Reihenfolge
 
 1. Teil A wird im Rahmen der Unterseiten gebaut (Login, Konto, Bestellhistorie sind im Seitenplan).
-2. Teil B nach Freigabe dieses Plans, nach Checkout und Backoffice-Grundgerüst, weil er auf beidem aufsetzt und weil Stripe für Off-Session-Zahlungen echte Testkeys braucht.
+2. Teil B direkt nach dem Checkout und dem Backoffice-Grundgerüst (freigegeben). Off-Session-Zahlungen laufen bis zu echten Stripe-Testkeys über den Mock-Zahlungsanbieter, der Erfolg, Ablehnung und 3-D-Secure simuliert.

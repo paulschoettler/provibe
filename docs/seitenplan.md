@@ -34,6 +34,8 @@ Stand: 17.10.2026. Quelle: URL-Inventar in `docs/analyse.md` (Abschnitt 2), Brie
 | `/policies/privacy-policy`                                 | Rechtstext           | Datenschutzerklärung (Shopify-Passagen ersetzt)                                                                                        | offen                     |
 | `/pages/widerruf-formular`                                 | Widerruf-Formular    | eigenes Formular, schreibt `withdrawal_requests`, Bestätigungsmail                                                                     | offen                     |
 | `/newsletter/bestaetigen`                                  | Newsletter-Status    | Double-Opt-in-Bestätigung                                                                                                              | gebaut                    |
+| `/account/abo`, `/account/abo/[id]`                        | Abo-Portal           | Übersicht, nächste Lieferung, Sorte, Menge, Intervall, überspringen, pausieren, Zahlungsmittel, kündigen                               | offen (nach Checkout)     |
+| `/abo-kuendigen`                                           | Kündigung ohne Login | Kündigungsbutton nach § 312k BGB: E-Mail, Bestätigungslink, Bestätigungsseite                                                          | offen (nach Checkout)     |
 | `/newsletter/abmelden`                                     | Newsletter-Status    | Abmeldung per Token, Grund optional                                                                                                    | offen                     |
 | `/blogs/news`, `/blogs/news/[slug]`                        | Blog                 | Liste und Artikel, leer und `noindex` bis zum ersten Beitrag                                                                           | offen                     |
 | 404                                                        | Fehlerseite          | Suche, Sorten, Links                                                                                                                   | offen                     |
@@ -44,25 +46,26 @@ Screens für die Abnahme (je Mobil und Desktop): Shop-Übersicht, Kollektion, Pr
 
 ## 2. Backoffice `/admin` (Briefing Abschnitt 8)
 
-| Route                                  | Inhalt                                                                                                        | Status |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
-| `/admin/login`, `/admin/2fa`           | Supabase Auth, Pflicht zur Zwei-Faktor-Authentifizierung, Rollen Owner, Admin, Support, Fulfillment           | offen  |
-| `/admin`                               | Dashboard: Umsatz, Bestellungen, Warenkorbwert, Conversion, Top-Produkte, Neu- gegen Bestandskunden, Bestände | offen  |
-| `/admin/bestellungen`, `/[id]`         | Liste mit Filtern, Detail mit Statusfluss, Erstattung, Rechnung und Lieferschein, Tracking, Notizen, CSV      | offen  |
-| `/admin/bestellungen/neu`              | manuelle Bestellung                                                                                           | offen  |
-| `/admin/produkte`, `/[id]`, `/neu`     | Produkte, Varianten, Bundles, Bilder, LMIV, Pfand, Steuer, SEO, Kollektionen                                  | offen  |
-| `/admin/kollektionen`, `/[id]`         | manuell und regelbasiert                                                                                      | offen  |
-| `/admin/bestand`                       | Übersicht, Korrekturen mit Grund, Historie, Warnschwellen                                                     | offen  |
-| `/admin/rabatte`, `/[id]`              | Codes, Regeln, Nutzung                                                                                        | offen  |
-| `/admin/kunden`, `/[id]`               | Mini-CRM: Profil, Bestellungen, Umsatz, Newsletter-Nachweis, Tags, Notizen, Timeline                          | offen  |
-| `/admin/segmente`                      | gespeicherte Filter als Zielgruppen                                                                           | offen  |
-| `/admin/leads`, `/[id]`                | Partner- und B2B-Anfragen mit Status                                                                          | offen  |
-| `/admin/newsletter`, `/kampagnen/[id]` | Kontakte, Kampagnen mit Block-Editor, Testversand, Planung, Kennzahlen                                        | offen  |
-| `/admin/automationen`                  | Willkommen, Warenkorbabbrecher, Bewertungsanfrage, je abschaltbar                                             | offen  |
-| `/admin/emails`                        | transaktionale Vorlagen einsehen, Versandprotokoll                                                            | offen  |
-| `/admin/inhalte/*`                     | Seiten, Rechtstexte (versioniert), Startseiten-Module, Announcement-Bar, Navigation, Footer, Blog             | offen  |
-| `/admin/einstellungen/*`               | Shopdaten, Versandzonen und Tarife, Steuern, Tracking-IDs, Rechnungsnummernkreis, Benutzer und Rollen         | offen  |
-| `/admin/protokoll`                     | Audit-Log                                                                                                     | offen  |
+| Route                                  | Inhalt                                                                                                                                                   | Status                |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `/admin/login`, `/admin/2fa`           | Supabase Auth, Pflicht zur Zwei-Faktor-Authentifizierung, Rollen Owner, Admin, Support, Fulfillment                                                      | offen                 |
+| `/admin`                               | Dashboard: Umsatz, Bestellungen, Warenkorbwert, Conversion, Top-Produkte, Neu- gegen Bestandskunden, Bestände                                            | offen                 |
+| `/admin/bestellungen`, `/[id]`         | Liste mit Filtern, Detail mit Statusfluss, Erstattung, Rechnung und Lieferschein, Tracking, Notizen, CSV                                                 | offen                 |
+| `/admin/bestellungen/neu`              | manuelle Bestellung                                                                                                                                      | offen                 |
+| `/admin/produkte`, `/[id]`, `/neu`     | Produkte, Varianten, Bundles, Bilder, LMIV, Pfand, Steuer, SEO, Kollektionen                                                                             | offen                 |
+| `/admin/kollektionen`, `/[id]`         | manuell und regelbasiert                                                                                                                                 | offen                 |
+| `/admin/bestand`                       | Übersicht, Korrekturen mit Grund, Historie, Warnschwellen                                                                                                | offen                 |
+| `/admin/rabatte`, `/[id]`              | Codes, Regeln, Nutzung                                                                                                                                   | offen                 |
+| `/admin/kunden`, `/[id]`               | Mini-CRM: Profil, Bestellungen, Umsatz, Newsletter-Nachweis, Tags, Notizen, Timeline                                                                     | offen                 |
+| `/admin/segmente`                      | gespeicherte Filter als Zielgruppen                                                                                                                      | offen                 |
+| `/admin/leads`, `/[id]`                | Partner- und B2B-Anfragen mit Status                                                                                                                     | offen                 |
+| `/admin/newsletter`, `/kampagnen/[id]` | Kontakte, Kampagnen mit Block-Editor, Testversand, Planung, Kennzahlen                                                                                   | offen                 |
+| `/admin/automationen`                  | Willkommen, Warenkorbabbrecher, Bewertungsanfrage, je abschaltbar                                                                                        | offen                 |
+| `/admin/emails`                        | transaktionale Vorlagen einsehen, Versandprotokoll                                                                                                       | offen                 |
+| `/admin/inhalte/*`                     | Seiten, Rechtstexte (versioniert), Startseiten-Module, Announcement-Bar, Navigation, Footer, Blog                                                        | offen                 |
+| `/admin/einstellungen/*`               | Shopdaten, Versandzonen und Tarife, Steuern, Tracking-IDs, Rechnungsnummernkreis, Benutzer und Rollen                                                    | offen                 |
+| `/admin/abos`, `/[id]`                 | Abos: Liste, Detail mit Lieferhistorie, pausieren, überspringen, Rabatt anpassen, kündigen; Einstellungen Standardrabatt, Intervalle, Erinnerungsvorlauf | offen (nach Checkout) |
+| `/admin/protokoll`                     | Audit-Log                                                                                                                                                | offen                 |
 
 Screens für die Abnahme (je Mobil und Desktop): Login mit 2FA, Dashboard, Bestellliste, Bestelldetail, Produktliste, Produkt-Editor, Kundenprofil, Newsletter-Kampagne, Inhalte-Editor (Rechtstext mit Versionen), Einstellungen. Das sind 10 Vorlagen, 20 Artboards; die übrigen Admin-Seiten folgen demselben Listen- und Detailmuster.
 
