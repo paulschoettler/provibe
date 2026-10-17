@@ -1,0 +1,5 @@
+Email,Email Marketing Status,Consent Updated At,Opt-in Level
+erika.mustermann@example.com,subscribed,2026-03-15 10:12:00 +0100,single_opt_in
+max.beispiel@example.org,subscribed,,single_opt_in
+import-test@provibe-drinks.de,unsubscribed,2026-06-02 08:00:00 +0200,single_opt_in
+nora.leser@example.net,subscribed,2026-02-20T18:45:00Z,confirmed_opt_in

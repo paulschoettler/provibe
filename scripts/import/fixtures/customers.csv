@@ -1,0 +1,6 @@
+Customer ID,First Name,Last Name,Email,Accepts Email Marketing,Default Address Company,Default Address Address1,Default Address Address2,Default Address City,Default Address Province Code,Default Address Country Code,Default Address Zip,Default Address Phone,Phone,Accepts SMS Marketing,Total Spent,Total Orders,Note,Tax Exempt,Tags
+'7001000000001,Erika,Mustermann,erika.mustermann@example.com,yes,,Musterstraße 12a,2. OG,Musterstadt,BY,DE,12345,'+491701234567,'+491701234567,no,54.63,1,"Mag Peach am liebsten, bitte ""kühl"" lagern",no,"Presale, VIP"
+'7001000000002,Max,Beispiel,Max.Beispiel@Example.org,yes,Beispiel GmbH,Beispielweg 7,,Beispielhausen,NW,DE,54321,,,no,50.70,1,,no,
+'7001000000003,Lena,Probe,import-test@provibe-drinks.de,yes,,Probeallee 3,,Teststadt,HH,DE,22222,,,no,137.80,1,,no,Presale
+'7001000000004,Paul,Telefon,,no,,Hörerweg 1,,Musterstadt,BY,DE,12345,,'+491609999999,yes,0.00,0,,no,
+'7001000000005,Clara,Unvollständig,clara.unvollstaendig@example.com,no,,,,Musterstadt,,DE,,,,no,0.00,0,,no,

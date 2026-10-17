@@ -1,0 +1,6 @@
+Code,Type,Value,Minimum,Usage limit,Once per customer,Times Used,Starts at,Ends at,Status
+PRESALE10,percentage,-10.0,,,no,12,2026-03-01 00:00:00 +0100,,Active
+WELCOME5,fixed_amount,-5.00,Minimum purchase of €30.00,500,yes,3,2026-04-01 00:00:00 +0200,2026-12-31 23:59:59 +0100,Active
+FREESHIP40,free_shipping,0,40.00,,no,0,2026-11-01 00:00:00 +0100,,Scheduled
+SUMMER24,percentage,15%,,,,40,2024-06-01,2024-08-31,Expired
+BUNDLE2X,buy_x_get_y,100%,,,,1,2026-05-01 00:00:00 +0200,,Active

@@ -17,6 +17,12 @@
     "db:local:stop": "bash scripts/db/local-pg.sh stop",
     "db:migrate:local": "bash scripts/db/local-pg.sh migrate",
     "db:seed:generate": "tsx scripts/seed/generate-seed-sql.ts",
+    "import:customers": "tsx --conditions=react-server scripts/import/customers.ts",
+    "import:discounts": "tsx scripts/import/discounts.ts",
+    "import:orders": "tsx scripts/import/orders.ts",
+    "import:newsletter": "tsx scripts/import/newsletter.ts",
+    "import:rollback": "tsx scripts/import/rollback.ts",
+    "test:import": "vitest run --config scripts/import/vitest.config.mts",
     "check": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "dependencies": {
