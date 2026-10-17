@@ -2,6 +2,48 @@
 
 Kurzform: Kontext, Entscheidung, Konsequenz. Neue Einträge oben anfügen.
 
+## ADR-016: Einwilligung als Cookie ohne Personenbezug, Tracking nur hinter der Einwilligung
+
+- Datum: 2026-10-17
+- Kontext: TDDDG § 25 und DSGVO Art. 6 und 7 verlangen eine echte Wahl, bevor Meta-Pixel, Google Ads oder TikTok laden. Der Nachweis muss später prüfbar sein, ohne dass wir Besucher identifizieren.
+- Entscheidung: Der Stand liegt im Cookie `pv_consent` (12 Monate, nicht httpOnly, weil der Browser ihn vor dem Laden eines Skripts lesen muss). Inhalt: Textversion, Zufallskennung, Zeitpunkt, Auswahl als Buchstabenfolge. Keine personenbezogenen Daten. Die Kennung verknüpft den Cookie mit `consent_logs` als Nachweis. Alle Anbieter sitzen hinter Adaptern in `src/lib/tracking/adapters.ts`, die erst nach Einwilligung laden; serverseitige Ereignisse landen in `tracking_events` nur mit Einwilligung. Steigt die Textversion (`CONSENT_VERSION`), fragt das Banner alle erneut. Banner ohne Dark Patterns: Ablehnen gleichwertig zu Annehmen, Einstellungen jederzeit unter `/cookie-einstellungen` und im Footer.
+- Konsequenz: Ohne Einwilligung lädt kein Fremdskript, auch nicht zum Vorladen. Neue Anbieter brauchen einen Adapter, einen Buchstaben im Cookie und eine neue Textversion.
+
+## ADR-015: Importskripte mit direkter PostgreSQL-Verbindung statt Supabase-Client
+
+- Datum: 2026-10-17
+- Kontext: Der Shopify-Import (Kunden, Bestellungen, Rabatte, Newsletter) braucht Transaktionen je Block mit Savepoint je Zeile, damit eine kaputte Zeile nicht den ganzen Lauf verwirft und ein Lauf vollständig zurückrollbar bleibt. Der REST-Client von Supabase kann keine Transaktionen.
+- Entscheidung: `scripts/import/*` verbindet sich per `pg` direkt mit der Datenbank. Standard ist die lokale Datenbank (`scripts/db/local-pg.sh`), jede andere Adresse braucht `--remote` und ein frisches `pg_dump`-Backup (höchstens 24 Stunden alt). `.env.local` wird in den Skripten bewusst nicht geladen. Jeder Lauf schreibt eine Zeile in `import_runs`, `rollback.ts` entfernt genau die Datensätze eines Laufs.
+- Konsequenz: Der Import ist der einzige Code mit direktem Datenbankzugang außerhalb von Supabase. Er läuft nur von Hand, nie aus der Anwendung, und ist durch die Backup-Pflicht an die Schutzregeln in CLAUDE.md gebunden.
+
+## ADR-014: Produktbilder nur als Original, Ableitungen über das Netlify Image CDN
+
+- Datum: 2026-10-17
+- Kontext: Das Backoffice lädt Produktbilder hoch. Eine eigene Bildverarbeitung mit `sharp` in Netlify Functions ist groß (native Abhängigkeit, Kaltstart, Bundle-Grenze) und doppelt, was `next/image` ohnehin leistet.
+- Entscheidung: Der Upload prüft Typ aus dem Dateikopf, Größe (10 MB) und Abmessungen, speichert nur das Original im Bucket `product-media` unter einem Pfad aus Handle und Inhalts-Hash. AVIF, WebP und responsive Größen erzeugt `next/image` über das Netlify Image CDN. `sharp` kommt zur Laufzeit nicht vor.
+- Konsequenz: Kein nativer Build-Schritt auf Netlify, keine Bildvarianten im Bucket. Freisteller und Zuschnitte macht der Auftraggeber vor dem Upload.
+
+## ADR-013: Kundensegmente als geprüfte Regel-DSL, Werte nie im SQL-Text
+
+- Datum: 2026-10-17
+- Kontext: Segmente für Newsletter und Automationen brauchen flexible Bedingungen (Bestellanzahl, Umsatz, letzte Bestellung, Newsletter-Status, Tags, Postleitzahl). Freitext-SQL aus dem Backoffice wäre eine Einfallstür.
+- Entscheidung: Eine Regel ist JSON (`match: all | any`, `conditions: [{ field, op, value }]`). Felder und Operatoren stammen aus einer festen Zod-Whitelist in `src/lib/admin/segments/rules.ts`. Der SQL-Text entsteht ausschließlich aus festen Bausteinen dieser Datei, Werte wandern als jsonb-Array in den Parameter der Datenbankfunktion (Migration 20261017204000, STABLE, nur lesend). Die Übersetzung ist rein und per Vitest getestet.
+- Konsequenz: Neue Felder brauchen Code und Test, nicht nur Konfiguration. Mitgliederzahlen werden bei Bedarf berechnet, nicht gespeichert.
+
+## ADR-012: Hintergrundjobs in der Datenbank mit Netlify Scheduled Function als Taktgeber
+
+- Datum: 2026-10-17
+- Kontext: Mails, Rechnungen, Reservierungsfreigaben und Automationen dürfen den Checkout nicht blockieren und müssen Fehler überstehen. Netlify bietet keine persistente Queue, Supabase keine Cron-Garantie im Free-Plan.
+- Entscheidung: Jobs liegen in der Tabelle `jobs` mit `kind`, `payload`, `run_at`, `attempts`. Die Funktion `claim_due_jobs` holt fällige Jobs mit `FOR UPDATE SKIP LOCKED`, `fail_job_with_backoff` plant Wiederholungen mit 2^attempts Minuten, nach `max_attempts` landet der Job in `dead` und erscheint im Backoffice. Der Runner (`src/lib/admin/jobs/runner.ts`) läuft über `/api/jobs/run`, geschützt mit `JOBS_RUNNER_SECRET`, und wird alle fünf Minuten von der Netlify Scheduled Function `jobs-run` angestoßen. Der Checkout versucht kritische Jobs zusätzlich sofort inline. Alle `kind`-Werte sind in `src/lib/admin/jobs/handlers.ts` registriert; unbekannte Kinds schlagen sofort fehl.
+- Konsequenz: Höchstens fünf Minuten Verzögerung für asynchrone Mails. Jobs sind idempotent zu schreiben, weil ein Job nach einem Absturz des Runners erneut läuft.
+
+## ADR-011: Katalog einmal je Build oder Request laden, Erneuerung über Cache-Tags
+
+- Datum: 2026-10-17
+- Kontext: Produktseiten, Kollektionen, Suche und Startseite brauchen denselben Katalog. Viele kleine Abfragen je Seite wären langsam und schwer zu invalidieren.
+- Entscheidung: `loadRawCatalog` in `src/lib/catalog/products.ts` lädt Produkte, Varianten, Übersetzungen, Bilder, Kollektionen und Bundle-Komponenten in einem Durchgang und hält sie je Request mit React `cache`. Seiten sind statisch mit `revalidate = 3600`; das Backoffice ruft nach jeder Änderung `revalidateTag("catalog")` und `revalidatePath` für die betroffenen Routen auf. Weitere Tags: `content`, `legal`, `redirects`, `reviews`.
+- Konsequenz: Änderungen im Backoffice sind innerhalb von Sekunden sichtbar, ohne dass die Seiten dynamisch werden. Neue Datenquellen für den Katalog gehören in `loadRawCatalog`, nicht in einzelne Seiten.
+
 ## ADR-010: Warenkorb über httpOnly-Cookie und Service-Role
 
 - Datum: 2026-09-21
