@@ -21,3 +21,17 @@ Stand: 17.10.2026. Wird bis zum Go-live gepflegt. Punkte mit **Auftraggeber** br
 - Sitemap in der Search Console einreichen, `noindex` und Passwortschutz entfernen, robots.txt prüfen.
 - Backups: Point-in-Time-Recovery in Supabase aktivieren, geplanter Export.
 - Shopify erst nach einer Übergangsphase kündigen, Domain bei Strato auf Netlify umstellen.
+
+## Lückenanalyse Go-live (17.10.2026, Stand nach Storefront, Konto und Checkout)
+
+Was noch fehlt, bevor der Shop den Shopify-Store ablösen kann. Reihenfolge nach Abhängigkeit; jeder Punkt bekommt Figma-Screens, wo es eine Oberfläche gibt, und wird danach gebaut.
+
+1. **Backoffice** (in Arbeit): Welle 1 Shell, UI-Kit, Login mit Zwei-Faktor, Dashboard, Protokoll, Benutzer; Serverlogik aller Module. Welle 2 Modulseiten (Bestellungen, Produkte, Kollektionen, Bestand, Rabatte, Kunden, Segmente, Leads, Newsletter, Automationen, E-Mails, Inhalte, Einstellungen).
+2. **Abo** (Figma Seite 07 in Arbeit): Datenmodell-Ergänzung, Abo-Lauf mit Jobs, Checkout-Umschalter, Portal, Kündigung ohne Login, Backoffice-Abos, Rechtstexte.
+3. **Consent und Tracking** (Figma Seite 07): Consent-Banner und Einstellungen ohne Dark Patterns, Speicherung der Einwilligung (consent_logs), Tracking-Schicht mit Event-Schema aus Briefing 6 (page_view bis generate_lead), Meta Pixel 1372318701489027, Google und TikTok nur mit Einwilligung, Conversions-API serverseitig vorbereitet, Tracking-IDs aus den Einstellungen.
+4. **Rechtstexte**: `docs/rechtstexte-aenderungen.md` mit Gegenüberstellung alt gegen neu (Shopify-Passagen durch Netlify, Supabase, Stripe, Resend, Lexware, DHL, Tracking ersetzen; Bestellablauf, Zahlarten, Abo-Bedingungen, Kündigungsbutton), eingespielt als Version 2 im Entwurf, Veröffentlichung erst nach deiner Freigabe. `docs/legal-checklist.md` (Button-Lösung, Grundpreis, Pfand, Widerruf, Datenschutz, Kontolöschung, Newsletter-Nachweis, Kündigungsbutton).
+5. **Shopify-Import**: Skripte für Kunden (mit Aktivierungsmail), Bestellhistorie, Rabattcodes, Newsletter-Abonnenten mit Einwilligungsstatus; Probelauf gegen die lokale Datenbank, Bericht mit Zahlen; braucht deine Exporte.
+6. **E-Mail-Vorlagen** vollständig: Versandbestätigung, Erstattung, Widerrufseingang, Konto aktivieren, Passwort, Abo-Mails; Vorschau im Backoffice; SPF, DKIM, DMARC Anleitung; Supabase-Auth-Mails auf Deutsch über Resend-SMTP.
+7. **Qualität und Betrieb**: Playwright-E2E (Produkt in den Warenkorb, Rabattcode, Checkout mit Testkarte, Webhook, Bestellmail, Bestellung im Backoffice, Erstattung), No-JS-Check je Route, Lighthouse CI und axe im Build, CSP mit Stripe-Hosts, Fehler- und 404-Protokoll im Backoffice, Health-Check, Backups (PITR empfehlen, geplanter Export), Netlify-Kontexte.
+8. **Restliche Storefront-Lücken**: Suche als Overlay im Header, Produktbewertungen anzeigen (reviews-Tabelle) nach Bewertungsanfrage, Google-Merchant-Feed (Phase 9), Blog-Editor im Backoffice (in Welle 1 Serverlogik), Produktfotos für Shirt und Cup (Auftraggeber), Handbuch `docs/handbuch.md` für den Betrieb.
+9. **Go-live selbst**: Domain bei Strato auf Netlify, Stripe live, Webhooks live, Testbestellung mit echter Zahlung, Search Console, Übergangsphase Shopify.
