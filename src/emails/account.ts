@@ -4,29 +4,31 @@
  * integrations().email.
  */
 
+import { EMAIL_COLORS as C, EMAIL_FONT, EMAIL_RADIUS } from "./components";
+
 export function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
 export function accountMailLayout(eyebrow: string, title: string, bodyHtml: string): string {
-  return `<!doctype html><html lang="de"><body style="margin:0;background:#FBF8EE;font-family:Jost,Helvetica,Arial,sans-serif;color:#4A2F39">
+  return `<!doctype html><html lang="de"><body style="margin:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
   <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:#7E2856;margin:0 0 12px">${eyebrow}</p>
-    <h1 style="font-size:26px;font-weight:600;letter-spacing:-.02em;margin:0 0 16px;color:#6B1D49">${title}</h1>
+    <p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;color:${C.text};margin:0 0 12px">${eyebrow}</p>
+    <h1 style="font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 16px;color:${C.text}">${title}</h1>
     ${bodyHtml}
-    <p style="font-size:13px;line-height:1.6;color:#8A7680;margin:32px 0 0">provibe · CG Projects UG (haftungsbeschränkt) · Kurt-Viermetz-Straße 1a · 86150 Augsburg<br>Fragen? Antworte einfach auf diese Mail oder schreib an hello@provibe-drinks.de.</p>
+    <p style="font-size:13px;line-height:1.6;color:${C.text};margin:32px 0 0">provibe · CG Projects UG (haftungsbeschränkt) · Kurt-Viermetz-Straße 1a · 86150 Augsburg<br>Fragen? Antworte einfach auf diese Mail oder schreib an hello@provibe-drinks.de.</p>
   </div></body></html>`;
 }
 
 export function accountMailButton(href: string, label: string): string {
-  return `<p style="margin:0 0 28px"><a href="${href}" style="display:inline-block;background:#D9306E;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 26px;border-radius:100px">${label}</a></p>`;
+  return `<p style="margin:0 0 28px"><a href="${href}" style="display:inline-block;background:${C.accent};color:${C.onAccent};text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:${EMAIL_RADIUS.pill}">${label}</a></p>`;
 }
 
 export const accountMailP = (text: string) =>
   `<p style="font-size:16px;line-height:1.6;margin:0 0 20px">${text}</p>`;
 
 export const accountMailSmall = (text: string) =>
-  `<p style="font-size:14px;line-height:1.6;color:#8A7680;margin:0 0 8px">${text}</p>`;
+  `<p style="font-size:14px;line-height:1.6;color:${C.text};margin:0 0 8px">${text}</p>`;
 
 /* ------------------------------------------------------------------------------------------ */
 /* Konto aktivieren (Massenversand)                                                            */

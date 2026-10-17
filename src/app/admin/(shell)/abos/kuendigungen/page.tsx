@@ -125,7 +125,7 @@ export default async function CancellationRequestsPage({
             header: "Name und E-Mail",
             cell: (r) => (
               <span className="flex flex-col">
-                <span className="font-semibold">{r.name}</span>
+                <span className="font-bold">{r.name}</span>
                 <span className="text-admin-text-2 text-[12px] break-all">{r.email}</span>
               </span>
             ),

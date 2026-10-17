@@ -34,7 +34,7 @@ export function InhalteNav() {
                   "lg:rounded-admin-feld flex h-11 items-center gap-2.5 text-[15px] whitespace-nowrap lg:h-10 lg:px-3 lg:text-[14px]",
                   "-mb-px border-b-2 px-3 lg:mb-0 lg:border-b-0",
                   active
-                    ? "border-admin-akzent text-admin-text lg:bg-admin-akzent-hell lg:text-admin-akzent font-semibold"
+                    ? "border-admin-akzent text-admin-text lg:bg-admin-akzent-hell lg:text-admin-akzent font-bold"
                     : "text-admin-text-2 hover:text-admin-text lg:text-admin-text lg:hover:bg-admin-flaeche border-transparent lg:font-medium",
                 )}
               >

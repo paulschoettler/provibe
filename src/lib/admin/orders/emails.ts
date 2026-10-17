@@ -1,4 +1,6 @@
 import { escapeHtml, type LegalEntity, type RenderedEmail } from "@/lib/checkout/emails";
+import { EMAIL_COLORS as C, EMAIL_FONT, EMAIL_RADIUS, emailLogo } from "@/emails/components";
+import { publicEnv } from "@/lib/env/public";
 import { formatEur } from "@/lib/money";
 
 /**
@@ -7,19 +9,9 @@ import { formatEur } from "@/lib/money";
  * Kundendaten werden immer escaped. Der interne Erstattungsgrund wird nie mitgeschickt.
  */
 
-const C = {
-  cream: "#FBF8EE",
-  cream2: "#F3F1E7",
-  aubergine: "#4A2F39",
-  plum: "#7E2856",
-  magenta: "#D9306E",
-  butter: "#F3EDA4",
-  mauve: "#8A7680",
-};
-
 function layout(title: string, body: string, entity: LegalEntity | null, isTest: boolean): string {
   const testBanner = isTest
-    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.butter};border:1.5px solid ${C.aubergine};border-radius:12px;font-size:13px;font-weight:600">TESTBESTELLUNG (Testmodus, keine echte Zahlung)</p>`
+    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.highlight};border:1.5px solid ${C.text};border-radius:${EMAIL_RADIUS.banner};font-size:13px;font-weight:700">TESTBESTELLUNG (Testmodus, keine echte Zahlung)</p>`
     : "";
   const imprint = entity
     ? `${escapeHtml(entity.name)}, ${escapeHtml(entity.street)}, ${escapeHtml(entity.zip)} ${escapeHtml(entity.city)}<br>` +
@@ -33,12 +25,12 @@ function layout(title: string, body: string, entity: LegalEntity | null, isTest:
       `<br>Kontakt: ${escapeHtml(entity.email)}`
     : "";
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
-<body style="margin:0;background:${C.cream};font-family:Jost,Helvetica,Arial,sans-serif;color:${C.aubergine}">
+<body style="margin:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
 <div style="max-width:600px;margin:0 auto;padding:32px 20px">
 ${testBanner}
-<p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:${C.plum};margin:0 0 12px">provibe</p>
+${emailLogo(publicEnv.siteUrl, "left")}
 ${body}
-<p style="font-size:12px;line-height:1.6;color:${C.mauve};margin:32px 0 0;border-top:1px solid #e2d9d0;padding-top:16px">${imprint}</p>
+<p style="font-size:12px;line-height:1.6;color:${C.text};margin:32px 0 0;border-top:1px solid ${C.line};padding-top:16px">${imprint}</p>
 </div></body></html>`;
 }
 
@@ -63,21 +55,21 @@ export function shippingEmail(input: ShippingEmailInput): RenderedEmail {
   const items = input.items
     .map(
       (i) =>
-        `<tr><td style="padding:6px 0;border-bottom:1px solid #e2d9d0;font-size:15px">${i.quantity} × <strong>${escapeHtml(i.title)}</strong>${i.description ? `<br><span style="font-size:13px">${escapeHtml(i.description)}</span>` : ""}</td></tr>`,
+        `<tr><td style="padding:6px 0;border-bottom:1px solid ${C.line};font-size:15px">${i.quantity} × <strong>${escapeHtml(i.title)}</strong>${i.description ? `<br><span style="font-size:13px">${escapeHtml(i.description)}</span>` : ""}</td></tr>`,
     )
     .join("");
   const button = input.trackingUrl
-    ? `<p style="margin:20px 0"><a href="${escapeHtml(input.trackingUrl)}" style="display:inline-block;background:${C.magenta};color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:999px">Sendung verfolgen</a></p>`
+    ? `<p style="margin:20px 0"><a href="${escapeHtml(input.trackingUrl)}" style="display:inline-block;background:${C.accent};color:${C.onAccent};text-decoration:none;font-weight:700;padding:12px 22px;border-radius:${EMAIL_RADIUS.pill}">Sendung verfolgen</a></p>`
     : "";
   const body = `<h1 style="font-size:28px;line-height:1.1;font-weight:700;margin:0 0 12px">Dein Vibe ist unterwegs!</h1>
 <p style="font-size:16px;line-height:1.6;margin:0 0 16px">${escapeHtml(greeting(input.firstName))} deine Bestellung <strong>${escapeHtml(input.orderNumber)}</strong> hat unser Lager verlassen.</p>
-<div style="background:${C.cream2};border-radius:22px;padding:18px">
+<div style="background:${C.surface};border-radius:${EMAIL_RADIUS.box};padding:18px">
 <p style="font-size:15px;margin:0 0 4px"><strong>Versand mit:</strong> ${escapeHtml(input.carrierLabel)}</p>
 <p style="font-size:15px;margin:0"><strong>Sendungsnummer:</strong> ${escapeHtml(input.trackingNumber)}</p>
 </div>
 ${button}
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-top:8px">${items}</table>
-<p style="font-size:15px;font-weight:600;margin:16px 0 4px">Lieferadresse</p><p style="font-size:14px;line-height:1.5;margin:0">${input.addressLines.map(escapeHtml).join("<br>")}</p>
+<p style="font-size:15px;font-weight:700;margin:16px 0 4px">Lieferadresse</p><p style="font-size:14px;line-height:1.5;margin:0">${input.addressLines.map(escapeHtml).join("<br>")}</p>
 <p style="font-size:14px;line-height:1.6;margin:24px 0 0">Fragen zur Lieferung? Antworte einfach auf diese E-Mail.</p>`;
   const text = [
     `Dein Vibe ist unterwegs!`,
@@ -116,11 +108,11 @@ export function refundEmail(input: RefundEmailInput): RenderedEmail {
   const rows = [
     ...input.lines.map(
       (l) =>
-        `<tr><td style="padding:6px 0;border-bottom:1px solid #e2d9d0;font-size:15px">${l.quantity} × ${escapeHtml(l.title)}</td><td style="padding:6px 0;border-bottom:1px solid #e2d9d0;text-align:right;font-size:15px">${formatEur(l.amountCents)}</td></tr>`,
+        `<tr><td style="padding:6px 0;border-bottom:1px solid ${C.lineSoft};font-size:15px">${l.quantity} × ${escapeHtml(l.title)}</td><td style="padding:6px 0;border-bottom:1px solid ${C.lineSoft};text-align:right;font-size:15px">${formatEur(l.amountCents)}</td></tr>`,
     ),
     ...(input.shippingCents > 0
       ? [
-          `<tr><td style="padding:6px 0;border-bottom:1px solid #e2d9d0;font-size:15px">Versandkosten</td><td style="padding:6px 0;border-bottom:1px solid #e2d9d0;text-align:right;font-size:15px">${formatEur(input.shippingCents)}</td></tr>`,
+          `<tr><td style="padding:6px 0;border-bottom:1px solid ${C.lineSoft};font-size:15px">Versandkosten</td><td style="padding:6px 0;border-bottom:1px solid ${C.lineSoft};text-align:right;font-size:15px">${formatEur(input.shippingCents)}</td></tr>`,
         ]
       : []),
     `<tr><td style="padding:8px 0;font-size:18px;font-weight:700">Erstattet</td><td style="padding:8px 0;text-align:right;font-size:18px;font-weight:700">${formatEur(input.amountCents)}</td></tr>`,
@@ -130,7 +122,7 @@ export function refundEmail(input: RefundEmailInput): RenderedEmail {
     : `Die Gutschrift geht auf dein ursprüngliches Zahlungsmittel (${input.paymentLabel}). Je nach Bank dauert es ein paar Werktage, bis du sie siehst.`;
   const body = `<h1 style="font-size:26px;font-weight:700;margin:0 0 12px">${input.isFull ? "Wir haben deine Bestellung erstattet." : "Wir haben dir einen Betrag erstattet."}</h1>
 <p style="font-size:16px;line-height:1.6;margin:0 0 16px">${escapeHtml(greeting(input.firstName))} zu deiner Bestellung <strong>${escapeHtml(input.orderNumber)}</strong> haben wir <strong>${formatEur(input.amountCents)}</strong> erstattet.</p>
-<div style="background:${C.cream2};border-radius:22px;padding:18px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse">${rows}</table></div>
+<div style="background:${C.surface};border-radius:${EMAIL_RADIUS.box};padding:18px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse">${rows}</table></div>
 <p style="font-size:15px;margin:16px 0 0">${escapeHtml(payout)}</p>
 <p style="font-size:14px;line-height:1.6;margin:16px 0 0">Fragen? Antworte einfach auf diese E-Mail.</p>`;
   const text = [

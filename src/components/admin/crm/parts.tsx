@@ -22,7 +22,7 @@ export function InfoList({
           className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2"
         >
           <dt className="text-admin-text-2 text-[13px]">{r.label}</dt>
-          <dd className="min-w-0 text-right font-semibold break-words">{r.value}</dd>
+          <dd className="min-w-0 text-right font-bold break-words">{r.value}</dd>
         </div>
       ))}
     </dl>
@@ -54,7 +54,10 @@ export function MailPreview({
       sandbox=""
       referrerPolicy="no-referrer"
       loading="lazy"
-      className={cx("rounded-admin-feld border-admin-rahmen w-full border bg-white", className)}
+      className={cx(
+        "rounded-admin-feld border-admin-rahmen bg-admin-karte w-full border",
+        className,
+      )}
       style={{ height }}
     />
   );
@@ -104,7 +107,7 @@ export function KpiCard({
   return (
     <div className="rounded-admin-karte border-admin-rahmen bg-admin-karte min-w-0 border p-4">
       <p className="text-admin-text-2 text-[13px]">{label}</p>
-      <p className="mt-1 truncate text-[22px] leading-[1.25] font-semibold tabular-nums md:text-[26px]">
+      <p className="mt-1 truncate text-[22px] leading-[1.25] font-bold tabular-nums md:text-[26px]">
         {value}
       </p>
       {hint ? <p className="text-admin-text-2 mt-1 line-clamp-2 text-[12px]">{hint}</p> : null}

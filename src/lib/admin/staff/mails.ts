@@ -1,4 +1,5 @@
 import "server-only";
+import { EMAIL_COLORS as C, EMAIL_FONT, EMAIL_RADIUS } from "@/emails/components";
 import { publicEnv } from "@/lib/env/public";
 import { serverEnv } from "@/lib/env/server";
 import { integrations } from "@/lib/integrations";
@@ -15,24 +16,24 @@ function escapeHtml(value: string): string {
 }
 
 function layout(title: string, bodyHtml: string): string {
-  return `<!doctype html><html lang="de"><body style="margin:0;background:#F6F6F7;font-family:Jost,Helvetica,Arial,sans-serif;color:#1A1A1A">
+  return `<!doctype html><html lang="de"><body style="margin:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
   <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <div style="background:#ffffff;border:1px solid #E3E3E3;border-radius:10px;padding:32px">
-      <p style="font-size:13px;font-weight:600;color:#D9306E;margin:0 0 12px">provibe Backoffice</p>
-      <h1 style="font-size:22px;font-weight:600;margin:0 0 16px">${title}</h1>
+    <div style="background:${C.surface};border:1px solid ${C.lineSoft};border-radius:10px;padding:32px">
+      <p style="font-size:13px;font-weight:700;color:${C.text};margin:0 0 12px">provibe Backoffice</p>
+      <h1 style="font-size:22px;font-weight:700;margin:0 0 16px">${title}</h1>
       ${bodyHtml}
     </div>
-    <p style="font-size:12px;line-height:1.6;color:#616161;margin:16px 0 0">Geschützter Bereich. Jede Anmeldung wird protokolliert. Du hast nichts angefordert? Dann ignorier diese E-Mail und sag dem Owner Bescheid.</p>
+    <p style="font-size:12px;line-height:1.6;color:${C.text};margin:16px 0 0">Geschützter Bereich. Jede Anmeldung wird protokolliert. Du hast nichts angefordert? Dann ignorier diese E-Mail und sag dem Owner Bescheid.</p>
   </div></body></html>`;
 }
 
 function button(href: string, label: string): string {
-  return `<p style="margin:0 0 24px"><a href="${href}" style="display:inline-block;background:#D9306E;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:10px 20px;border-radius:100px">${label}</a></p>`;
+  return `<p style="margin:0 0 24px"><a href="${href}" style="display:inline-block;background:${C.accent};color:${C.onAccent};text-decoration:none;font-weight:700;font-size:14px;padding:10px 20px;border-radius:${EMAIL_RADIUS.pill}">${label}</a></p>`;
 }
 
 const p = (text: string) => `<p style="font-size:15px;line-height:1.6;margin:0 0 16px">${text}</p>`;
 const small = (text: string) =>
-  `<p style="font-size:13px;line-height:1.6;color:#616161;margin:0 0 8px">${text}</p>`;
+  `<p style="font-size:13px;line-height:1.6;color:${C.text};margin:0 0 8px">${text}</p>`;
 
 function logLinkForLocalDev(label: string, link: string) {
   const env = serverEnv();

@@ -72,7 +72,7 @@ export function Topbar({
   return (
     <header className="border-admin-rahmen bg-admin-karte sticky top-0 z-40 flex h-14 items-center gap-1 border-b px-1 lg:gap-4 lg:px-6">
       <MobileNav items={items} user={user} />
-      <p className="min-w-0 flex-1 truncate text-[18px] leading-[1.4] font-semibold lg:flex-none lg:grow lg:basis-0 lg:text-[24px]">
+      <p className="text-admin-ueberschrift min-w-0 flex-1 truncate text-[18px] leading-[1.4] font-medium lg:flex-none lg:grow lg:basis-0 lg:text-[24px]">
         {title}
       </p>
       <form
@@ -115,7 +115,7 @@ export function Topbar({
         >
           <Icon name="glocke" size={20} />
           {bellCount > 0 ? (
-            <span className="bg-admin-akzent text-admin-auf-akzent absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold lg:top-0.5 lg:right-0.5">
+            <span className="bg-admin-akzent text-admin-auf-akzent absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold lg:top-0.5 lg:right-0.5">
               {bellCount > 99 ? "99+" : bellCount}
             </span>
           ) : null}

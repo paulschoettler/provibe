@@ -97,7 +97,7 @@ export function ModuleForm({ mod, canEdit }: { mod: HomepageModuleView; canEdit:
                   key={i}
                   className="rounded-admin-feld border-admin-rahmen flex flex-col gap-3 border p-3"
                 >
-                  <legend className="px-1 text-[13px] font-semibold">
+                  <legend className="px-1 text-[13px] font-bold">
                     {isNew
                       ? `${spec.repeat!.itemLabel} hinzufügen`
                       : `${spec.repeat!.itemLabel} ${i + 1}`}

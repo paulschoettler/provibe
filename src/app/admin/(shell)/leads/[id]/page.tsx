@@ -225,8 +225,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             {l.customer ? (
               <div className="flex flex-col gap-2 text-[14px]">
                 <p>
-                  Verknüpft mit <span className="font-semibold break-all">{l.customer.email}</span>{" "}
-                  ({l.customer.customerType.toUpperCase()}, Freigabe {l.customer.b2bStatus}).
+                  Verknüpft mit <span className="font-bold break-all">{l.customer.email}</span> (
+                  {l.customer.customerType.toUpperCase()}, Freigabe {l.customer.b2bStatus}).
                 </p>
                 <Link
                   href={`/admin/kunden/${l.customer.id}`}

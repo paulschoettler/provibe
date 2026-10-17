@@ -54,7 +54,7 @@ export function MobileNav({ items, user }: { items: NavLink[]; user: ShellUser }
               type="button"
               onClick={close}
               aria-label="Navigation schließen"
-              className="rounded-admin-feld absolute top-3 -right-[56px] flex size-11 items-center justify-center text-white hover:bg-white/10"
+              className="rounded-admin-feld text-admin-auf-akzent hover:bg-admin-seitenleiste-hover absolute top-3 -right-[56px] flex size-11 items-center justify-center"
             >
               <Icon name="schliessen" size={20} />
             </button>

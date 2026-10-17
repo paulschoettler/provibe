@@ -197,7 +197,7 @@ function RefundForm(props: RefundDialogProps) {
                       />
                       <span className="text-admin-text-2 whitespace-nowrap">von {max}</span>
                     </label>
-                    <span className="w-20 text-right text-[14px] font-semibold tabular-nums">
+                    <span className="w-20 text-right text-[14px] font-bold tabular-nums">
                       {formatMoney(refundLineAmount(item, value > 0 ? value : max).amountCents)}
                     </span>
                   </li>
@@ -218,7 +218,7 @@ function RefundForm(props: RefundDialogProps) {
                     {refundedShipping > 0 ? " · bereits teilweise erstattet" : ""}
                   </span>
                 </label>
-                <span className="w-20 text-right text-[14px] font-semibold tabular-nums">
+                <span className="w-20 text-right text-[14px] font-bold tabular-nums">
                   {formatMoney(props.refundableShippingCents)}
                 </span>
               </li>
@@ -337,7 +337,7 @@ function RefundForm(props: RefundDialogProps) {
                 <Icon name="warnung" size={20} />
               </span>
               <div className="text-[14px]">
-                <p className="font-semibold">
+                <p className="font-bold">
                   {formatMoney(amountCents)} an{" "}
                   {props.manual ? "den Kunden (Überweisung)" : props.paymentLabel} erstatten?
                 </p>
@@ -383,8 +383,8 @@ function RefundForm(props: RefundDialogProps) {
                     </dd>
                   </>
                 ) : null}
-                <dt className="border-admin-rahmen border-t pt-1.5 font-semibold">Erstattung</dt>
-                <dd className="border-admin-rahmen border-t pt-1.5 text-right font-semibold tabular-nums">
+                <dt className="border-admin-rahmen border-t pt-1.5 font-bold">Erstattung</dt>
+                <dd className="border-admin-rahmen border-t pt-1.5 text-right font-bold tabular-nums">
                   {formatMoney(calc.value.amountCents)}
                 </dd>
               </dl>

@@ -60,7 +60,7 @@ function underlineClass(active?: boolean) {
   return cx(
     "-mb-px flex h-11 items-center gap-1.5 border-b-2 px-3 text-[15px] whitespace-nowrap",
     active
-      ? "border-admin-akzent font-semibold text-admin-text"
+      ? "border-admin-akzent font-bold text-admin-text"
       : "border-transparent text-admin-text-2 hover:text-admin-text",
   );
 }
@@ -73,7 +73,7 @@ export function chipClass(active?: boolean, kind: "tab" | "select" = "tab") {
   return cx(
     "flex h-9 items-center gap-1.5 rounded-admin-feld border px-3 text-[14px] leading-[1.4] whitespace-nowrap",
     active
-      ? "border-admin-akzent bg-admin-akzent-hell font-semibold text-admin-text"
+      ? "border-admin-akzent bg-admin-akzent-hell font-bold text-admin-text"
       : kind === "select"
         ? "border-admin-rahmen-stark bg-admin-karte font-medium text-admin-text hover:bg-admin-flaeche"
         : "border-transparent font-medium text-admin-text-2 hover:bg-admin-flaeche hover:text-admin-text",

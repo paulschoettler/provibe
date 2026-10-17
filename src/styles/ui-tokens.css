@@ -25,6 +25,9 @@
   --pv-ui-gray-700: #4b5563;
   --pv-ui-gray-900: #1a1a1a;
 
+  /* Suchvorschau im Backoffice (SEO-Felder): Linkfarbe eines Google-Treffers, nur dort */
+  --pv-ui-serp-link: #1a5fb4;
+
   /* Schatten und Abdunkelung: aus Wildberry abgeleitet, damit kein neuer Farbton entsteht */
   --pv-ui-shadow-color: rgb(from var(--pv-wildberry) r g b / 0.14);
   --pv-ui-shadow-strong: rgb(from var(--pv-wildberry) r g b / 0.24);

@@ -3,6 +3,7 @@ import { loginUrl } from "@/lib/auth/redirect";
 import { getCurrentCustomer } from "@/lib/auth/session";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { supabaseServer } from "@/lib/supabase/server";
+import { BRAND_COLORS as C, BRAND_FONTS, BRAND_KIT_URL } from "@/lib/brand/tokens";
 
 /**
  * Rechnung als PDF. Die Bestellung wird mit der Nutzer-Session geladen (RLS: nur eigene),
@@ -13,13 +14,13 @@ export const dynamic = "force-dynamic";
 
 function notFound(number: string, message: string) {
   const safe = number.replace(/[^A-Za-z0-9#-]/g, "");
-  const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Rechnung nicht verfügbar | provibe</title></head>
-<body style="margin:0;background:#FBF8EE;color:#4A2F39;font-family:Jost,system-ui,sans-serif">
+  const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Rechnung nicht verfügbar | provibe</title><link rel="stylesheet" href="${BRAND_KIT_URL}"></head>
+<body style="margin:0;background:${C.cream};color:${C.wildberry};font-family:${BRAND_FONTS.sans}">
 <main style="max-width:560px;margin:0 auto;padding:64px 16px">
-<p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:#7E2856;margin:0 0 12px">Dein Konto</p>
-<h1 style="font-size:32px;line-height:1.1;color:#6B1D49;margin:0 0 16px">Rechnung noch nicht verfügbar</h1>
+<p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;color:${C.wildberry};margin:0 0 12px;font-family:${BRAND_FONTS.condensed}">Dein Konto</p>
+<h1 style="font-size:32px;line-height:1.1;font-weight:500;color:${C.wildberry};margin:0 0 16px">Rechnung noch nicht verfügbar</h1>
 <p style="font-size:16px;line-height:1.6;margin:0 0 24px">${message}</p>
-<p><a href="/account/bestellungen/${encodeURIComponent(safe)}" style="color:#7E2856;font-weight:600">Zurück zur Bestellung</a></p>
+<p><a href="/account/bestellungen/${encodeURIComponent(safe)}" style="color:${C.wildberry};font-weight:700">Zurück zur Bestellung</a></p>
 </main></body></html>`;
   return new NextResponse(html, {
     status: 404,

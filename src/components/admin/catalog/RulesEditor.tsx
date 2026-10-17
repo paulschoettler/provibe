@@ -282,7 +282,7 @@ export function RulesEditor({
         className="rounded-admin-feld bg-admin-flaeche p-3"
         aria-busy={pending}
       >
-        <h3 id="regel-vorschau" className="flex items-center gap-2 text-[14px] font-semibold">
+        <h3 id="regel-vorschau" className="flex items-center gap-2 text-[14px] font-bold">
           Vorschau
           <Badge tone="blue" noDot>
             {result.ok ? `${result.total} Produkte passen` : "Bedingung prüfen"}

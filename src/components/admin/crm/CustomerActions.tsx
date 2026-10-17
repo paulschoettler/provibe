@@ -197,7 +197,7 @@ export function CustomerActions({ target }: { target: CustomerActionTarget }) {
                 {target.erasureRules.map((r) => (
                   <li key={r.label} className="flex flex-col gap-0.5 px-3 py-2">
                     <span>
-                      <span className="font-semibold">{r.label}</span>{" "}
+                      <span className="font-bold">{r.label}</span>{" "}
                       <span className="text-admin-text-2">({r.action})</span>
                     </span>
                     <span className="text-admin-text-2">{r.detail}</span>

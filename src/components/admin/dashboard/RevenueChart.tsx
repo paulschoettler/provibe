@@ -5,7 +5,8 @@ import { formatEur } from "@/lib/money";
 
 /**
  * Umsatzkurve (Figma 28:5911) als Inline-SVG ohne Chart-Bibliothek. Zeitraum als 2-px-Linie in
- * Magenta mit Fläche und Punkten, Vorzeitraum gestrichelt in Grau (Strichart als zweite Kodierung).
+ * Wildberry mit Cream-Fläche und Punkten, Vorzeitraum gestrichelt in neutralem Grau (Strichart als zweite
+ * Kodierung). Farben nur über CI-Tokens (CLAUDE.md), Raster in --pv-ui-gray-200.
  * Linien und Flächen skalieren mit der Breite (non-scaling-stroke), Punkte, Achsen und Tooltip sind
  * HTML. Fadenkreuz mit Tooltip bei Zeiger und Tastatur (Pfeiltasten), Tabelle für Screenreader.
  */
@@ -18,7 +19,11 @@ export interface ChartPoint {
 
 const W = 1000;
 const H = 300;
-const PREV_COLOR = "#8a8f98";
+/** Vorzeitraum: neutrales Grau (Funktionsfarbe, Peach hätte auf Weiß nur 2,07:1), gestrichelt */
+const PREV_COLOR = "var(--pv-ui-gray-500)";
+const CURRENT_COLOR = "var(--admin-farbe-akzent)";
+const AREA_COLOR = "var(--pv-cream)";
+const GRID_COLOR = "var(--pv-ui-gray-200)";
 
 function niceMax(value: number): number {
   if (value <= 0) return 10000;
@@ -125,6 +130,8 @@ export function RevenueChart({
               preserveAspectRatio="none"
               className="absolute inset-0 size-full overflow-visible"
             >
+              {/* Fläche deckend (keine Transparenz laut CI), deshalb das Raster darüber zeichnen */}
+              <path d={area} fill={AREA_COLOR} />
               {ticks.map((t) => (
                 <line
                   key={t}
@@ -132,12 +139,11 @@ export function RevenueChart({
                   x2={W}
                   y1={y(t)}
                   y2={y(t)}
-                  stroke="var(--admin-farbe-rahmen)"
+                  stroke={GRID_COLOR}
                   strokeWidth="1"
                   vectorEffect="non-scaling-stroke"
                 />
               ))}
-              <path d={area} fill="var(--admin-farbe-akzent)" fillOpacity="0.08" />
               <path
                 d={line("previous")}
                 fill="none"
@@ -150,7 +156,7 @@ export function RevenueChart({
               <path
                 d={line("current")}
                 fill="none"
-                stroke="var(--admin-farbe-akzent)"
+                stroke={CURRENT_COLOR}
                 strokeWidth="2"
                 vectorEffect="non-scaling-stroke"
                 strokeLinejoin="round"
@@ -171,7 +177,7 @@ export function RevenueChart({
               <>
                 <span
                   aria-hidden="true"
-                  className="bg-admin-text-2/40 absolute inset-y-0 w-px"
+                  className="bg-admin-rahmen-stark absolute inset-y-0 w-px"
                   style={{ left: `${pct(active)}%` }}
                 />
                 <span

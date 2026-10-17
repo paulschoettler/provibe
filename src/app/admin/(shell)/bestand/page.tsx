@@ -155,7 +155,7 @@ export default async function InventoryPage({
         />
       </div>
 
-      <h2 className="mb-2 text-[16px] font-semibold">Lagereinheiten</h2>
+      <h2 className="mb-2 text-[16px] font-bold">Lagereinheiten</h2>
       <Table
         caption="Bestand je Lagereinheit"
         rows={overview.rows}
@@ -236,7 +236,7 @@ export default async function InventoryPage({
             header: "Verfügbar",
             width: "100px",
             align: "right",
-            cell: (r) => <span className="font-semibold tabular-nums">{available(r)}</span>,
+            cell: (r) => <span className="font-bold tabular-nums">{available(r)}</span>,
           },
           {
             key: "bestand",
@@ -291,7 +291,7 @@ export default async function InventoryPage({
 
       {derivedOn ? (
         <>
-          <h2 className="mt-6 mb-1 text-[16px] font-semibold">Packs und Bundles</h2>
+          <h2 className="mt-6 mb-1 text-[16px] font-bold">Packs und Bundles</h2>
           <p className="text-admin-text-2 mb-2 text-[13px]">
             Kein eigener Bestand. Verfügbar ist, was die enthaltenen Dosen und Merch-Artikel
             hergeben (kleinster Wert über alle Bestandteile). Gebucht wird oben bei den
@@ -337,7 +337,7 @@ export default async function InventoryPage({
                 header: "Verfügbar",
                 width: "100px",
                 align: "right",
-                cell: (r) => <span className="font-semibold tabular-nums">{available(r)}</span>,
+                cell: (r) => <span className="font-bold tabular-nums">{available(r)}</span>,
               },
               {
                 key: "status",
@@ -426,19 +426,19 @@ export default async function InventoryPage({
             <dl className="grid grid-cols-2 gap-3 text-[14px] md:grid-cols-4">
               <div>
                 <dt className="text-admin-text-2 text-[13px]">Verfügbar</dt>
-                <dd className="text-[20px] font-semibold tabular-nums">{available(selected)}</dd>
+                <dd className="text-[20px] font-bold tabular-nums">{available(selected)}</dd>
               </div>
               {selected.stockRole === "unit" ? (
                 <>
                   <div>
                     <dt className="text-admin-text-2 text-[13px]">Bestand</dt>
-                    <dd className="text-[20px] font-semibold tabular-nums">
+                    <dd className="text-[20px] font-bold tabular-nums">
                       {formatNumber(selected.onHand)}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-admin-text-2 text-[13px]">Reserviert</dt>
-                    <dd className="text-[20px] font-semibold tabular-nums">
+                    <dd className="text-[20px] font-bold tabular-nums">
                       {formatNumber(selected.reserved)}
                     </dd>
                   </div>
@@ -484,7 +484,7 @@ export default async function InventoryPage({
               <>
                 {canAdjust ? (
                   <section>
-                    <h3 className="mb-2 text-[15px] font-semibold">
+                    <h3 className="mb-2 text-[15px] font-bold">
                       {isCan(selected) ? "Dosen buchen" : "Bestand buchen"}
                     </h3>
                     <AdjustStockForm variantId={selected.variantId} unitHint={unitHint(selected)} />
@@ -492,7 +492,7 @@ export default async function InventoryPage({
                 ) : null}
                 {canEdit ? (
                   <section className="border-admin-rahmen flex flex-col gap-4 border-t pt-4">
-                    <h3 className="text-[15px] font-semibold">Einstellungen</h3>
+                    <h3 className="text-[15px] font-bold">Einstellungen</h3>
                     <ThresholdForm
                       variantId={selected.variantId}
                       value={selected.lowStockThreshold}
@@ -515,7 +515,7 @@ export default async function InventoryPage({
 
             {selectedReservations.length > 0 ? (
               <section className="border-admin-rahmen border-t pt-4">
-                <h3 className="mb-2 text-[15px] font-semibold">Reservierungen</h3>
+                <h3 className="mb-2 text-[15px] font-bold">Reservierungen</h3>
                 <ul className="flex flex-col gap-1 text-[14px]">
                   {selectedReservations.map((r) => (
                     <li key={r.id}>
@@ -530,7 +530,7 @@ export default async function InventoryPage({
             ) : null}
 
             <section className="border-admin-rahmen border-t pt-4">
-              <h3 className="mb-2 text-[15px] font-semibold">Historie</h3>
+              <h3 className="mb-2 text-[15px] font-bold">Historie</h3>
               {movements.length === 0 ? (
                 <p className="text-admin-text-2 text-[14px]">Noch keine Buchungen.</p>
               ) : (
@@ -541,7 +541,7 @@ export default async function InventoryPage({
                       className="border-admin-rahmen flex items-start gap-3 border-b py-2.5 last:border-b-0"
                     >
                       <span
-                        className={`w-14 shrink-0 text-right font-semibold tabular-nums ${m.delta < 0 ? "text-admin-rot" : "text-admin-gruen"}`}
+                        className={`w-14 shrink-0 text-right font-bold tabular-nums ${m.delta < 0 ? "text-admin-rot" : "text-admin-gruen"}`}
                       >
                         {delta(m.delta)}
                       </span>

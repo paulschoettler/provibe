@@ -11,6 +11,7 @@ import {
   escapeHtml,
   renderBulkActivationMail,
 } from "@/emails/account";
+import { EMAIL_COLORS } from "@/emails/components";
 
 /**
  * Konto-Mails über integrations().email (bis zum Go-live Mock beziehungsweise Allowlist).
@@ -101,7 +102,7 @@ export async function sendEmailChangedMail(oldEmail: string, newEmail: string) {
       `Ab sofort melden wir uns bei dir unter <strong>${safeNew}</strong>. Bestellungen und Rechnungen findest du weiter in deinem Konto.`,
     ) +
       p(
-        `Das warst du nicht? Dann schreib uns bitte sofort an <a href="mailto:hello@provibe-drinks.de" style="color:#7E2856">hello@provibe-drinks.de</a>, wir sperren das Konto.`,
+        `Das warst du nicht? Dann schreib uns bitte sofort an <a href="mailto:hello@provibe-drinks.de" style="color:${EMAIL_COLORS.text}">hello@provibe-drinks.de</a>, wir sperren das Konto.`,
       ),
   );
   const text = `Deine E-Mail-Adresse für dein provibe Konto wurde auf ${newEmail} geändert.\n\nDas warst du nicht? Dann schreib uns bitte sofort an hello@provibe-drinks.de.`;
@@ -127,7 +128,7 @@ export async function sendAccountDeletedMail(to: string) {
         "Bestellungen und Rechnungen müssen wir aus steuerlichen Gründen bis zum Ende der gesetzlichen Aufbewahrungsfrist aufbewahren. Sie sind nicht mehr mit einem Login verbunden.",
       ) +
       p(
-        `Du kannst jederzeit wieder als Gast bestellen oder ein neues Konto anlegen: <a href="${publicEnv.siteUrl}" style="color:#7E2856">provibe-drinks.de</a>`,
+        `Du kannst jederzeit wieder als Gast bestellen oder ein neues Konto anlegen: <a href="${publicEnv.siteUrl}" style="color:${EMAIL_COLORS.text}">provibe-drinks.de</a>`,
       ),
   );
   const text =

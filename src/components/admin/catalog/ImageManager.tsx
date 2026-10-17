@@ -197,20 +197,20 @@ export function ImageManager({
                 />
                 <span
                   className={cx(
-                    "absolute top-2 right-2 flex size-6 items-center justify-center rounded-full text-[12px] font-semibold",
+                    "absolute top-2 right-2 flex size-6 items-center justify-center rounded-full text-[12px] font-bold",
                     i === 0 ? "bg-admin-akzent text-admin-auf-akzent" : "bg-admin-karte",
                   )}
                 >
                   {i + 1}
                 </span>
                 {i === 0 ? (
-                  <span className="bg-admin-akzent text-admin-auf-akzent absolute bottom-2 left-2 rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                  <span className="bg-admin-akzent text-admin-auf-akzent absolute bottom-2 left-2 rounded-full px-2 py-0.5 text-[11px] font-bold">
                     Hauptbild
                   </span>
                 ) : null}
                 {canEdit && hydrated ? (
                   <span
-                    className="bg-admin-karte/90 absolute top-2 left-2 flex size-6 cursor-grab items-center justify-center rounded-md"
+                    className="bg-admin-karte absolute top-2 left-2 flex size-6 cursor-grab items-center justify-center rounded-md"
                     aria-hidden="true"
                   >
                     <Icon name="griff" size={14} />
@@ -304,7 +304,7 @@ export function ImageManager({
 
       {canEdit ? (
         <div className="rounded-admin-feld border-admin-rahmen-stark flex flex-col gap-3 border border-dashed p-3">
-          <p className="text-[14px] font-semibold">Bild hochladen</p>
+          <p className="text-[14px] font-bold">Bild hochladen</p>
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
             <label className="flex min-w-0 flex-col gap-1.5">
               <span className="text-[13px] font-medium">Alt-Text für das neue Bild *</span>

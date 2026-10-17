@@ -91,7 +91,7 @@ function DashboardBody({ data, periodLabel }: { data: DashboardData; periodLabel
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card title="Umsatz" className="lg:col-span-2">
-          <p className="mb-3 text-[22px] font-semibold tabular-nums md:text-[26px]">
+          <p className="mb-3 text-[22px] font-bold tabular-nums md:text-[26px]">
             {formatMoney(summary.revenueCents)}
           </p>
           <RevenueChart
@@ -114,7 +114,7 @@ function DashboardBody({ data, periodLabel }: { data: DashboardData; periodLabel
                 aria-hidden="true"
               >
                 <span className="bg-admin-akzent h-full" style={{ width: `${newShare}%` }} />
-                <span className="bg-admin-seitenleiste ml-0.5 h-full flex-1" />
+                <span className="bg-pv-peach ml-0.5 h-full flex-1" />
               </div>
               <SplitRow
                 color="bg-admin-akzent"
@@ -124,7 +124,7 @@ function DashboardBody({ data, periodLabel }: { data: DashboardData; periodLabel
                 share={newShare}
               />
               <SplitRow
-                color="bg-admin-seitenleiste"
+                color="bg-pv-peach"
                 label="Bestandskunden"
                 orders={customers.returning.orders}
                 revenue={customers.returning.revenueCents}
@@ -271,7 +271,7 @@ function DashboardBody({ data, periodLabel }: { data: DashboardData; periodLabel
           rowHref={(o) => `/admin/bestellungen/${o.id}`}
           toolbar={
             <div className="flex items-center justify-between px-4 py-3">
-              <h2 id="letzte-bestellungen" className="text-[16px] font-semibold">
+              <h2 id="letzte-bestellungen" className="text-[16px] font-bold">
                 Letzte Bestellungen
               </h2>
               <Link href="/admin/bestellungen" className={cardActionClass}>
@@ -374,7 +374,7 @@ function SplitRow({
           {formatMoney(revenue)}
         </span>
       </span>
-      <span className="text-[15px] font-semibold tabular-nums">{share} %</span>
+      <span className="text-[15px] font-bold tabular-nums">{share} %</span>
     </div>
   );
 }

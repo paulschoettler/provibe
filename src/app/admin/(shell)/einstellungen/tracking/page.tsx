@@ -98,7 +98,7 @@ export default async function TrackingSettingsPage() {
           <Card>
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[16px] font-semibold">Meta Pixel</h2>
+                <h2 className="text-[16px] font-bold">Meta Pixel</h2>
                 <ConsentBadge text="Marketing" />
               </div>
               <Switch
@@ -120,7 +120,7 @@ export default async function TrackingSettingsPage() {
           <Card>
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[16px] font-semibold">Google Ads</h2>
+                <h2 className="text-[16px] font-bold">Google Ads</h2>
                 <ConsentBadge text="Marketing" />
               </div>
               <Switch
@@ -164,7 +164,7 @@ export default async function TrackingSettingsPage() {
           <Card>
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[16px] font-semibold">TikTok Pixel</h2>
+                <h2 className="text-[16px] font-bold">TikTok Pixel</h2>
                 <ConsentBadge text="Marketing" />
               </div>
               <Switch

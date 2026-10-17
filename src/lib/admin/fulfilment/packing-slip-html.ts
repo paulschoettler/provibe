@@ -1,3 +1,4 @@
+import { BRAND_COLORS as C, EMAIL_FONT_STACK } from "@/lib/brand/tokens";
 import { escapeHtml, type LegalEntity } from "@/lib/checkout/emails";
 
 /**
@@ -68,7 +69,7 @@ function packingSlipSheet(data: PackingSlipData): string {
 ${data.isTest ? '<p class="test">TESTBESTELLUNG, nicht versenden</p>' : ""}
 <header>
   <div>
-    <p class="brand">provibe</p>
+    <p class="brand"><img src="/brand/logo/provibe-logo-wildberry.svg" alt="provibe" width="202" height="79"></p>
     ${entity}
     <div class="address">${data.shippingAddressLines.map(e).join("<br>")}</div>
   </div>
@@ -99,26 +100,27 @@ ${
 const PACKING_SLIP_STYLES = `
   @page { size: A4; margin: 18mm 16mm; }
   * { box-sizing: border-box; }
-  body { font-family: Jost, Helvetica, Arial, sans-serif; color: #1A1A1A; font-size: 12pt; margin: 0; }
+  body { font-family: ${EMAIL_FONT_STACK}; color: ${C.burgundy}; font-size: 12pt; margin: 0; }
   .sheet { max-width: 180mm; margin: 0 auto; padding: 16px; }
   header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
   h1 { font-size: 20pt; margin: 0 0 4px; }
-  .brand { font-size: 11pt; letter-spacing: .24em; text-transform: uppercase; font-weight: 600; color: #4A2F39; }
-  .sender { font-size: 8pt; color: #616161; margin: 24px 0 2px; text-decoration: underline; }
+  .brand { margin: 0; line-height: 0; }
+  .brand img { display: block; width: auto; height: 9mm; }
+  .sender { font-size: 8pt; color: ${C.wildberry}; margin: 24px 0 2px; text-decoration: underline; }
   .address { font-size: 12pt; line-height: 1.4; }
   .meta { font-size: 10pt; line-height: 1.6; text-align: right; }
-  .muted { color: #616161; font-size: 10pt; }
+  .muted { color: ${C.wildberry}; font-size: 10pt; }
   table { width: 100%; border-collapse: collapse; margin-top: 24px; }
-  th { text-align: left; font-size: 9pt; text-transform: uppercase; letter-spacing: .06em; color: #616161; border-bottom: 1.5px solid #1A1A1A; padding: 6px 4px; }
-  td { border-bottom: 1px solid #E3E3E3; padding: 8px 4px; vertical-align: top; }
+  th { text-align: left; font-size: 9pt; text-transform: uppercase; letter-spacing: .06em; color: ${C.wildberry}; border-bottom: 1.5px solid ${C.burgundy}; padding: 6px 4px; }
+  td { border-bottom: 1px solid ${C.cream}; padding: 8px 4px; vertical-align: top; }
   td.qty { font-weight: 700; width: 14mm; text-align: right; padding-right: 10px; }
   td.check { width: 10mm; }
-  .box { display: inline-block; width: 4mm; height: 4mm; border: 1.2px solid #1A1A1A; border-radius: 1mm; }
-  .sku { font-family: ui-monospace, Menlo, monospace; font-size: 9pt; color: #4B5563; white-space: nowrap; }
+  .box { display: inline-block; width: 4mm; height: 4mm; border: 1.2px solid ${C.burgundy}; border-radius: 1mm; }
+  .sku { font-family: ui-monospace, Menlo, monospace; font-size: 9pt; color: ${C.wildberry}; white-space: nowrap; }
   .components { margin: 4px 0 0; padding-left: 16px; font-size: 10pt; }
-  .note { margin-top: 20px; padding: 10px 12px; border: 1px solid #E3E3E3; border-radius: 8px; font-size: 10pt; }
-  .test { margin: 0 0 12px; padding: 6px 10px; border: 1.5px solid #B7791F; color: #87570F; border-radius: 8px; font-weight: 600; font-size: 10pt; }
-  footer { margin-top: 28px; font-size: 9pt; color: #616161; }
+  .note { margin-top: 20px; padding: 10px 12px; border: 1px solid ${C.cream}; border-radius: 8px; font-size: 10pt; }
+  .test { margin: 0 0 12px; padding: 6px 10px; background: ${C.lime_raspberry}; border: 1.5px solid ${C.wildberry}; color: ${C.wildberry}; border-radius: 8px; font-weight: 700; font-size: 10pt; }
+  footer { margin-top: 28px; font-size: 9pt; color: ${C.wildberry}; }
   @media print { .sheet { padding: 0; } }
   .sheet + .sheet { break-before: page; page-break-before: always; margin-top: 32px; }
 `;

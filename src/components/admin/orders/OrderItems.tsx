@@ -85,7 +85,7 @@ export function OrderItems({ order, showTotals }: { order: OrderDetail; showTota
                     <span className="text-admin-text-2 tabular-nums">
                       {item.quantity} × {formatMoney(item.unitPriceCents)}
                     </span>
-                    <span className="w-20 text-right font-semibold tabular-nums">
+                    <span className="w-20 text-right font-bold tabular-nums">
                       {formatMoney(item.quantity * item.unitPriceCents)}
                     </span>
                   </div>
@@ -103,7 +103,7 @@ export function OrderItems({ order, showTotals }: { order: OrderDetail; showTota
 
       {order.customerNote ? (
         <p className="rounded-admin-feld bg-admin-gelb-hell mt-3 p-3 text-[13px]">
-          <span className="font-semibold">Hinweis des Kunden:</span> {order.customerNote}
+          <span className="font-bold">Hinweis des Kunden:</span> {order.customerNote}
         </p>
       ) : null}
 
@@ -129,8 +129,8 @@ export function OrderItems({ order, showTotals }: { order: OrderDetail; showTota
             Versand{a.shippingName ? ` (${a.shippingName})` : ""}
           </dt>
           <dd className="text-right tabular-nums">{formatMoney(a.shippingCents)}</dd>
-          <dt className="border-admin-rahmen border-t pt-2 font-semibold">Gesamt</dt>
-          <dd className="border-admin-rahmen border-t pt-2 text-right font-semibold tabular-nums">
+          <dt className="border-admin-rahmen border-t pt-2 font-bold">Gesamt</dt>
+          <dd className="border-admin-rahmen border-t pt-2 text-right font-bold tabular-nums">
             {formatMoney(a.totalCents)}
           </dd>
           {a.taxLines.map((t) => (

@@ -336,7 +336,7 @@ export function DiscountEditor({
                 <Card title="Übersicht">
                   <dl className="grid grid-cols-[1fr_auto] gap-y-1.5 text-[14px]">
                     <dt className="text-admin-text-2">Eingelöst</dt>
-                    <dd className="text-right font-semibold">
+                    <dd className="text-right font-bold">
                       {d.usage_count}
                       {d.usage_limit != null ? ` von ${d.usage_limit}` : ""}
                     </dd>
@@ -436,7 +436,7 @@ function UsageCard({ usage }: { usage: DiscountUsage }) {
                   <td className="px-4">
                     <Link
                       href={`/admin/bestellungen/${r.orderId}`}
-                      className="font-semibold hover:underline"
+                      className="font-bold hover:underline"
                     >
                       {r.orderNumber ?? r.orderId.slice(0, 8)}
                     </Link>

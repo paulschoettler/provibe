@@ -123,7 +123,7 @@ export default async function KundeDetailPage({
           <span className="flex items-center gap-3">
             <span
               aria-hidden="true"
-              className="bg-admin-akzent-hell text-admin-akzent flex size-12 shrink-0 items-center justify-center rounded-full text-[16px] font-semibold md:size-14 md:text-[18px]"
+              className="bg-admin-akzent-hell text-admin-akzent flex size-12 shrink-0 items-center justify-center rounded-full text-[16px] font-bold md:size-14 md:text-[18px]"
             >
               {p.initials}
             </span>
@@ -348,7 +348,7 @@ function Overview({
               {subscriptions.map((s) => (
                 <li key={s.id} className="flex flex-col gap-1 py-2 first:pt-0 last:pb-0">
                   <span className="flex items-center justify-between gap-2">
-                    <span className="text-[14px] font-semibold">
+                    <span className="text-[14px] font-bold">
                       {s.quantity} × {s.productTitle ?? "Produkt"}
                       {s.variantTitle ? ` (${s.variantTitle})` : ""}
                     </span>
@@ -384,7 +384,7 @@ function Overview({
             <div className="flex flex-col gap-3 text-[14px]">
               {p.addresses.map((a) => (
                 <address key={a.id} className="not-italic">
-                  <p className="text-admin-text-2 mb-1 text-[12px] font-semibold tracking-wide uppercase">
+                  <p className="text-admin-text-2 mb-1 text-[12px] font-bold tracking-wide uppercase">
                     {a.label ?? "Adresse"}
                     {a.isDefaultShipping ? " · Lieferadresse (Standard)" : ""}
                     {a.isDefaultBilling ? " · Rechnungsadresse" : ""}
@@ -467,7 +467,7 @@ function OrdersCard({
   return (
     <section aria-labelledby="bestellhistorie" className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <h2 id="bestellhistorie" className="text-[16px] font-semibold">
+        <h2 id="bestellhistorie" className="text-[16px] font-bold">
           Bestellhistorie
         </h2>
         {!full && path && (total ?? 0) > 0 ? (
@@ -506,7 +506,7 @@ function OrdersCard({
             align: "right",
             width: "110px",
             cell: (o) => (
-              <span className="font-semibold tabular-nums">{formatMoney(o.totalCents)}</span>
+              <span className="font-bold tabular-nums">{formatMoney(o.totalCents)}</span>
             ),
           },
         ]}

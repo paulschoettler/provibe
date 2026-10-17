@@ -47,7 +47,7 @@ export function Stat({
       )}
     >
       <p className="text-admin-text-2 text-[13px] font-medium">{label}</p>
-      <p className="text-[22px] leading-[1.4] font-semibold tabular-nums md:text-[26px]">{value}</p>
+      <p className="text-[22px] leading-[1.4] font-bold tabular-nums md:text-[26px]">{value}</p>
       {delta ? (
         <p className="flex flex-wrap items-center gap-1 text-[13px]">
           {delta.direction !== "flat" ? (
@@ -55,7 +55,7 @@ export function Stat({
               <Icon name={delta.direction === "up" ? "trend-hoch" : "trend-runter"} size={16} />
             </span>
           ) : null}
-          <span className={cx("font-semibold tabular-nums", tone)}>{delta.text}</span>
+          <span className={cx("font-bold tabular-nums", tone)}>{delta.text}</span>
           <span className="text-admin-text-2 max-md:hidden">{deltaSuffix}</span>
         </p>
       ) : hint ? (

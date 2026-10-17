@@ -73,7 +73,7 @@ export function CodeInput({ invalid, autoFocus }: { invalid?: boolean; autoFocus
               }
             }}
             className={cx(
-              "rounded-admin-feld bg-admin-karte h-14 w-full min-w-0 flex-1 text-center text-[24px] font-semibold tabular-nums outline-none",
+              "rounded-admin-feld bg-admin-karte h-14 w-full min-w-0 flex-1 text-center text-[24px] font-bold tabular-nums outline-none",
               invalid
                 ? "border-admin-rot border-2"
                 : "border-admin-rahmen-stark focus:border-admin-akzent border focus:border-2",

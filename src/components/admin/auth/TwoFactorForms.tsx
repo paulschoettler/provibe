@@ -247,7 +247,7 @@ function RecoveryCodes({ codes, next }: { codes: string[]; next: string }) {
         Zwei-Faktor-Anmeldung ist aktiv.
       </FormMessage>
       <div>
-        <h2 className="text-[16px] font-semibold">Deine Wiederherstellungscodes</h2>
+        <h2 className="text-[16px] font-bold">Deine Wiederherstellungscodes</h2>
         <p className="text-admin-text-2 mt-1 text-[13px]">
           Wir zeigen sie nur dieses eine Mal. Bewahre sie sicher auf, zum Beispiel im
           Passwortmanager. Mit einem Code kommst du rein, wenn dein Handy weg ist.
@@ -273,7 +273,7 @@ function RecoveryCodes({ codes, next }: { codes: string[]; next: string }) {
           type="checkbox"
           checked={saved}
           onChange={(e) => setSaved(e.currentTarget.checked)}
-          className="mt-0.5 size-[18px] accent-[var(--admin-farbe-akzent)]"
+          className="accent-admin-akzent mt-0.5 size-[18px]"
         />
         Ich habe die Codes sicher gespeichert.
       </label>

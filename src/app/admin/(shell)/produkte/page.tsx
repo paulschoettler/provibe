@@ -269,7 +269,7 @@ export default async function ProductsPage({
               width: "100px",
               align: "right",
               cell: (p) => (
-                <span className="font-semibold tabular-nums">
+                <span className="font-bold tabular-nums">
                   {p.priceMinCents != null ? formatMoney(p.priceMinCents) : "–"}
                 </span>
               ),

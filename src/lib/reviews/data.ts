@@ -39,7 +39,7 @@ interface OrderRow extends TokenOrder {
   order_items: OrderItemRow[];
 }
 
-const DEFAULT_TINT = "#f7dceb";
+const DEFAULT_TINT = "var(--pv-cream)";
 
 function nameFromAddress(address: unknown): { first: string | null; last: string | null } {
   if (!address || typeof address !== "object") return { first: null, last: null };

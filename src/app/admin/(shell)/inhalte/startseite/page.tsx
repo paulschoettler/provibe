@@ -120,7 +120,7 @@ export default async function HomepageModulesPage({
         <Icon name={KIND_ICONS[m.kind] ?? "inhalte"} size={18} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-2 text-[14px] font-semibold">
+        <span className="flex items-center gap-2 text-[14px] font-bold">
           {i + 1}. {m.label}
           {!m.isEnabled ? (
             <Badge tone="gray" hollow>
@@ -228,7 +228,7 @@ export default async function HomepageModulesPage({
                 )}
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[13px] font-semibold">Meldung {i + 1}</span>
+                    <span className="text-[13px] font-bold">Meldung {i + 1}</span>
                     {a.isLive ? (
                       <Badge tone="green">Live</Badge>
                     ) : a.isActive ? (

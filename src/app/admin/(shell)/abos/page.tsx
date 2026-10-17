@@ -124,7 +124,7 @@ export default async function AbosPage({
       header: "Abo und Kunde",
       cell: (s) => (
         <span className="flex flex-col">
-          <span className="font-semibold">{s.customerName || s.customerEmail || "Kunde"}</span>
+          <span className="font-bold">{s.customerName || s.customerEmail || "Kunde"}</span>
           <span className="text-admin-text-2 text-[12px]">{s.number}</span>
         </span>
       ),
@@ -192,9 +192,7 @@ export default async function AbosPage({
             width: "110px",
             align: "right",
             cell: (s) => (
-              <span className="font-semibold tabular-nums">
-                {formatMoney(s.totalPerDeliveryCents)}
-              </span>
+              <span className="font-bold tabular-nums">{formatMoney(s.totalPerDeliveryCents)}</span>
             ),
           },
         ] satisfies Column<AdminSubscriptionListItem>[])
@@ -332,7 +330,7 @@ export default async function AbosPage({
                 <span className="flex items-center gap-2.5">
                   <CanThumb src={s.imageUrl ?? null} />
                   <span className="flex flex-col">
-                    <span className="font-semibold">
+                    <span className="font-bold">
                       {s.customerName || s.customerEmail || "Kunde"}
                     </span>
                     <span className="text-admin-text-2 text-[13px] font-normal">

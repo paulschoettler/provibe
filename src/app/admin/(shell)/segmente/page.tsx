@@ -177,7 +177,7 @@ export default async function SegmentePage({
                 {state.rows.map((row, i) => (
                   <div key={i} className="flex flex-col gap-2">
                     {i > 0 ? (
-                      <p className="text-admin-text-2 text-[12px] font-semibold tracking-wide uppercase">
+                      <p className="text-admin-text-2 text-[12px] font-bold tracking-wide uppercase">
                         {state.match === "any" ? "oder" : "und"}
                       </p>
                     ) : null}
@@ -206,7 +206,7 @@ export default async function SegmentePage({
                   <Icon name="kunden" size={22} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[18px] font-semibold">
+                  <p className="text-[18px] font-bold">
                     {count === null
                       ? rules
                         ? "Treffer nicht verfügbar"
@@ -246,7 +246,7 @@ export default async function SegmentePage({
             rowHref={(m) => `/admin/kunden/${m.id}`}
             toolbar={
               <div className="flex items-center justify-between px-4 py-3">
-                <h2 className="text-[16px] font-semibold">Vorschau</h2>
+                <h2 className="text-[16px] font-bold">Vorschau</h2>
                 <span className="text-admin-text-2 text-[13px]">
                   {count ? `erste ${Math.min(20, preview.length)} von ${formatNumber(count)}` : ""}
                 </span>
@@ -312,7 +312,7 @@ export default async function SegmentePage({
                       <div className="flex items-start justify-between gap-2">
                         <Link
                           href={`${PATH}?bearbeiten=${s.id}`}
-                          className="text-[15px] font-semibold hover:underline"
+                          className="text-[15px] font-bold hover:underline"
                           aria-current={s.id === editId ? "true" : undefined}
                         >
                           {s.name}

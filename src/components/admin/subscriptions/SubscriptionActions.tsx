@@ -281,13 +281,13 @@ function DiscountForm(props: SubscriptionActionsProps) {
         >
           <p className="flex justify-between gap-3">
             <span className="text-admin-text-2">Preis je Lieferung bisher</span>
-            <span className="font-semibold tabular-nums">
+            <span className="font-bold tabular-nums">
               {before !== null ? formatMoney(before) : "–"}
             </span>
           </p>
           <p className="flex justify-between gap-3">
             <span className="text-admin-text-2">Preis je Lieferung neu</span>
-            <span className="font-semibold tabular-nums">
+            <span className="font-bold tabular-nums">
               {after !== null
                 ? formatMoney(after)
                 : bp === null
@@ -300,7 +300,7 @@ function DiscountForm(props: SubscriptionActionsProps) {
               <span className="text-admin-text-2">
                 {after <= before ? "Ersparnis je Lieferung" : "Mehrpreis je Lieferung"}
               </span>
-              <span className="font-semibold tabular-nums">
+              <span className="font-bold tabular-nums">
                 {formatMoney(Math.abs(before - after))}
               </span>
             </p>

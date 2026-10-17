@@ -61,7 +61,7 @@ export default async function SearchPage({
         </label>
         <button
           type="submit"
-          className="rounded-admin-badge bg-admin-akzent text-admin-auf-akzent hover:bg-admin-akzent-hover h-11 px-5 text-[14px] font-semibold"
+          className="rounded-admin-badge bg-admin-akzent text-admin-auf-akzent hover:bg-admin-akzent-hover h-11 px-5 text-[14px] font-bold"
         >
           Suchen
         </button>
@@ -167,7 +167,7 @@ function ResultRow({
         className="hover:bg-admin-flaeche flex min-h-[52px] items-center gap-3 px-4 py-2"
       >
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[14px] font-semibold">{title}</span>
+          <span className="block truncate text-[14px] font-bold">{title}</span>
           {meta ? (
             <span className="text-admin-text-2 block truncate text-[13px]">{meta}</span>
           ) : null}

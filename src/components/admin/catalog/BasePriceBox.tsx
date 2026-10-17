@@ -95,7 +95,7 @@ export function BasePriceBox({ initial }: { initial: Inputs }) {
       <p className="text-admin-text-2 text-[12px]">Grundpreis automatisch berechnet</p>
       {first ? (
         <>
-          <p className="mt-1 text-[26px] leading-tight font-semibold">
+          <p className="mt-1 text-[26px] leading-tight font-bold">
             {first.error ?? first.label}
             <span className="text-admin-text-2 ml-2 text-[13px] font-normal">
               bei {first.title}
@@ -114,7 +114,7 @@ export function BasePriceBox({ initial }: { initial: Inputs }) {
               {rest.map((r) => (
                 <div key={r.index} className="contents">
                   <dt className="text-admin-text-2">{r.title}</dt>
-                  <dd className="text-right font-semibold">{r.error ?? r.label}</dd>
+                  <dd className="text-right font-bold">{r.error ?? r.label}</dd>
                 </div>
               ))}
             </dl>

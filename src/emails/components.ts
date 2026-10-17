@@ -6,22 +6,55 @@
  * Reine Funktionen, keine Datenbank, getestet in templates.test.ts.
  */
 
+import { BRAND_COLORS, BRAND_RADIUS, EMAIL_FONT_STACK } from "@/lib/brand/tokens";
+
+/**
+ * Farbrollen aller Mails nach CI-Guide. Mailclients kennen keine CSS-Variablen, deshalb kommen die
+ * Werte aus brand/provibe-ci/tokens.json (über src/lib/brand/tokens.ts), nie als Hex im Code.
+ * Die übrigen Mailvorlagen (Checkout, Abo, Konto, Formulare, Backoffice) nutzen dieselben Rollen.
+ */
 export const EMAIL_COLORS = {
-  cream: "#FBF8EE",
-  cream2: "#F3F1E7",
-  aubergine: "#4A2F39",
-  plum: "#7E2856",
-  wine: "#6B1D49",
-  magenta: "#D9306E",
-  butter: "#F3EDA4",
-  mauve: "#8A7680",
-  line: "#E2D9D0",
-  white: "#FFFFFF",
+  /** Seitenhintergrund */
+  background: BRAND_COLORS.cream,
+  /** Kästen auf dem Hintergrund (Zusammenfassung, Produktkarte); Weiß, damit sie sich vom Cream abheben */
+  surface: BRAND_COLORS.white,
+  /** Fließtext, Überschriften, gedämpfter Text und Links */
+  text: BRAND_COLORS.wildberry,
+  /** Button */
+  accent: BRAND_COLORS.wildberry,
+  onAccent: BRAND_COLORS.white,
+  /** Testhinweis-Fläche (Wildberry-Text darauf, Kontrast 7,48) */
+  highlight: BRAND_COLORS.lime_raspberry,
+  /** Trennlinien auf dem Cream-Hintergrund */
+  line: BRAND_COLORS.wildberry,
+  /** Trennlinien in weißen Kästen */
+  lineSoft: BRAND_COLORS.cream,
 } as const;
 
-/** Jost ist im Mailclient selten installiert, deshalb system-ui als Rückfall. */
-export const EMAIL_FONT =
-  "Jost, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+/**
+ * Filson lädt im Mailclient nicht (Adobe-Kit), die Fallbacks Helvetica und Arial tragen die Darstellung.
+ * Doppelte Anführungszeichen werden zu einfachen, weil der Stapel in style="…" steht.
+ */
+export const EMAIL_FONT = EMAIL_FONT_STACK.replace(/"/g, "'");
+
+/** Radien aus dem CI-Guide: Kasten 24 px, Testhinweis wie Button-Leiste 12 px. Buttons bleiben Pill wie im Shop. */
+export const EMAIL_RADIUS = {
+  box: `${BRAND_RADIUS.box}px`,
+  banner: `${BRAND_RADIUS.button}px`,
+  pill: "100px",
+} as const;
+
+/**
+ * Logo im Mailkopf: PNG-Ableitung des CI-SVG (provibe-logo-wildberry.svg, siehe docs/brand-assets.md),
+ * angezeigt mit 120 × 47 px (Seitenverhältnis 2,55 : 1). Einzige Stelle für den Pfad.
+ */
+export const EMAIL_LOGO_PATH = "/brand/logo-derived/provibe-logo-wildberry@2x.png";
+
+/** Logo-Kopf als verlinktes Bild, absolute URL aus siteUrl (Mailclients brauchen absolute Pfade). */
+export function emailLogo(siteUrl: string, align: "center" | "left" = "center"): string {
+  const base = siteUrl.replace(/\/$/, "");
+  return `<p style="margin:0 0 24px;text-align:${align}"><a href="${escapeHtml(base)}" style="text-decoration:none"><img src="${escapeHtml(base + EMAIL_LOGO_PATH)}" width="120" height="47" alt="provibe" style="display:inline-block;width:120px;height:47px;border:0"></a></p>`;
+}
 
 const C = EMAIL_COLORS;
 
@@ -65,24 +98,25 @@ export interface ImprintEntity {
 
 export function heading(text: string, level: 1 | 2 = 1): string {
   const size = level === 1 ? "28px" : "20px";
-  return `<h${level} style="margin:0 0 12px;font-family:${EMAIL_FONT};font-size:${size};line-height:1.15;font-weight:600;letter-spacing:-0.01em;color:${C.wine}">${escapeHtml(text)}</h${level}>`;
+  return `<h${level} style="margin:0 0 12px;font-family:${EMAIL_FONT};font-size:${size};line-height:1.15;font-weight:700;letter-spacing:-0.01em;color:${C.text}">${escapeHtml(text)}</h${level}>`;
 }
 
 export function paragraph(
   html: string,
   options: { muted?: boolean; small?: boolean } = {},
 ): string {
-  const color = options.muted ? C.mauve : C.aubergine;
+  // Gedämpfter Text bleibt Wildberry (keine Abstufungen im CI), kleiner gesetzt
+  const color = C.text;
   const size = options.small ? "13px" : "16px";
   return `<p style="margin:0 0 16px;font-family:${EMAIL_FONT};font-size:${size};line-height:1.6;color:${color}">${html}</p>`;
 }
 
 export function button(label: string, href: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px auto 24px"><tr><td style="border-radius:100px;background:${C.magenta}"><a href="${escapeHtml(href)}" style="display:inline-block;padding:14px 28px;font-family:${EMAIL_FONT};font-size:15px;font-weight:600;color:${C.white};text-decoration:none;border-radius:100px">${escapeHtml(label)}</a></td></tr></table>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px auto 24px"><tr><td style="border-radius:${EMAIL_RADIUS.pill};background:${C.accent}"><a href="${escapeHtml(href)}" style="display:inline-block;padding:14px 28px;font-family:${EMAIL_FONT};font-size:15px;font-weight:700;color:${C.onAccent};text-decoration:none;border-radius:${EMAIL_RADIUS.pill}">${escapeHtml(label)}</a></td></tr></table>`;
 }
 
 export function image(src: string, alt: string, href?: string): string {
-  const img = `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:16px">`;
+  const img = `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:${EMAIL_RADIUS.box}">`;
   return `<div style="margin:0 0 20px">${href ? `<a href="${escapeHtml(href)}">${img}</a>` : img}</div>`;
 }
 
@@ -103,11 +137,11 @@ export function productCard(p: ProductCardData): string {
   const img = p.imageUrl
     ? `<td width="120" style="padding:16px 0 16px 16px;vertical-align:middle"><a href="${escapeHtml(p.url)}"><img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" width="104" style="display:block;width:104px;height:auto;border:0"></a></td>`
     : "";
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;background:${C.cream2};border-radius:22px"><tr>${img}<td style="padding:16px 20px;vertical-align:middle;font-family:${EMAIL_FONT};color:${C.aubergine}">
-<p style="margin:0 0 4px;font-size:20px;font-weight:600;color:${C.wine}"><a href="${escapeHtml(p.url)}" style="color:${C.wine};text-decoration:none">${escapeHtml(p.title)}</a></p>
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;background:${C.surface};border-radius:${EMAIL_RADIUS.box}"><tr>${img}<td style="padding:16px 20px;vertical-align:middle;font-family:${EMAIL_FONT};color:${C.text}">
+<p style="margin:0 0 4px;font-size:20px;font-weight:700;color:${C.text}"><a href="${escapeHtml(p.url)}" style="color:${C.text};text-decoration:none">${escapeHtml(p.title)}</a></p>
 ${p.line ? `<p style="margin:0 0 8px;font-size:14px">${escapeHtml(p.line)}</p>` : ""}
-<p style="margin:0 0 4px;font-size:18px;font-weight:600">${escapeHtml(p.priceLine)}</p>
-${p.detailLine ? `<p style="margin:0;font-size:13px;color:${C.mauve}">${escapeHtml(p.detailLine)}</p>` : ""}
+<p style="margin:0 0 4px;font-size:18px;font-weight:700">${escapeHtml(p.priceLine)}</p>
+${p.detailLine ? `<p style="margin:0;font-size:13px;color:${C.text}">${escapeHtml(p.detailLine)}</p>` : ""}
 </td></tr></table>`;
 }
 
@@ -129,16 +163,16 @@ export function footer(options: {
         ]
           .filter(Boolean)
           .join(" · "),
-        `Kontakt: <a href="mailto:${escapeHtml(e.email)}" style="color:${C.mauve}">${escapeHtml(e.email)}</a> · <a href="${escapeHtml(options.siteUrl)}/pages/impressum" style="color:${C.mauve}">Impressum</a>`,
+        `Kontakt: <a href="mailto:${escapeHtml(e.email)}" style="color:${C.text}">${escapeHtml(e.email)}</a> · <a href="${escapeHtml(options.siteUrl)}/pages/impressum" style="color:${C.text}">Impressum</a>`,
       ]
         .filter(Boolean)
         .join("<br>")
     : "";
   const reason = options.reason ? `${escapeHtml(options.reason)} ` : "";
   const unsubscribe = options.unsubscribeUrl
-    ? `<a href="${escapeHtml(options.unsubscribeUrl)}" style="color:${C.plum};font-weight:600">Abmelden</a>`
+    ? `<a href="${escapeHtml(options.unsubscribeUrl)}" style="color:${C.text};font-weight:700">Abmelden</a>`
     : "";
-  return `<div style="margin:32px 0 0;padding-top:16px;border-top:1px solid ${C.line};font-family:${EMAIL_FONT};font-size:12px;line-height:1.7;color:${C.mauve};text-align:center">
+  return `<div style="margin:32px 0 0;padding-top:16px;border-top:1px solid ${C.line};font-family:${EMAIL_FONT};font-size:12px;line-height:1.7;color:${C.text};text-align:center">
 ${reason || unsubscribe ? `<p style="margin:0 0 8px">${reason}${unsubscribe}</p>` : ""}
 <p style="margin:0">${imprint}</p>
 </div>`;
@@ -157,15 +191,15 @@ export function emailLayout(options: {
     ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">${escapeHtml(options.preheader)}</div>`
     : "";
   const banner = options.testBanner
-    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.butter};border:1.5px solid ${C.aubergine};border-radius:12px;font-family:${EMAIL_FONT};font-size:13px;font-weight:600;color:${C.aubergine}">${escapeHtml(options.testBanner)}</p>`
+    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.highlight};border:1.5px solid ${C.text};border-radius:${EMAIL_RADIUS.banner};font-family:${EMAIL_FONT};font-size:13px;font-weight:700;color:${C.text}">${escapeHtml(options.testBanner)}</p>`
     : "";
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(options.title)}</title></head>
-<body style="margin:0;padding:0;background:${C.cream};font-family:${EMAIL_FONT};color:${C.aubergine}">
+<body style="margin:0;padding:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
 ${pre}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.cream}"><tr><td align="center" style="padding:24px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.background}"><tr><td align="center" style="padding:24px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px"><tr><td style="padding:8px 20px 32px">
 ${banner}
-<p style="margin:0 0 24px;text-align:center"><a href="${escapeHtml(options.siteUrl)}" style="font-family:${EMAIL_FONT};font-size:30px;font-weight:600;letter-spacing:-0.02em;color:${C.wine};text-decoration:none">provibe</a></p>
+${emailLogo(options.siteUrl)}
 ${options.bodyHtml}
 ${options.footerHtml}
 </td></tr></table>

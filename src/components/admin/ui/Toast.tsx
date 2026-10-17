@@ -39,14 +39,14 @@ export function Toast({
       {visible ? (
         <div
           className={cx(
-            "rounded-admin-karte shadow-admin-karte pointer-events-auto flex min-h-12 max-w-full items-center gap-3 px-4 py-2 text-[14px] text-white",
+            "rounded-admin-karte shadow-admin-karte text-admin-auf-akzent pointer-events-auto flex min-h-12 max-w-full items-center gap-3 px-4 py-2 text-[14px]",
             toast.tone === "error" ? "bg-admin-rot" : "bg-admin-text",
           )}
         >
           <Icon name={toast.tone === "error" ? "warnung" : "haken"} size={18} />
           <p className="min-w-0 font-medium">{toast.message}</p>
           {action ? (
-            <a href={action.href} className="font-semibold whitespace-nowrap underline">
+            <a href={action.href} className="font-bold whitespace-nowrap underline">
               {action.label}
             </a>
           ) : null}
@@ -54,7 +54,10 @@ export function Toast({
             type="button"
             onClick={() => setHidden(toast.id)}
             aria-label="Meldung schließen"
-            className="rounded-admin-feld -mr-2 flex size-8 shrink-0 items-center justify-center hover:bg-white/10"
+            className={cx(
+              "rounded-admin-feld -mr-2 flex size-8 shrink-0 items-center justify-center",
+              toast.tone === "error" ? "hover:bg-admin-rot-hover" : "hover:bg-admin-grau-text",
+            )}
           >
             <Icon name="schliessen" size={16} />
           </button>

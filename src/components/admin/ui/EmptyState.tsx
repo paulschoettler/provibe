@@ -30,7 +30,7 @@ export function EmptyState({
       <span className="bg-admin-akzent-hell text-admin-akzent flex size-11 items-center justify-center rounded-full">
         <Icon name={icon} size={22} />
       </span>
-      <p className="text-[15px] font-semibold">{title}</p>
+      <p className="text-[15px] font-bold">{title}</p>
       {children ? <div className="text-admin-text-2 max-w-md text-[14px]">{children}</div> : null}
       {action ? <div className="mt-1">{action}</div> : null}
     </div>

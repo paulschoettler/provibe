@@ -104,7 +104,7 @@ export default async function StaffUsersPage({
               <Icon name="schild" size={22} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-semibold">Zwei-Faktor-Pflicht</p>
+              <p className="text-[15px] font-bold">Zwei-Faktor-Pflicht</p>
               <p className="text-admin-text-2 mt-0.5 text-[13px]">
                 Alle Benutzer melden sich mit Passwort oder Magic Link plus TOTP-Code an. Ohne
                 eingerichteten zweiten Faktor ist kein Zugriff möglich. Verlorenes Gerät:
@@ -119,7 +119,7 @@ export default async function StaffUsersPage({
               title="Immer aktiv (Briefing Abschnitt 8)"
               className="bg-admin-akzent relative mt-1 inline-flex h-6 w-10 shrink-0 rounded-full opacity-90"
             >
-              <span className="absolute top-1 left-5 size-4 rounded-full bg-white shadow" />
+              <span className="bg-admin-karte absolute top-1 left-5 size-4 rounded-full shadow" />
             </span>
           </div>
         </Card>
@@ -134,7 +134,7 @@ export default async function StaffUsersPage({
               header: "Benutzer",
               cell: (u) => (
                 <span className="flex items-center gap-3">
-                  <span className="bg-admin-akzent-hell text-admin-akzent flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold">
+                  <span className="bg-admin-akzent-hell text-admin-akzent flex size-8 shrink-0 items-center justify-center rounded-full text-[12px] font-bold">
                     {initials(u.displayName, u.email)}
                   </span>
                   <span className="min-w-0">
@@ -180,11 +180,11 @@ export default async function StaffUsersPage({
           renderCard={(u) => (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center gap-3">
-                <span className="bg-admin-akzent-hell text-admin-akzent flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold">
+                <span className="bg-admin-akzent-hell text-admin-akzent flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold">
                   {initials(u.displayName, u.email)}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[16px] font-semibold">{nameOf(u)}</span>
+                  <span className="block truncate text-[16px] font-bold">{nameOf(u)}</span>
                   <span className="text-admin-text-2 block truncate text-[14px]">{u.email}</span>
                 </span>
                 {canManage ? actionsFor(u) : null}
@@ -212,7 +212,7 @@ export default async function StaffUsersPage({
           <ul className="mb-4 grid gap-2 md:hidden">
             {STAFF_ROLES.map((r) => (
               <li key={r} className="border-admin-rahmen border-b pb-2 last:border-b-0">
-                <p className="text-[15px] font-semibold">{ROLE_LABELS[r]}</p>
+                <p className="text-[15px] font-bold">{ROLE_LABELS[r]}</p>
                 <p className="text-admin-text-2 text-[13px]">{ROLE_DESCRIPTIONS[r]}</p>
               </li>
             ))}

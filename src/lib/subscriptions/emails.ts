@@ -1,4 +1,5 @@
 import { escapeHtml, type LegalEntity, type RenderedEmail } from "@/lib/checkout/emails";
+import { EMAIL_COLORS as C, EMAIL_FONT, EMAIL_RADIUS, emailLogo } from "@/emails/components";
 import { formatEur } from "@/lib/money";
 import { formatDay, formatDayTime } from "./schedule";
 
@@ -6,18 +7,6 @@ import { formatDay, formatDayTime } from "./schedule";
  * Abo-Mails in Brand-Optik (Figma 73:1813, 73:1846, 73:1882), jeweils HTML und Textfassung.
  * Reine Funktionen ohne Datenbank (Vorschau im Backoffice, Tests). Kundendaten werden escaped.
  */
-
-const C = {
-  cream: "#FBF8EE",
-  cream2: "#F3F1E7",
-  aubergine: "#4A2F39",
-  plum: "#7E2856",
-  wine: "#6B1D49",
-  magenta: "#D9306E",
-  pink: "#F6DCEA",
-  butter: "#F3EDA4",
-  mauve: "#8A7680",
-};
 
 export interface AboMailBase {
   siteUrl: string;
@@ -70,26 +59,26 @@ function layout(input: {
     ? [entity.name, entity.street, `${entity.zip} ${entity.city}`].map(escapeHtml).join(" · ")
     : "CG Projects UG (haftungsbeschränkt) · Kurt-Viermetz-Straße 1a · 86150 Augsburg";
   const testBanner = base.isTest
-    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.butter};border:1.5px solid ${C.aubergine};border-radius:12px;font-size:13px;font-weight:600">TEST (Testmodus, keine echte Zahlung)</p>`
+    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.highlight};border:1.5px solid ${C.text};border-radius:${EMAIL_RADIUS.banner};font-size:13px;font-weight:700">TEST (Testmodus, keine echte Zahlung)</p>`
     : "";
   const footer =
     input.footer === false
       ? ""
-      : `<p style="margin:0 0 8px">Du bekommst diese E-Mail, weil du ein Abo bei PROVIBE hast. Kündigen geht jederzeit im Konto oder ohne Login unter <a href="${base.siteUrl}/abo-kuendigen" style="color:${C.mauve}">${escapeHtml(base.siteUrl.replace(/^https?:\/\//, ""))}/abo-kuendigen</a>.</p>`;
+      : `<p style="margin:0 0 8px">Du bekommst diese E-Mail, weil du ein Abo bei PROVIBE hast. Kündigen geht jederzeit im Konto oder ohne Login unter <a href="${base.siteUrl}/abo-kuendigen" style="color:${C.text}">${escapeHtml(base.siteUrl.replace(/^https?:\/\//, ""))}/abo-kuendigen</a>.</p>`;
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(input.subject)}</title></head>
-<body style="margin:0;background:${C.cream};font-family:Jost,Helvetica,Arial,sans-serif;color:${C.aubergine}">
+<body style="margin:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
 <span style="display:none;max-height:0;overflow:hidden">${escapeHtml(input.preview)}</span>
 <div style="max-width:600px;margin:0 auto;padding:32px 20px">
 ${testBanner}
-<p style="text-align:center;margin:0 0 28px;font-size:34px;font-weight:700;letter-spacing:-.02em;color:${C.wine}">provibe</p>
+${emailLogo(base.siteUrl)}
 ${input.body}
-<div style="border-top:1px solid ${C.aubergine};margin-top:32px;padding-top:20px;text-align:center;font-size:12px;line-height:1.6;color:${C.mauve}">
+<div style="border-top:1px solid ${C.line};margin-top:32px;padding-top:20px;text-align:center;font-size:12px;line-height:1.6;color:${C.text}">
 ${footer}<p style="margin:0">${imprint}</p>
 </div></div></body></html>`;
 }
 
 function h1(text: string): string {
-  return `<h1 style="font-size:28px;line-height:1.15;font-weight:700;margin:0 0 12px;color:${C.aubergine}">${escapeHtml(text)}</h1>`;
+  return `<h1 style="font-size:28px;line-height:1.15;font-weight:700;margin:0 0 12px;color:${C.text}">${escapeHtml(text)}</h1>`;
 }
 
 function p(html: string, small = false): string {
@@ -97,14 +86,14 @@ function p(html: string, small = false): string {
 }
 
 function button(href: string, label: string): string {
-  return `<p style="text-align:center;margin:24px 0"><a href="${href}" style="display:inline-block;background:${C.magenta};color:#fff;text-decoration:none;font-weight:600;font-size:16px;padding:14px 28px;border-radius:999px">${escapeHtml(label)}</a></p>`;
+  return `<p style="text-align:center;margin:24px 0"><a href="${href}" style="display:inline-block;background:${C.accent};color:${C.onAccent};text-decoration:none;font-weight:700;font-size:16px;padding:14px 28px;border-radius:${EMAIL_RADIUS.pill}">${escapeHtml(label)}</a></p>`;
 }
 
 function links(items: { href: string; label: string }[]): string {
   return `<p style="text-align:center;margin:0 0 20px">${items
     .map(
       (i) =>
-        `<a href="${i.href}" style="color:${C.plum};font-weight:600;margin:0 10px">${escapeHtml(i.label)}</a>`,
+        `<a href="${i.href}" style="color:${C.text};font-weight:700;margin:0 10px">${escapeHtml(i.label)}</a>`,
     )
     .join("")}</p>`;
 }
@@ -113,20 +102,20 @@ function productCard(s: AboMailSubscription, siteUrl: string): string {
   const img = s.imageUrl
     ? `<td style="width:84px;vertical-align:top;padding-right:16px"><img src="${siteUrl}${s.imageUrl}" width="72" alt="${escapeHtml(s.productTitle)}" style="display:block;width:72px;height:auto"></td>`
     : "";
-  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${C.cream2};border-radius:22px;padding:20px;margin:8px 0 16px"><tr>${img}
-<td style="vertical-align:top"><p style="margin:0 0 4px;font-size:20px;font-weight:600">${escapeHtml(s.productTitle)} im Abo</p>
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${C.surface};border-radius:${EMAIL_RADIUS.box};padding:20px;margin:8px 0 16px"><tr>${img}
+<td style="vertical-align:top"><p style="margin:0 0 4px;font-size:20px;font-weight:700">${escapeHtml(s.productTitle)} im Abo</p>
 <p style="margin:0 0 8px;font-size:14px">${escapeHtml(packLabel(s))} · ${escapeHtml(s.number)}</p>
 <p style="margin:0 0 4px;font-size:17px;font-weight:700">${formatEur(s.totalCents)} je Lieferung</p>
-<p style="margin:0;font-size:13px;color:${C.mauve}">inkl. ${formatEur(s.depositCents)} Pfand und ${s.shippingCents > 0 ? `${formatEur(s.shippingCents)} Versand` : "kostenlosem Versand"}, inkl. MwSt.${s.basePriceText ? ` · ${escapeHtml(s.basePriceText)}` : ""}</p></td></tr></table>`;
+<p style="margin:0;font-size:13px;color:${C.text}">inkl. ${formatEur(s.depositCents)} Pfand und ${s.shippingCents > 0 ? `${formatEur(s.shippingCents)} Versand` : "kostenlosem Versand"}, inkl. MwSt.${s.basePriceText ? ` · ${escapeHtml(s.basePriceText)}` : ""}</p></td></tr></table>`;
 }
 
 function table(rows: [string, string][], tone: "white" | "pink" = "white"): string {
-  const bg = tone === "pink" ? C.pink : "#ffffff";
-  const border = tone === "pink" ? `border:1.5px solid ${C.magenta};` : "";
+  const bg = tone === "pink" ? C.background : C.surface;
+  const border = tone === "pink" ? `border:1.5px solid ${C.accent};` : "";
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${bg};${border}border-radius:18px;padding:16px 20px;margin:8px 0 16px">${rows
     .map(
       ([k, v]) =>
-        `<tr><td style="padding:5px 12px 5px 0;font-size:14px;color:${C.plum};vertical-align:top;width:40%">${escapeHtml(k)}</td><td style="padding:5px 0;font-size:14px;font-weight:600;vertical-align:top">${escapeHtml(v)}</td></tr>`,
+        `<tr><td style="padding:5px 12px 5px 0;font-size:14px;color:${C.text};vertical-align:top;width:40%">${escapeHtml(k)}</td><td style="padding:5px 0;font-size:14px;font-weight:700;vertical-align:top">${escapeHtml(v)}</td></tr>`,
     )
     .join("")}</table>`;
 }

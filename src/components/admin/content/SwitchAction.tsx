@@ -65,7 +65,7 @@ function SwitchButton({
       >
         <span
           className={cx(
-            "absolute top-1 left-1 size-4 rounded-full bg-white shadow transition-transform",
+            "bg-admin-karte absolute top-1 left-1 size-4 rounded-full shadow transition-transform",
             checked && "translate-x-4",
           )}
         />

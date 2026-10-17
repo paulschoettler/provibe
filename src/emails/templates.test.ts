@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { campaignBlocksSchema, renderCampaignEmail, resolveImageSrc } from "./campaign";
+import { BRAND_COLORS } from "@/lib/brand/tokens";
 import { escapeHtml, htmlToText, safeUrl, textParagraphs } from "./components";
 import { CRM_TEMPLATE_KEYS, renderCrmTemplate } from "./index";
 
@@ -94,7 +95,12 @@ describe("Kampagne", () => {
     expect(mail.html).toContain(ctx.unsubscribeUrl);
     expect(mail.html).toContain("CG Projects UG (haftungsbeschränkt)");
     expect(mail.html).toContain("USt-IdNr.: DE457662597");
-    expect(mail.html).toContain("system-ui");
+    // Schriftstapel mit Rückfall (Filson lädt im Mailclient nicht), CI-Farben aus tokens.json
+    expect(mail.html).toContain("Helvetica Neue', Arial, sans-serif");
+    expect(mail.html).toContain(`color:${BRAND_COLORS.wildberry}`);
+    expect(mail.html).toContain(`background:${BRAND_COLORS.cream}`);
+    expect(mail.html).toContain("/brand/logo-derived/provibe-logo-wildberry@2x.png");
+    expect(mail.html).not.toMatch(/style="[^"]*"[a-z-]+"/);
     expect(mail.html).not.toContain("unbekannt");
     expect(mail.text).toContain("Abmelden (https://shop.example/newsletter/abmelden?token=abc)");
   });

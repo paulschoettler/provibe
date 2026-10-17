@@ -4,18 +4,18 @@ Bausteine nach Figma "Admin-Bausteine" (Datei `wttVzqEheGArNkqUliXd3x`, Seite 05
 
 ## Tokens (Tailwind-Klassen)
 
-| Zweck                             | Klasse                                                                                                                                 |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Hintergrund, Karte, ruhige Fläche | `bg-admin-hintergrund`, `bg-admin-karte`, `bg-admin-flaeche`                                                                           |
-| Rahmen                            | `border-admin-rahmen`, `border-admin-rahmen-stark` (Felder, Sekundär-Button)                                                           |
-| Text                              | `text-admin-text`, `text-admin-text-2`                                                                                                 |
-| Akzent Magenta                    | `bg-admin-akzent`, `hover:bg-admin-akzent-hover`, `bg-admin-akzent-hell`                                                               |
-| Seitenleiste                      | `bg-admin-seitenleiste`, `text-admin-seitenleiste-text`                                                                                |
-| Status                            | `admin-gruen`, `admin-gelb` (Text `admin-gelb-text`), `admin-blau`, `admin-rot`, `admin-grau` (Text `admin-grau-text`), je mit `-hell` |
-| Radius                            | `rounded-admin-karte` (10), `rounded-admin-feld` (8), `rounded-admin-badge` (Pill), `rounded-admin-dialog` (12)                        |
-| Schatten                          | `shadow-admin-karte`                                                                                                                   |
+| Zweck                             | Klasse                                                                                                                                    |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Hintergrund, Karte, ruhige Fläche | `bg-admin-hintergrund`, `bg-admin-karte`, `bg-admin-flaeche`                                                                              |
+| Rahmen                            | `border-admin-rahmen`, `border-admin-rahmen-stark` (Felder, Sekundär-Button)                                                              |
+| Text                              | `text-admin-text`, `text-admin-text-2`                                                                                                    |
+| Akzent Wildberry                  | `bg-admin-akzent`, `hover:bg-admin-akzent-hover` (Burgundy), `bg-admin-akzent-hell` (Cream); Überschriften `text-admin-ueberschrift`      |
+| Seitenleiste                      | `bg-admin-seitenleiste`, `text-admin-seitenleiste-text`, `bg-admin-seitenleiste-aktiv`/`-aktiv-text`, `hover:bg-admin-seitenleiste-hover` |
+| Status                            | `admin-gruen`, `admin-gelb` (Text `admin-gelb-text`), `admin-blau`, `admin-rot`, `admin-grau` (Text `admin-grau-text`), je mit `-hell`    |
+| Radius                            | `rounded-admin-karte` (10), `rounded-admin-feld` (8), `rounded-admin-badge` (Pill), `rounded-admin-dialog` (12)                           |
+| Schatten                          | `shadow-admin-karte`                                                                                                                      |
 
-Höhen: Button 36 px (mobil 44), Feld 40 (mobil 44), Kopfzeile 56, Seitenleiste 240, Tabellenkopf 40, Zeile 52 (mit Bild 64). Schrift Jost.
+Höhen: Button 36 px (mobil 44), Feld 40 (mobil 44), Kopfzeile 56, Seitenleiste 240, Tabellenkopf 40, Zeile 52 (mit Bild 64). Schrift Filson Pro (`var(--pv-font-sans)`). Farben nur über die Admin-Tokens, die auf CI-Tokens (`--pv-*`) und Funktionsfarben (`--pv-ui-*`, `src/styles/ui-tokens.css`) zeigen; keine Hex-Werte, keine Transparenz-Modifier.
 
 ## Bausteine und Props
 

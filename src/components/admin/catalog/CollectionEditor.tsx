@@ -227,7 +227,7 @@ export function CollectionEditor({
                         className="rounded-admin-feld border-admin-rahmen-stark border border-dashed"
                         open={members.length === 0}
                       >
-                        <summary className="text-admin-akzent flex min-h-11 cursor-pointer items-center gap-2 px-3 text-[14px] font-semibold">
+                        <summary className="text-admin-akzent flex min-h-11 cursor-pointer items-center gap-2 px-3 text-[14px] font-bold">
                           <Icon name="plus" size={16} />
                           Produkte hinzufügen
                         </summary>
@@ -336,7 +336,7 @@ export function CollectionEditor({
                             type="file"
                             name="file"
                             accept="image/jpeg,image/png,image/webp,image/avif"
-                            className="text-[13px] file:mr-3 file:rounded-[8px] file:border file:border-[var(--color-admin-rahmen-stark)] file:bg-transparent file:px-3 file:py-2"
+                            className="file:border-admin-rahmen-stark text-[13px] file:mr-3 file:rounded-[8px] file:border file:bg-transparent file:px-3 file:py-2"
                           />
                         </label>
                         <div className="flex flex-wrap gap-2">
@@ -372,7 +372,7 @@ export function CollectionEditor({
                 <Card title="Übersicht">
                   <dl className="grid grid-cols-[1fr_auto] gap-y-1.5 text-[14px]">
                     <dt className="text-admin-text-2">Produkte</dt>
-                    <dd className="text-right font-semibold">{members.length}</dd>
+                    <dd className="text-right font-bold">{members.length}</dd>
                     <dt className="text-admin-text-2">Pfad</dt>
                     <dd className="truncate text-right">/collections/{c.handle}</dd>
                     <dt className="text-admin-text-2">Angelegt</dt>

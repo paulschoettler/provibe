@@ -166,7 +166,7 @@ export function ManualProductList({
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[14px] font-semibold">{p.title}</span>
+                <span className="block truncate text-[14px] font-bold">{p.title}</span>
                 <span className="text-admin-text-2 block truncate text-[12px]">
                   /products/{p.handle}
                 </span>

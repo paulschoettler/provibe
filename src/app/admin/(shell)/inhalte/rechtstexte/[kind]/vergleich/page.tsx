@@ -213,7 +213,7 @@ function VersionHead({
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[15px] font-semibold">
+        <p className="text-[15px] font-bold">
           Version {v.version} ({side})
         </p>
         {v.status === "draft" ? (
@@ -277,7 +277,7 @@ function Cell({
         tone === "removed" &&
           "bg-admin-rot-hell text-admin-rot admin-diff-entfernt border-admin-rot border-l-4 px-3 py-2",
         tone === "added" &&
-          "bg-admin-gruen-hell border-admin-gruen border-l-4 px-3 py-2 text-[color:var(--color-admin-gruen)]",
+          "bg-admin-gruen-hell border-admin-gruen text-admin-gruen border-l-4 px-3 py-2",
         tone === "empty" && "max-md:hidden",
       )}
     >
@@ -294,8 +294,8 @@ function Row({ op }: { op: DiffOp }) {
   if (op.type === "equal")
     return (
       <div className="text-admin-text-2 grid gap-2 text-[14px] md:grid-cols-2 md:gap-6">
-        <p className={cx(heading(op.old.tag) && "text-admin-text font-semibold")}>{op.old.text}</p>
-        <p className={cx("max-md:hidden", heading(op.new.tag) && "text-admin-text font-semibold")}>
+        <p className={cx(heading(op.old.tag) && "text-admin-text font-bold")}>{op.old.text}</p>
+        <p className={cx("max-md:hidden", heading(op.new.tag) && "text-admin-text font-bold")}>
           {op.new.text}
         </p>
       </div>

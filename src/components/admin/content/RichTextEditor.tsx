@@ -156,7 +156,7 @@ export function RichTextEditor({
               disabled={disabled || source}
               aria-label={t.label}
               title={t.label}
-              className="rounded-admin-feld hover:bg-admin-karte flex size-11 items-center justify-center text-[15px] font-semibold disabled:opacity-40 md:size-9"
+              className="rounded-admin-feld hover:bg-admin-karte flex size-11 items-center justify-center text-[15px] font-bold disabled:opacity-40 md:size-9"
             >
               {t.icon ? <Icon name={t.icon} size={18} /> : <span aria-hidden="true">{t.text}</span>}
             </button>
@@ -185,7 +185,7 @@ export function RichTextEditor({
           onBlur={sync}
           hidden={source}
           style={{ minHeight }}
-          className="admin-inhalte-prosa max-h-[70vh] overflow-y-auto px-4 py-3 text-[14px] leading-[1.6] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-admin-akzent)] focus-visible:ring-inset"
+          className="admin-inhalte-prosa focus-visible:ring-admin-akzent max-h-[70vh] overflow-y-auto px-4 py-3 text-[14px] leading-[1.6] outline-none focus-visible:ring-2 focus-visible:ring-inset"
         />
         <textarea
           ref={hiddenRef}

@@ -73,7 +73,7 @@ export function InfoRow({ label, children }: { label: ReactNode; children: React
   return (
     <div className="border-admin-rahmen flex items-baseline justify-between gap-3 border-b py-2.5 text-[13px] last:border-b-0">
       <dt className="text-admin-text-2">{label}</dt>
-      <dd className="text-right font-semibold">{children}</dd>
+      <dd className="text-right font-bold">{children}</dd>
     </div>
   );
 }

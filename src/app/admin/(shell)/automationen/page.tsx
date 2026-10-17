@@ -218,10 +218,7 @@ export default async function AutomationenPage({
                         <Icon name={ICONS[a.key]} size={20} />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <h2
-                          id={`${formId}-titel`}
-                          className="text-[17px] leading-[1.3] font-semibold"
-                        >
+                        <h2 id={`${formId}-titel`} className="text-[17px] leading-[1.3] font-bold">
                           {a.name}
                         </h2>
                         <p
@@ -344,7 +341,7 @@ export default async function AutomationenPage({
           rowKey={(r) => r.id}
           toolbar={
             <div className="flex flex-col gap-2 p-3">
-              <h2 className="text-[16px] font-semibold">Letzte Läufe</h2>
+              <h2 className="text-[16px] font-bold">Letzte Läufe</h2>
               <Tabs
                 variant="chip"
                 label="Automation filtern"

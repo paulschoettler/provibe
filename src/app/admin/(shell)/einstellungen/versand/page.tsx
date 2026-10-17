@@ -84,7 +84,7 @@ export default async function ShippingSettingsPage({
           <Icon name="ort" size={20} />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-[16px] font-semibold">{z.name}</h2>
+          <h2 className="text-[16px] font-bold">{z.name}</h2>
           <p className="text-admin-text-2 text-[13px]">
             Länder: {z.countryCodes.join(", ")}
             {!z.isEnabled ? " · vorbereitet, abgeschaltet" : ""}
@@ -168,10 +168,10 @@ export default async function ShippingSettingsPage({
           renderCard={(r) => (
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2 text-[15px] font-semibold">
+                <span className="flex items-center gap-2 text-[15px] font-bold">
                   <Icon name="lkw" size={18} /> {r.name}
                 </span>
-                <span className="font-semibold">{formatMoney(r.priceCents)}</span>
+                <span className="font-bold">{formatMoney(r.priceCents)}</span>
               </div>
               <p className="text-admin-text-2 text-[13px]">
                 {r.freeAboveSubtotalCents != null

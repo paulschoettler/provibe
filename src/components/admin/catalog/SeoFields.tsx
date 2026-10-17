@@ -86,7 +86,7 @@ export function SeoFields({
         <p className="text-admin-text-2 truncate text-[12px]">
           provibe-drinks.de › {pathPrefix} › {live.handle || "…"}
         </p>
-        <p className="mt-1 truncate text-[17px] leading-snug font-medium text-[#1a5fb4]">
+        <p className="text-admin-serp-link mt-1 truncate text-[17px] leading-snug font-medium">
           {cut(shownTitle, 70)}
         </p>
         <p className="text-admin-text-2 mt-1 line-clamp-2 text-[13px]">

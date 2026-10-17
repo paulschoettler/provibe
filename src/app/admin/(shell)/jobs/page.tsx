@@ -305,14 +305,14 @@ export default async function JobsPage({
             </dl>
             {job.lastError ? (
               <div>
-                <h3 className="mb-2 text-[15px] font-semibold">Letzte Fehlermeldung</h3>
-                <pre className="rounded-admin-feld bg-admin-rot-hell/60 p-3 font-mono text-[12px] break-all whitespace-pre-wrap">
+                <h3 className="mb-2 text-[15px] font-bold">Letzte Fehlermeldung</h3>
+                <pre className="rounded-admin-feld bg-admin-rot-hell p-3 font-mono text-[12px] break-all whitespace-pre-wrap">
                   {job.lastError}
                 </pre>
               </div>
             ) : null}
             <div>
-              <h3 className="mb-2 text-[15px] font-semibold">Payload</h3>
+              <h3 className="mb-2 text-[15px] font-bold">Payload</h3>
               <pre className="rounded-admin-feld bg-admin-flaeche p-3 font-mono text-[12px] break-all whitespace-pre-wrap">
                 {JSON.stringify(job.payload, null, 2)}
               </pre>

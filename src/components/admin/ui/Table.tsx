@@ -158,7 +158,7 @@ export function Table<T>({
                       className={cx(
                         rowH,
                         "border-admin-rahmen has-[input[data-row-select]:checked]:bg-admin-akzent-hell relative border-b last:border-b-0",
-                        href && "hover:bg-admin-flaeche/60",
+                        href && "hover:bg-admin-hintergrund",
                       )}
                     >
                       {selection && value !== undefined ? (
@@ -188,7 +188,7 @@ export function Table<T>({
                           {href && i === 0 ? (
                             <Link
                               href={href}
-                              className="font-semibold after:absolute after:inset-0 after:content-[''] hover:underline"
+                              className="font-bold after:absolute after:inset-0 after:content-[''] hover:underline"
                             >
                               {col.cell(row)}
                             </Link>
@@ -302,7 +302,7 @@ export function CardRow({
 }) {
   return (
     <div className="flex flex-col gap-2.5">
-      <div className="flex items-center gap-2 text-[16px] font-semibold">
+      <div className="flex items-center gap-2 text-[16px] font-bold">
         <span className="min-w-0 flex-1 truncate">{primary}</span>
         {aside ? <span className="shrink-0 tabular-nums">{aside}</span> : null}
       </div>

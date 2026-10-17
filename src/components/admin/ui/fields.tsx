@@ -410,11 +410,11 @@ export function CheckboxBox({
         className="peer border-admin-rahmen-stark bg-admin-karte checked:border-admin-akzent checked:bg-admin-akzent indeterminate:border-admin-akzent indeterminate:bg-admin-akzent aria-invalid:border-admin-rot size-[18px] cursor-pointer appearance-none rounded-[4px] border-[1.5px]"
         {...rest}
       />
-      <span className="pointer-events-none absolute inset-0 hidden items-center justify-center text-white peer-checked:flex">
+      <span className="text-admin-auf-akzent pointer-events-none absolute inset-0 hidden items-center justify-center peer-checked:flex">
         <Icon name="haken" size={14} />
       </span>
       <span className="pointer-events-none absolute inset-0 hidden items-center justify-center peer-indeterminate:flex">
-        <span className="h-[2px] w-2 rounded-[1px] bg-white" />
+        <span className="bg-admin-auf-akzent h-[2px] w-2 rounded-[1px]" />
       </span>
     </span>
   );
@@ -466,7 +466,7 @@ export function Switch({
         className="flex min-h-11 cursor-pointer items-center gap-3 md:min-h-0"
       >
         <span className={cx("min-w-0 flex-1", hideLabel && "sr-only")}>
-          <span className="block text-[14px] font-semibold">{label}</span>
+          <span className="block text-[14px] font-bold">{label}</span>
           {description ? (
             <span className="text-admin-text-2 mt-0.5 block text-[13px]">{description}</span>
           ) : null}
@@ -484,7 +484,7 @@ export function Switch({
             className="peer bg-admin-rahmen-stark checked:bg-admin-akzent h-6 w-10 cursor-pointer appearance-none rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             {...rest}
           />
-          <span className="pointer-events-none absolute top-1 left-1 size-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
+          <span className="bg-admin-karte pointer-events-none absolute top-1 left-1 size-4 rounded-full shadow transition-transform peer-checked:translate-x-4" />
         </span>
       </label>
       <FieldNote id={fieldId} hint={hint} error={s.error} />
@@ -544,7 +544,7 @@ export function RadioCards({
             className="border-admin-rahmen-stark bg-admin-karte checked:border-admin-akzent mt-0.5 size-[18px] shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] checked:border-[5px]"
           />
           <span className="min-w-0">
-            <span className="block text-[14px] font-semibold">{o.label}</span>
+            <span className="block text-[14px] font-bold">{o.label}</span>
             {o.description ? (
               <span className="text-admin-text-2 mt-0.5 block text-[13px]">{o.description}</span>
             ) : null}

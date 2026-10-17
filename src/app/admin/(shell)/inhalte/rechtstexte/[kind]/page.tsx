@@ -102,7 +102,7 @@ export default async function LegalDocumentPage({
               className={`border-admin-rahmen border-t px-4 py-3 ${isViewed ? "bg-admin-akzent-hell" : ""}`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[14px] font-semibold">Version {v.version}</span>
+                <span className="text-[14px] font-bold">Version {v.version}</span>
                 {v.status === "draft" ? (
                   <Badge tone="gray">Entwurf</Badge>
                 ) : v.isCurrent ? (
@@ -267,9 +267,7 @@ export default async function LegalDocumentPage({
                 Veröffentlichen
               </summary>
               <div className="rounded-admin-karte border-admin-rahmen bg-admin-karte shadow-admin-karte mt-2 flex w-full flex-col gap-3 border p-4 md:w-[420px]">
-                <p className="text-[15px] font-semibold">
-                  Version {editing.version} veröffentlichen
-                </p>
+                <p className="text-[15px] font-bold">Version {editing.version} veröffentlichen</p>
                 <fieldset className="flex flex-col gap-2">
                   <legend className="mb-1 text-[13px] font-medium">Gültig ab</legend>
                   <label className="flex min-h-11 items-center gap-2 text-[14px] md:min-h-0">
@@ -278,7 +276,7 @@ export default async function LegalDocumentPage({
                       name="effectiveMode"
                       value="now"
                       defaultChecked
-                      className="size-4 accent-[var(--color-admin-akzent)]"
+                      className="accent-admin-akzent size-4"
                     />
                     Sofort
                   </label>
@@ -287,7 +285,7 @@ export default async function LegalDocumentPage({
                       type="radio"
                       name="effectiveMode"
                       value="later"
-                      className="size-4 accent-[var(--color-admin-akzent)]"
+                      className="accent-admin-akzent size-4"
                     />
                     Zu einem späteren Zeitpunkt (zum Beispiel angekündigte AGB-Änderung)
                   </label>

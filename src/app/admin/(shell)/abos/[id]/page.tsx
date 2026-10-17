@@ -243,7 +243,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
       <div className="flex items-center gap-3">
         <CanThumb src={line?.imageUrl ?? item.imageUrl ?? null} size="md" />
         <div className="min-w-0">
-          <p className="text-admin-akzent font-semibold">{item.productTitle || "Produkt"}</p>
+          <p className="text-admin-akzent font-bold">{item.productTitle || "Produkt"}</p>
           <p className="text-admin-text-2 text-[13px]">
             {(line?.description ?? item.variantTitle).split(" · im Abo")[0]} · Menge {row.quantity}
           </p>
@@ -252,7 +252,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
         <div className="rounded-admin-feld bg-admin-flaeche p-3">
           <dt className="text-admin-text-2 text-[12px]">Nächste Lieferung</dt>
-          <dd className="text-[16px] font-semibold">
+          <dd className="text-[16px] font-bold">
             {row.status === "past_due"
               ? "Zahlung offen"
               : next
@@ -275,14 +275,14 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
         </div>
         <div className="rounded-admin-feld bg-admin-flaeche p-3">
           <dt className="text-admin-text-2 text-[12px]">Erinnerung</dt>
-          <dd className="text-[16px] font-semibold">{reminder ? formatDay(reminder) : "–"}</dd>
+          <dd className="text-[16px] font-bold">{reminder ? formatDay(reminder) : "–"}</dd>
           <dd className="text-admin-text-2 text-[12px]">
             {settings.reminderDays} Tage vorher per E-Mail
           </dd>
         </div>
         <div className="rounded-admin-feld bg-admin-flaeche p-3">
           <dt className="text-admin-text-2 text-[12px]">Danach</dt>
-          <dd className="text-[16px] font-semibold">
+          <dd className="text-[16px] font-bold">
             {following.length ? following.map((d) => formatDay(d)).join(", ") : "–"}
           </dd>
           <dd className="text-admin-text-2 text-[12px]">
@@ -329,14 +329,12 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
         <ul className="divide-admin-rahmen border-admin-rahmen divide-y border-t">
           {next && row.status !== "cancelled" ? (
             <li className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-[14px]">
-              <span className="w-24 font-semibold">
+              <span className="w-24 font-bold">
                 {row.status === "past_due" ? "offen" : "geplant"}
               </span>
               <span className="text-admin-text-2 flex-1">{formatDay(next)}</span>
               {seeMoney && snapshot ? (
-                <span className="font-semibold tabular-nums">
-                  {formatMoney(snapshot.totalCents)}
-                </span>
+                <span className="font-bold tabular-nums">{formatMoney(snapshot.totalCents)}</span>
               ) : null}
               {row.status === "past_due" ? (
                 <Badge tone="yellow">Zahlung offen</Badge>
@@ -354,7 +352,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
               >
                 <Link
                   href={`/admin/bestellungen/${d.orderId}`}
-                  className="text-admin-akzent w-24 font-semibold underline underline-offset-2"
+                  className="text-admin-akzent w-24 font-bold underline underline-offset-2"
                 >
                   {d.orderNumber}
                 </Link>
@@ -363,7 +361,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
                   {d.kind === "initial" ? "Erstbestellung" : "Folgelieferung"}
                 </span>
                 {seeMoney ? (
-                  <span className="font-semibold tabular-nums">{formatMoney(d.totalCents)}</span>
+                  <span className="font-bold tabular-nums">{formatMoney(d.totalCents)}</span>
                 ) : null}
                 <span className="flex gap-1">
                   {seeMoney && pay ? <Badge tone={pay.tone}>{pay.label}</Badge> : null}
@@ -520,7 +518,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
             >
               <Link
                 href={`/admin/kunden/${detail.customer.id}`}
-                className="text-admin-akzent font-semibold underline underline-offset-2"
+                className="text-admin-akzent font-bold underline underline-offset-2"
               >
                 {customerName}
               </Link>
@@ -539,7 +537,7 @@ export default async function AboDetailPage({ params }: { params: Promise<{ id: 
             <Card title="Zahlungsmittel">
               {detail.paymentMethod ? (
                 <>
-                  <p className="font-semibold">
+                  <p className="font-bold">
                     {brandLabel(detail.paymentMethod.brand, detail.paymentMethod.type)}
                     {detail.paymentMethod.last4 ? ` ···· ${detail.paymentMethod.last4}` : ""}
                   </p>
@@ -577,7 +575,7 @@ function PriceRow({ label, value, strong }: { label: string; value: string; stro
   return (
     <div className="flex items-center justify-between gap-3 py-2.5">
       <dt className={strong ? "font-medium" : "text-admin-text-2"}>{label}</dt>
-      <dd className="font-semibold tabular-nums">{value}</dd>
+      <dd className="font-bold tabular-nums">{value}</dd>
     </div>
   );
 }

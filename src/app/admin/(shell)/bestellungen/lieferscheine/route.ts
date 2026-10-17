@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { requireStaff } from "@/lib/admin/auth";
 import { renderPackingSlips } from "@/lib/admin/fulfilment/packing-slip";
 import { idsFrom } from "@/lib/admin/orders/url";
+import { BRAND_FONTS } from "@/lib/brand/tokens";
 
 /**
  * Sammeldruck der Lieferscheine aus der Bestellliste (ids mehrfach oder kommagetrennt). Druckfertiges
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 function message(status: number, text: string) {
   return new NextResponse(
-    `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Lieferscheine</title></head><body style="font-family:Jost,system-ui,sans-serif;padding:32px"><p>${text}</p><p><a href="/admin/bestellungen">Zurück zu den Bestellungen</a></p></body></html>`,
+    `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Lieferscheine</title></head><body style="font-family:${BRAND_FONTS.sans};padding:32px"><p>${text}</p><p><a href="/admin/bestellungen">Zurück zu den Bestellungen</a></p></body></html>`,
     {
       status,
       headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },

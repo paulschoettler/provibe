@@ -629,7 +629,7 @@ function NewVariantRow({
       open={open}
       className="rounded-admin-feld border-admin-rahmen-stark group border border-dashed"
     >
-      <summary className="text-admin-akzent flex min-h-11 cursor-pointer items-center gap-2 px-3 text-[14px] font-semibold">
+      <summary className="text-admin-akzent flex min-h-11 cursor-pointer items-center gap-2 px-3 text-[14px] font-bold">
         <Icon name="plus" size={16} />
         {index === 0 ? "Erste Variante" : "Variante hinzufügen"}
       </summary>
@@ -763,9 +763,7 @@ function BundleVariantComponents({
     <div className="border-admin-rahmen border-t first:border-t-0">
       <input type="hidden" name={`${base}.present`} value="1" />
       {showTitle ? (
-        <h3 className="bg-admin-flaeche px-4 py-2 text-[14px] font-semibold">
-          Variante {view.title}
-        </h3>
+        <h3 className="bg-admin-flaeche px-4 py-2 text-[14px] font-bold">Variante {view.title}</h3>
       ) : null}
       <div className="overflow-x-auto">
         <table className="w-full text-[14px]">
@@ -806,7 +804,7 @@ function BundleVariantComponents({
                     />
                     <Link
                       href={`/admin/produkte/${c.productId}`}
-                      className="font-semibold hover:underline"
+                      className="font-bold hover:underline"
                     >
                       {c.productTitle}
                     </Link>
@@ -831,7 +829,7 @@ function BundleVariantComponents({
                     {availText(stock[c.componentVariantId])}
                   </td>
                   <td
-                    className={`px-2 py-2 font-semibold max-sm:hidden ${short ? "text-admin-rot" : ""}`}
+                    className={`px-2 py-2 font-bold max-sm:hidden ${short ? "text-admin-rot" : ""}`}
                   >
                     {Number.isFinite(lim) ? `${lim} Bundles` : "unbegrenzt"}
                   </td>
@@ -886,13 +884,13 @@ function BundleVariantComponents({
         ) : null}
         <dl className="grid grid-cols-[1fr_auto] gap-y-1 text-[14px]">
           <dt className="text-admin-text-2">Summe Einzelpreise ({units} Einheiten)</dt>
-          <dd className="text-right font-semibold">
+          <dd className="text-right font-bold">
             {view.componentsSumCents != null ? formatMoney(view.componentsSumCents) : "–"}
           </dd>
           <dt className="text-admin-text-2">Bundle-Preis</dt>
-          <dd className="text-right font-semibold">{formatMoney(view.priceCents)}</dd>
+          <dd className="text-right font-bold">{formatMoney(view.priceCents)}</dd>
           <dt className="text-admin-text-2">Pfand aus Komponenten</dt>
-          <dd className="text-right font-semibold">{formatMoney(deposit)}</dd>
+          <dd className="text-right font-bold">{formatMoney(deposit)}</dd>
         </dl>
       </div>
     </div>
@@ -1103,7 +1101,7 @@ export function PriceHistoryCard({
           {views.map((v) => (
             <div key={v.id} className="contents">
               <dt className="text-admin-text-2 truncate">Niedrigster Preis 30 Tage, {v.title}</dt>
-              <dd className="text-right font-semibold">
+              <dd className="text-right font-bold">
                 {v.lowestPrice30dCents != null ? formatMoney(v.lowestPrice30dCents) : "–"}
               </dd>
             </div>
@@ -1145,7 +1143,7 @@ export function PriceHistoryCard({
               {entries.map((e) => (
                 <tr key={e.id} className="border-admin-rahmen h-10 border-b last:border-b-0">
                   <td className="px-4">{e.variantTitle}</td>
-                  <td className="px-2 text-right font-semibold tabular-nums">
+                  <td className="px-2 text-right font-bold tabular-nums">
                     {formatMoney(e.priceCents)}
                   </td>
                   <td className="px-2 text-right tabular-nums max-sm:hidden">

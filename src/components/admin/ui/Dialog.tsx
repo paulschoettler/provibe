@@ -174,7 +174,7 @@ export function Dialog({
             <div className="flex max-h-[calc(100dvh-32px)] flex-col">
               <div className="border-admin-rahmen flex items-start gap-2 border-b py-3 pr-2 pl-5">
                 <div className="min-w-0 flex-1 py-1.5">
-                  <h2 id={titleId} className="text-[18px] leading-[1.4] font-semibold">
+                  <h2 id={titleId} className="text-[18px] leading-[1.4] font-bold">
                     {title}
                   </h2>
                   {description ? (

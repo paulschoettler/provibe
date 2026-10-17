@@ -48,7 +48,7 @@ export function PageHeader({
           ) : null}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-[24px] leading-[1.25] font-semibold tracking-[-0.01em] md:text-[28px]">
+              <h1 className="text-[24px] leading-[1.25] font-medium tracking-[-0.01em] md:text-[28px]">
                 {title}
               </h1>
               {meta}

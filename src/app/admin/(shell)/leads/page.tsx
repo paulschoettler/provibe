@@ -442,7 +442,7 @@ async function ContactTab({ sp }: { sp: SearchParamsInput }) {
               ]}
             />
             <div>
-              <h3 className="mb-2 text-[15px] font-semibold">Nachricht</h3>
+              <h3 className="mb-2 text-[15px] font-bold">Nachricht</h3>
               <p className="rounded-admin-feld bg-admin-flaeche p-3 text-[14px] leading-[1.55] break-words whitespace-pre-line">
                 {entry.message}
               </p>
@@ -643,14 +643,14 @@ async function WithdrawalTab({ sp }: { sp: SearchParamsInput }) {
               ]}
             />
             <div>
-              <h3 className="mb-2 text-[15px] font-semibold">Widerrufene Waren</h3>
+              <h3 className="mb-2 text-[15px] font-bold">Widerrufene Waren</h3>
               <p className="rounded-admin-feld bg-admin-flaeche p-3 text-[14px] whitespace-pre-line">
                 {entry.itemsDescription}
               </p>
             </div>
             {entry.message ? (
               <div>
-                <h3 className="mb-2 text-[15px] font-semibold">Nachricht</h3>
+                <h3 className="mb-2 text-[15px] font-bold">Nachricht</h3>
                 <p className="rounded-admin-feld bg-admin-flaeche p-3 text-[14px] whitespace-pre-line">
                   {entry.message}
                 </p>

@@ -45,7 +45,7 @@ export function Card({
         <div className={cx("flex items-start gap-2 px-4 pt-4", flush ? "pb-3" : "pb-2")}>
           <div className="min-w-0 flex-1">
             {title ? (
-              <h2 id={headingId} className="text-[16px] leading-[1.4] font-semibold">
+              <h2 id={headingId} className="text-[16px] leading-[1.4] font-bold">
                 {title}
               </h2>
             ) : null}

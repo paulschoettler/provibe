@@ -92,7 +92,7 @@ export function SaveBar({
           type="reset"
           form={formId}
           tabIndex={visible ? undefined : -1}
-          className="rounded-admin-feld border-admin-rahmen-stark bg-admin-karte text-admin-text h-11 border px-4 text-[14px] font-semibold md:h-9"
+          className="rounded-admin-feld border-admin-rahmen-stark bg-admin-karte text-admin-text h-11 border px-4 text-[14px] font-bold md:h-9"
         >
           {discardLabel}
         </button>
@@ -101,7 +101,7 @@ export function SaveBar({
           form={formId}
           disabled={pending}
           tabIndex={visible ? undefined : -1}
-          className="rounded-admin-badge bg-admin-akzent text-admin-auf-akzent hover:bg-admin-akzent-hover h-11 px-4 text-[14px] font-semibold disabled:opacity-60 md:h-9"
+          className="rounded-admin-badge bg-admin-seitenleiste-aktiv text-admin-seitenleiste-aktiv-text hover:bg-admin-karte h-11 px-4 text-[14px] font-bold disabled:opacity-60 md:h-9"
         >
           {pending ? "Wird gespeichert …" : saveLabel}
         </button>

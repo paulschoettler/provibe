@@ -24,7 +24,7 @@ export function AddressFieldset({
   const n = (k: string) => `${prefix}_${k}`;
   return (
     <fieldset className="flex flex-col gap-3">
-      <legend className="mb-1 text-[14px] font-semibold">{legend}</legend>
+      <legend className="mb-1 text-[14px] font-bold">{legend}</legend>
       <div className="grid grid-cols-2 gap-3">
         <Field
           name={n("first_name")}

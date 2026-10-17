@@ -101,7 +101,7 @@ export default async function NavigationPage({
           </span>
         ) : null}
         <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-center gap-1.5 text-[14px] font-semibold">
+          <span className="flex flex-wrap items-center gap-1.5 text-[14px] font-bold">
             {it.label || "(ohne Beschriftung)"}
             {it.isExternal ? (
               <Badge tone="gray" noDot>

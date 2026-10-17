@@ -53,7 +53,7 @@ export function CsvImport({ defaultOpen }: { defaultOpen?: boolean }) {
             <FormMessage tone="error">{state.message}</FormMessage>
           ) : null}
           <div className="rounded-admin-feld bg-admin-flaeche p-3 text-[13px] leading-[1.5]">
-            <p className="font-semibold">Pflichtfelder für den Einwilligungsnachweis</p>
+            <p className="font-bold">Pflichtfelder für den Einwilligungsnachweis</p>
             <ul className="mt-1 list-disc pl-5">
               <li>
                 <strong>E-Mail</strong> und <strong>Status</strong> (abonniert, unbestätigt oder
@@ -94,7 +94,7 @@ export function CsvImport({ defaultOpen }: { defaultOpen?: boolean }) {
         >
           <input type="hidden" name="csv" value={plan.csv} />
           <DialogBody>
-            <h3 className="text-[15px] font-semibold">Ergebnis der Prüfung</h3>
+            <h3 className="text-[15px] font-bold">Ergebnis der Prüfung</h3>
             <dl className="grid grid-cols-2 gap-2 text-[13px] sm:grid-cols-4">
               <Fact label="Neu" value={plan.plan.insert} />
               <Fact label="Aktualisiert" value={plan.plan.update} />
@@ -153,7 +153,7 @@ function Fact({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-admin-feld border-admin-rahmen border px-3 py-2">
       <dt className="text-admin-text-2">{label}</dt>
-      <dd className="text-[18px] font-semibold tabular-nums">{value}</dd>
+      <dd className="text-[18px] font-bold tabular-nums">{value}</dd>
     </div>
   );
 }

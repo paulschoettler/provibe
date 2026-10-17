@@ -266,7 +266,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
             width: "150px",
             sortable: true,
             cell: (o) => (
-              <span className="flex items-center gap-1.5 font-semibold whitespace-nowrap">
+              <span className="flex items-center gap-1.5 font-bold whitespace-nowrap">
                 {o.orderNumber}
                 {o.isTest ? (
                   <Badge tone="gray" noDot>
@@ -301,7 +301,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
                   align: "right" as const,
                   sortable: true,
                   cell: (o: (typeof rows)[number]) => (
-                    <span className="font-semibold tabular-nums">{formatMoney(o.totalCents)}</span>
+                    <span className="font-bold tabular-nums">{formatMoney(o.totalCents)}</span>
                   ),
                 },
               ]

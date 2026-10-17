@@ -2,6 +2,7 @@
 
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
+import { EMAIL_COLORS as C, EMAIL_FONT, EMAIL_RADIUS } from "@/emails/components";
 import { publicEnv } from "@/lib/env/public";
 import { integrations } from "@/lib/integrations";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -22,14 +23,14 @@ const schema = z.object({
 });
 
 function optInEmail(confirmUrl: string) {
-  const html = `<!doctype html><html lang="de"><body style="margin:0;background:#FBF8EE;font-family:Jost,Helvetica,Arial,sans-serif;color:#4A2F39">
+  const html = `<!doctype html><html lang="de"><body style="margin:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
   <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:#D9306E;margin:0 0 12px">provibe Newsletter</p>
-    <h1 style="font-size:26px;font-weight:600;letter-spacing:-.02em;margin:0 0 16px">Nur noch ein Klick.</h1>
+    <p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;color:${C.text};margin:0 0 12px">provibe Newsletter</p>
+    <h1 style="font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 16px">Nur noch ein Klick.</h1>
     <p style="font-size:16px;line-height:1.6;margin:0 0 24px">Bitte bestätige, dass du unseren Newsletter bekommen möchtest. Ohne diese Bestätigung schicken wir dir nichts.</p>
-    <p style="margin:0 0 28px"><a href="${confirmUrl}" style="display:inline-block;background:#D9306E;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 26px;border-radius:100px">Anmeldung bestätigen</a></p>
-    <p style="font-size:14px;line-height:1.6;color:#8A7680;margin:0 0 8px">Falls der Button nicht geht, kopier diesen Link in deinen Browser:<br><span style="word-break:break-all">${confirmUrl}</span></p>
-    <p style="font-size:13px;line-height:1.6;color:#8A7680;margin:24px 0 0">Der Link gilt ${OPT_IN_TTL_DAYS} Tage. Du hast dich nicht angemeldet? Dann ignorier diese E-Mail einfach.</p>
+    <p style="margin:0 0 28px"><a href="${confirmUrl}" style="display:inline-block;background:${C.accent};color:${C.onAccent};text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:${EMAIL_RADIUS.pill}">Anmeldung bestätigen</a></p>
+    <p style="font-size:14px;line-height:1.6;color:${C.text};margin:0 0 8px">Falls der Button nicht geht, kopier diesen Link in deinen Browser:<br><span style="word-break:break-all">${confirmUrl}</span></p>
+    <p style="font-size:13px;line-height:1.6;color:${C.text};margin:24px 0 0">Der Link gilt ${OPT_IN_TTL_DAYS} Tage. Du hast dich nicht angemeldet? Dann ignorier diese E-Mail einfach.</p>
   </div></body></html>`;
   const text = `provibe Newsletter\n\nBitte bestätige deine Anmeldung:\n${confirmUrl}\n\nDer Link gilt ${OPT_IN_TTL_DAYS} Tage. Du hast dich nicht angemeldet? Dann ignorier diese E-Mail einfach.`;
   return { html, text };

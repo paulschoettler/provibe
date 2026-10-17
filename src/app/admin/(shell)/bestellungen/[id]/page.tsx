@@ -595,9 +595,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               </div>
               <dl className="mt-3 grid grid-cols-[120px_1fr] gap-y-2 text-[14px]">
                 <dt className="text-admin-text-2">Betrag</dt>
-                <dd className="font-semibold tabular-nums">
-                  {formatMoney(order.payment.amountCents)}
-                </dd>
+                <dd className="font-bold tabular-nums">{formatMoney(order.payment.amountCents)}</dd>
                 <dt className="text-admin-text-2">Zeitpunkt</dt>
                 <dd>
                   {order.payment.paidAt
@@ -688,7 +686,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             >
               {order.customer ? (
                 <div className="flex items-start gap-3">
-                  <span className="bg-admin-akzent-hell text-admin-akzent flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold">
+                  <span className="bg-admin-akzent-hell text-admin-akzent flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold">
                     {initials(order.customer.name)}
                   </span>
                   <div className="min-w-0 text-[14px]">

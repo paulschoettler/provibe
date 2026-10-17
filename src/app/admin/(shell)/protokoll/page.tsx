@@ -298,7 +298,7 @@ function EntryDetail({ entry, actor }: { entry: AuditEntry; actor?: string }) {
         <dd className="text-admin-text-2 text-[13px] break-words">{entry.userAgent ?? "–"}</dd>
       </dl>
       <div>
-        <h3 className="mb-2 text-[15px] font-semibold">Änderung</h3>
+        <h3 className="mb-2 text-[15px] font-bold">Änderung</h3>
         {changes.length === 0 ? (
           <p className="text-admin-text-2 text-[14px]">
             Keine Vorher- oder Nachher-Daten gespeichert.
@@ -328,10 +328,10 @@ function EntryDetail({ entry, actor }: { entry: AuditEntry; actor?: string }) {
                     <th scope="row" className="px-3 py-2 text-left font-medium">
                       {c.key}
                     </th>
-                    <td className={`px-3 py-2 ${c.changed ? "bg-admin-rot-hell/60" : ""}`}>
+                    <td className={`px-3 py-2 ${c.changed ? "bg-admin-rot-hell" : ""}`}>
                       <pre className="font-mono break-all whitespace-pre-wrap">{fmt(c.before)}</pre>
                     </td>
-                    <td className={`px-3 py-2 ${c.changed ? "bg-admin-gruen-hell/60" : ""}`}>
+                    <td className={`px-3 py-2 ${c.changed ? "bg-admin-gruen-hell" : ""}`}>
                       <pre className="font-mono break-all whitespace-pre-wrap">{fmt(c.after)}</pre>
                     </td>
                   </tr>

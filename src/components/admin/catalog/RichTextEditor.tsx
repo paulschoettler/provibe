@@ -250,7 +250,7 @@ function ToolButton({
       disabled={disabled}
       aria-label={label}
       title={label}
-      className="rounded-admin-feld hover:bg-admin-karte flex size-11 items-center justify-center text-[14px] font-semibold md:size-8"
+      className="rounded-admin-feld hover:bg-admin-karte flex size-11 items-center justify-center text-[14px] font-bold md:size-8"
     >
       {children}
     </button>

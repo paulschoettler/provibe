@@ -188,7 +188,7 @@ export function CampaignEditor(props: CampaignEditorProps) {
             </div>
           </Card>
           <section aria-labelledby="aufbau-titel" className="flex flex-col gap-2">
-            <h2 id="aufbau-titel" className="px-1 text-[16px] font-semibold">
+            <h2 id="aufbau-titel" className="px-1 text-[16px] font-bold">
               Aufbau{" "}
               <span className="text-admin-text-2 text-[13px] font-normal">
                 {blocks.length} Blöcke, Fuß mit Abmeldelink ist Pflicht
@@ -220,7 +220,7 @@ export function CampaignEditor(props: CampaignEditorProps) {
                   <div className="flex items-center gap-2">
                     <Icon name={ICONS[b.type]} size={18} />
                     <p className="min-w-0 flex-1 truncate text-[14px]">
-                      <span className="font-semibold">{BLOCK_LABELS[b.type]}</span>
+                      <span className="font-bold">{BLOCK_LABELS[b.type]}</span>
                       <span className="text-admin-text-2">
                         {" "}
                         · {blockSummary(b, props.productNames)}
@@ -287,7 +287,7 @@ export function CampaignEditor(props: CampaignEditorProps) {
                   onClick={() => setDevice(d)}
                   className={cx(
                     "flex h-9 items-center gap-1.5 rounded-[6px] px-3 text-[14px]",
-                    device === d ? "bg-admin-karte font-semibold shadow-sm" : "text-admin-text-2",
+                    device === d ? "bg-admin-karte font-bold shadow-sm" : "text-admin-text-2",
                   )}
                 >
                   <Icon name={d === "desktop" ? "dashboard" : "handy"} size={16} />
@@ -306,7 +306,7 @@ export function CampaignEditor(props: CampaignEditorProps) {
               srcDoc={html}
               sandbox=""
               referrerPolicy="no-referrer"
-              className="rounded-admin-feld border-admin-rahmen h-[760px] max-w-full border bg-white"
+              className="rounded-admin-feld border-admin-rahmen bg-admin-karte h-[760px] max-w-full border"
               style={{ width: device === "desktop" ? 640 : 375 }}
             />
           </div>

@@ -30,7 +30,7 @@ function SubscriptionLinks({ items }: { items: Detail["subscriptions"] }) {
         <li key={sub.id} className="flex items-center gap-2 text-[14px]">
           <Link
             href={`/admin/abos/${sub.id}`}
-            className="text-admin-akzent font-semibold underline underline-offset-2"
+            className="text-admin-akzent font-bold underline underline-offset-2"
           >
             {sub.number}
           </Link>

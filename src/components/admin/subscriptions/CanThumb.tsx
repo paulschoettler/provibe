@@ -1,10 +1,10 @@
 import Image from "next/image";
 
-/** Dosenbild der Sorte auf zartem Grund (Figma Abo-Liste, 28 × 40 px). */
+/** Dosenbild der Sorte auf dem Grund ihrer CI-Farbe (Figma Abo-Liste, 28 × 40 px). */
 const BACKGROUND: Record<string, string> = {
-  wildberry: "bg-[#f7dceb]",
-  "raspberry-lime": "bg-[#e6f2d9]",
-  peach: "bg-[#f7ca99]",
+  wildberry: "bg-pv-cream",
+  "raspberry-lime": "bg-pv-lime-raspberry",
+  peach: "bg-pv-peach",
 };
 
 export function CanThumb({ src, size = "sm" }: { src: string | null; size?: "sm" | "md" }) {

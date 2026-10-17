@@ -348,7 +348,7 @@ async function TemplatesTab({ sp, session }: { sp: SearchParamsInput; session: S
               <div className="flex flex-col gap-2">
                 <p className="text-[13px]">
                   <span className="text-admin-text-2">Vorschau-Betreff:</span>{" "}
-                  <span className="font-semibold">{preview.subject}</span>
+                  <span className="font-bold">{preview.subject}</span>
                 </p>
                 <MailPreview html={preview.html} title={`Vorschau ${selected.name}`} height={820} />
               </div>
@@ -584,7 +584,7 @@ async function LogTab({ sp, session }: { sp: SearchParamsInput; session: StaffSe
               ]}
             />
             <div>
-              <h3 className="mb-2 text-[15px] font-semibold">Resend-Ereignisse</h3>
+              <h3 className="mb-2 text-[15px] font-bold">Resend-Ereignisse</h3>
               {events.length === 0 ? (
                 <p className="text-admin-text-2 text-[13px]">
                   Noch keine Ereignisse

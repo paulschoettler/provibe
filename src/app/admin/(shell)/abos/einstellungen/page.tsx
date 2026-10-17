@@ -119,7 +119,7 @@ export default async function AboSettingsPage() {
                   <p className="text-admin-text-2">
                     Beispiel {first!.title} {firstExample.title}
                   </p>
-                  <p className="text-[15px] font-semibold">
+                  <p className="text-[15px] font-bold">
                     {formatMoney(firstExample.list)} einmalig, {formatMoney(firstExample.abo)} im
                     Abo
                   </p>
@@ -166,7 +166,7 @@ export default async function AboSettingsPage() {
                     const ex = example(p, own ?? s.discountBp);
                     return (
                       <tr key={p.id} className="border-admin-rahmen border-b last:border-b-0">
-                        <th scope="row" className="px-4 py-2 text-left font-semibold">
+                        <th scope="row" className="px-4 py-2 text-left font-bold">
                           {p.title}
                           <span className="text-admin-text-2 block text-[12px] font-normal">
                             alle Packgrößen
@@ -304,7 +304,7 @@ export default async function AboSettingsPage() {
               <div aria-disabled="true" className="flex flex-col gap-3">
                 <div className="rounded-admin-feld bg-admin-flaeche text-admin-text-2 flex items-center justify-between gap-3 p-3 text-[14px]">
                   <span>Vorlauf der Ankündigung</span>
-                  <span className="font-semibold">{PRICE_NOTICE_DAYS} Tage</span>
+                  <span className="font-bold">{PRICE_NOTICE_DAYS} Tage</span>
                 </div>
                 <p className="text-admin-text-2 flex items-start gap-2 text-[13px]">
                   <Icon name="schloss" size={16} />

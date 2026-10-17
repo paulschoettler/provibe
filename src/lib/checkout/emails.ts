@@ -1,4 +1,6 @@
+import { publicEnv } from "@/lib/env/public";
 import { formatEur } from "@/lib/money";
+import { EMAIL_COLORS as C, EMAIL_FONT, EMAIL_RADIUS, emailLogo } from "@/emails/components";
 import { deliveryWindow, formatDeliveryWindow, formatGermanDate } from "./delivery";
 import { lineAmounts, type OrderView } from "./order-view";
 import { formatAddressLines } from "./snapshot";
@@ -49,17 +51,6 @@ export interface RenderedEmail {
   text: string;
 }
 
-const C = {
-  cream: "#FBF8EE",
-  cream2: "#F3F1E7",
-  aubergine: "#4A2F39",
-  plum: "#7E2856",
-  wine: "#6B1D49",
-  magenta: "#D9306E",
-  butter: "#F3EDA4",
-  mauve: "#8A7680",
-};
-
 export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -71,7 +62,7 @@ export function escapeHtml(value: string): string {
 
 function layout(title: string, body: string, entity: LegalEntity | null, isTest: boolean): string {
   const testBanner = isTest
-    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.butter};border:1.5px solid ${C.aubergine};border-radius:12px;font-size:13px;font-weight:600">TESTBESTELLUNG (Testmodus, keine echte Zahlung)</p>`
+    ? `<p style="margin:0 0 16px;padding:8px 12px;background:${C.highlight};border:1.5px solid ${C.text};border-radius:${EMAIL_RADIUS.banner};font-size:13px;font-weight:700">TESTBESTELLUNG (Testmodus, keine echte Zahlung)</p>`
     : "";
   const imprint = entity
     ? `${escapeHtml(entity.name)}, ${escapeHtml(entity.street)}, ${escapeHtml(entity.zip)} ${escapeHtml(entity.city)}<br>` +
@@ -85,12 +76,12 @@ function layout(title: string, body: string, entity: LegalEntity | null, isTest:
       `<br>Kontakt: ${escapeHtml(entity.email)}`
     : "";
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
-<body style="margin:0;background:${C.cream};font-family:Jost,Helvetica,Arial,sans-serif;color:${C.aubergine}">
+<body style="margin:0;background:${C.background};font-family:${EMAIL_FONT};color:${C.text}">
 <div style="max-width:600px;margin:0 auto;padding:32px 20px">
 ${testBanner}
-<p style="font-size:13px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:${C.plum};margin:0 0 12px">provibe</p>
+${emailLogo(publicEnv.siteUrl, "left")}
 ${body}
-<p style="font-size:12px;line-height:1.6;color:${C.mauve};margin:32px 0 0;border-top:1px solid #e2d9d0;padding-top:16px">${imprint}</p>
+<p style="font-size:12px;line-height:1.6;color:${C.text};margin:32px 0 0;border-top:1px solid ${C.line};padding-top:16px">${imprint}</p>
 </div></body></html>`;
 }
 
@@ -104,10 +95,10 @@ function summaryTable(order: OrderView): string {
     .map((i) => ({ i, a: lineAmounts(i) }))
     .map(
       ({ i, a }) =>
-        `<tr><td style="padding:8px 0;border-bottom:1px solid #e2d9d0;font-size:15px"><strong>${escapeHtml(i.title)}</strong><br>
+        `<tr><td style="padding:8px 0;border-bottom:1px solid ${C.lineSoft};font-size:15px"><strong>${escapeHtml(i.title)}</strong><br>
 <span style="font-size:13px">${escapeHtml(i.description)}</span><br>
 <span style="font-size:13px">Menge ${i.quantity}${a.depositCents > 0 ? ` · zzgl. ${formatEur(a.depositCents)} Pfand` : ""}${i.basePriceText ? ` · ${escapeHtml(i.basePriceText)}` : ""}</span></td>
-<td style="padding:8px 0;border-bottom:1px solid #e2d9d0;text-align:right;font-size:15px;font-weight:600;vertical-align:top">${formatEur(a.goodsCents)}</td></tr>`,
+<td style="padding:8px 0;border-bottom:1px solid ${C.lineSoft};text-align:right;font-size:15px;font-weight:700;vertical-align:top">${formatEur(a.goodsCents)}</td></tr>`,
     )
     .join("");
   const tax = order.taxLines
@@ -126,7 +117,7 @@ ${row("Gesamt", formatEur(order.totalCents), true)}
 }
 
 function addressBlock(title: string, lines: string[]): string {
-  return `<p style="font-size:15px;font-weight:600;margin:16px 0 4px">${title}</p><p style="font-size:14px;line-height:1.5;margin:0">${lines.map(escapeHtml).join("<br>")}</p>`;
+  return `<p style="font-size:15px;font-weight:700;margin:16px 0 4px">${title}</p><p style="font-size:14px;line-height:1.5;margin:0">${lines.map(escapeHtml).join("<br>")}</p>`;
 }
 
 export function orderConfirmationEmail(
@@ -145,18 +136,18 @@ export function orderConfirmationEmail(
     .filter((l): l is { title: string; bodyHtml: string } => Boolean(l))
     .map(
       (l) =>
-        `<div style="margin-top:28px;padding-top:20px;border-top:2px solid ${C.aubergine}"><h2 style="font-size:20px;margin:0 0 12px">${escapeHtml(l.title)}</h2><div style="font-size:13px;line-height:1.6">${l.bodyHtml}</div></div>`,
+        `<div style="margin-top:28px;padding-top:20px;border-top:2px solid ${C.text}"><h2 style="font-size:20px;margin:0 0 12px">${escapeHtml(l.title)}</h2><div style="font-size:13px;line-height:1.6">${l.bodyHtml}</div></div>`,
     )
     .join("");
 
   const body = `<h1 style="font-size:28px;line-height:1.1;font-weight:700;margin:0 0 12px">Danke, dein Vibe ist unterwegs!</h1>
 <p style="font-size:16px;line-height:1.6;margin:0 0 20px">Wir haben deine Bestellung <strong>${escapeHtml(order.orderNumber)}</strong> vom ${formatGermanDate(deliveryWindow(placed).orderDate)} erhalten und packen schon. Diese E-Mail ist deine Bestellbestätigung.</p>
-<div style="background:${C.cream2};border-radius:22px;padding:18px">${summaryTable(order)}</div>
+<div style="background:${C.surface};border-radius:${EMAIL_RADIUS.box};padding:18px">${summaryTable(order)}</div>
 <p style="font-size:15px;margin:16px 0 0"><strong>Zustellung voraussichtlich:</strong> ${window}</p>
 ${addressBlock("Lieferadresse", formatAddressLines(order.shippingAddress))}
 ${addressBlock("Rechnungsadresse", order.billingAddress ? formatAddressLines(order.billingAddress) : ["wie Lieferadresse"])}
-<p style="font-size:15px;font-weight:600;margin:16px 0 4px">Zahlart</p><p style="font-size:14px;margin:0">${escapeHtml(order.paymentLabel)}</p>
-<p style="font-size:14px;line-height:1.6;margin:24px 0 0">Du kannst den Vertrag innerhalb von 14 Tagen widerrufen, Details stehen in der Widerrufsbelehrung unten. Am schnellsten geht es über <a href="${siteUrl}/pages/widerruf-formular" style="color:${C.plum};font-weight:600">Vertrag widerrufen</a>. Fragen? Antworte einfach auf diese E-Mail.</p>
+<p style="font-size:15px;font-weight:700;margin:16px 0 4px">Zahlart</p><p style="font-size:14px;margin:0">${escapeHtml(order.paymentLabel)}</p>
+<p style="font-size:14px;line-height:1.6;margin:24px 0 0">Du kannst den Vertrag innerhalb von 14 Tagen widerrufen, Details stehen in der Widerrufsbelehrung unten. Am schnellsten geht es über <a href="${siteUrl}/pages/widerruf-formular" style="color:${C.text};font-weight:700">Vertrag widerrufen</a>. Fragen? Antworte einfach auf diese E-Mail.</p>
 <p style="font-size:13px;line-height:1.6;margin:16px 0 0">Unten findest du unsere AGB und die Widerrufsbelehrung in der Fassung, die bei deiner Bestellung galt.</p>
 ${legalSections}`;
 
@@ -203,9 +194,9 @@ export function internalNotificationEmail(order: OrderView, siteUrl: string): Re
   const subject = `${order.isTest ? "[TEST] " : ""}Neue Bestellung ${order.orderNumber} über ${formatEur(order.totalCents)}`;
   const body = `<h1 style="font-size:22px;font-weight:700;margin:0 0 12px">Neue Bestellung ${escapeHtml(order.orderNumber)}</h1>
 <p style="font-size:15px;margin:0 0 12px">${escapeHtml(order.email)} · ${escapeHtml(order.paymentLabel)}</p>
-<div style="background:${C.cream2};border-radius:22px;padding:18px">${summaryTable(order)}</div>
+<div style="background:${C.surface};border-radius:${EMAIL_RADIUS.box};padding:18px">${summaryTable(order)}</div>
 ${addressBlock("Lieferadresse", formatAddressLines(order.shippingAddress))}
-<p style="margin:20px 0 0"><a href="${siteUrl}/admin/bestellungen/${order.id}" style="color:${C.plum};font-weight:600">Im Backoffice öffnen</a></p>`;
+<p style="margin:20px 0 0"><a href="${siteUrl}/admin/bestellungen/${order.id}" style="color:${C.text};font-weight:700">Im Backoffice öffnen</a></p>`;
   const text = `Neue Bestellung ${order.orderNumber}\n${order.email}\nGesamt: ${formatEur(order.totalCents)}\n${siteUrl}/admin/bestellungen/${order.id}`;
   return { subject, html: layout(subject, body, null, order.isTest), text };
 }

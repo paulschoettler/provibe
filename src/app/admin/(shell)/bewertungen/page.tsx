@@ -307,7 +307,7 @@ export default async function ReviewsPage({
                   {REVIEW_STATUS_LABELS[detail.status]}
                 </Badge>
               </div>
-              {detail.title ? <h3 className="text-[16px] font-semibold">{detail.title}</h3> : null}
+              {detail.title ? <h3 className="text-[16px] font-bold">{detail.title}</h3> : null}
               <p className="text-[14px] leading-[1.6] whitespace-pre-line">
                 {detail.body ?? "ohne Text"}
               </p>

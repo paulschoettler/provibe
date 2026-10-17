@@ -11,7 +11,7 @@ export type ButtonVariant = "primary" | "secondary" | "danger" | "text";
 export type ButtonSize = "md" | "sm";
 
 const BASE =
-  "inline-flex shrink-0 items-center justify-center gap-1.5 text-[14px] leading-[1.4] font-semibold whitespace-nowrap transition-colors select-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55";
+  "inline-flex shrink-0 items-center justify-center gap-1.5 text-[14px] leading-[1.4] font-bold whitespace-nowrap transition-colors select-none disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
