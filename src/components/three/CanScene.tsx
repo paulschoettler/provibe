@@ -4,7 +4,6 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PerformanceMonitor, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import gsap from "gsap";
 import type { HomeFlavor } from "@/lib/catalog/home";
 import { useHomeStore } from "@/lib/home/store";
@@ -25,6 +24,8 @@ import {
   HERO_DRAG_EVENT,
   type HeroDragDetail,
 } from "@/components/home/hero-drag";
+import CanLighting, { ENVIRONMENT_INTENSITY } from "./CanLighting";
+import { CAN_FRONT_ROTATION_Y, prepareCanMaterial } from "./can-material";
 
 /**
  * Eine einzige fixe WebGL-Canvas für die ganze Startseite (Arbeitspaket A).
@@ -45,12 +46,14 @@ const DEG = Math.PI / 180;
 /** Dauer und Kurve der Ringdrehung. Gilt auch für das Einrasten nach dem Ziehen. */
 const RING_DURATION = 0.8;
 const RING_EASE = "power3.inOut";
+/** Grunddrehung um die Y-Achse: Etikett frontal (Herleitung in can-material.ts). */
+const CAN_BASE_ROTATION_Y = CAN_FRONT_ROTATION_Y;
 /**
- * Grunddrehung der Dose um die Y-Achse, damit das Etikett zur Kamera zeigt.
- * Alle drei Modelle teilen Mesh und UV-Layout, ein Wert reicht. Stellschraube,
- * falls der Schriftzug beim ersten Blick nicht mittig sitzt.
+ * Erst um die eigene Achse drehen, dann in der Bildebene kippen. Mit der
+ * three-Vorgabe "XYZ" würde die Kippung mitgedreht: Bei einer frontal stehenden
+ * Dose (rund 90 Grad Grunddrehung) kippte sie dann zur Kamera statt zur Seite.
  */
-const CAN_BASE_ROTATION_Y = (120 * Math.PI) / 180;
+const CAN_EULER_ORDER: THREE.EulerOrder = "ZYX";
 
 /** Lineare Mischung, damit wir nicht für jede Zeile THREE.MathUtils bemühen. */
 function mix(from: number, to: number, t: number): number {
@@ -91,7 +94,7 @@ function range(value: number, from: number, to: number): number {
  * Dose auf Einheitshöhe bringen und im Ursprung zentrieren. Das Quellmodell
  * steht auf der Y-Achse (Ursprung am Boden) und ist knapp vier Einheiten hoch.
  */
-function normalizeCan(source: THREE.Object3D): THREE.Group {
+function normalizeCan(source: THREE.Object3D, maxAnisotropy: number): THREE.Group {
   const clone = source.clone(true);
   clone.traverse((object) => {
     const mesh = object as THREE.Mesh;
@@ -99,20 +102,7 @@ function normalizeCan(source: THREE.Object3D): THREE.Group {
     mesh.frustumCulled = false;
     // Material je Dose klonen, damit sich Nachbardosen einzeln ausblenden lassen.
     const original = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-    const materials = original.map((material) => {
-      const standard = material.clone() as THREE.MeshStandardMaterial;
-      // Rückseiten wegschneiden, sonst scheint bei durchsichtigen Nachbardosen
-      // die Innenseite des Etiketts durch. needsUpdate, weil side und transparent
-      // in das Shader-Programm eingehen.
-      standard.side = THREE.FrontSide;
-      standard.needsUpdate = true;
-      if (typeof standard.roughness === "number") {
-        // Die Quelle liefert roughnessFactor 1.7, außerhalb der glTF-Spanne.
-        standard.roughness = Math.min(1, standard.roughness);
-        standard.envMapIntensity = 0.85;
-      }
-      return standard;
-    });
+    const materials = original.map((material) => prepareCanMaterial(material, maxAnisotropy));
     mesh.material = Array.isArray(mesh.material) ? materials : materials[0];
   });
 
@@ -140,7 +130,8 @@ function CanModel({
 }) {
   // useDraco: false, damit drei keinen Decoder von einer CDN zieht. Meshopt bleibt an.
   const { scene } = useGLTF(url, false, true);
-  const object = useMemo(() => normalizeCan(scene), [scene]);
+  const maxAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
+  const object = useMemo(() => normalizeCan(scene, maxAnisotropy), [scene, maxAnisotropy]);
   const invalidate = useThree((state) => state.invalidate);
 
   useEffect(() => {
@@ -158,27 +149,6 @@ function CanModel({
   }, [object, index, onReady, invalidate]);
 
   return <primitive object={object} />;
-}
-
-/** Umgebungslicht aus einem lokal gebauten RoomEnvironment, ohne CDN und ohne HDR-Datei. */
-function LocalEnvironment() {
-  const gl = useThree((state) => state.gl);
-
-  const texture = useMemo(() => {
-    const generator = new THREE.PMREMGenerator(gl);
-    const room = new RoomEnvironment();
-    const target = generator.fromScene(room, 0.04);
-    generator.dispose();
-    room.traverse((object) => {
-      const mesh = object as THREE.Mesh;
-      if (mesh.isMesh) mesh.geometry.dispose();
-    });
-    return target.texture;
-  }, [gl]);
-
-  useEffect(() => () => texture.dispose(), [texture]);
-
-  return <primitive object={texture} attach="environment" />;
 }
 
 interface SceneProps {
@@ -412,10 +382,13 @@ function Scene({ flavors, mobileModels }: SceneProps) {
 
       const idle = still ? 0 : Math.sin(time * 0.45) * 8 * DEG * front;
       // Nachbardosen kippen nach außen: links gegen, rechts mit dem Uhrzeigersinn.
+      slot.rotation.order = CAN_EULER_ORDER;
       slot.rotation.z = -sin * CAN_TILT_Z_DEG * DEG;
-      // Gedämpfte Mitdrehung, damit das Etikett der Nachbardosen lesbar bleibt.
+      // Nachbardosen drehen sich leicht zur Kamera (rechts negativ, links positiv),
+      // damit auch bei ihnen Schriftzug und Früchte zu sehen sind. Der Anteil hängt
+      // am Ringwinkel: Eine einfahrende Dose dreht sich dabei von selbst auf frontal.
       slot.rotation.y =
-        CAN_BASE_ROTATION_Y + sin * CAN_YAW_DEG * DEG + idle + spin * Math.PI * front;
+        CAN_BASE_ROTATION_Y - sin * CAN_YAW_DEG * DEG + idle + spin * Math.PI * front;
       slot.scale.setScalar(geometry.canHeight * mix(geometry.neighborScale, 1, front));
 
       // Beim Zoom treten die Nachbardosen zurück, bleiben aber sichtbar.
@@ -439,8 +412,10 @@ function Scene({ flavors, mobileModels }: SceneProps) {
       group.visible = footer > 0;
       group.position.x = side * THREE.MathUtils.lerp(footerStartX, footerX, footer);
       group.position.y = footerY;
+      group.rotation.order = CAN_EULER_ORDER;
       group.rotation.z = -side * THREE.MathUtils.lerp(18, 6, footer) * DEG;
-      group.rotation.y = CAN_BASE_ROTATION_Y + footer * 25 * DEG;
+      // Beim Einfliegen drehen sie sich zur Bildmitte und kommen fast frontal an.
+      group.rotation.y = CAN_BASE_ROTATION_Y - side * THREE.MathUtils.lerp(35, 10, footer) * DEG;
       group.scale.setScalar(footerScale);
     }
   });
@@ -453,11 +428,7 @@ function Scene({ flavors, mobileModels }: SceneProps) {
 
   return (
     <>
-      <LocalEnvironment />
-      <ambientLight intensity={0.85} />
-      <directionalLight position={[3.2, 4.5, 5]} intensity={2.4} />
-      <directionalLight position={[-4, 2.2, -3.5]} intensity={1.7} color="#ffe9f2" />
-      <directionalLight position={[0, -3, 3]} intensity={0.55} />
+      <CanLighting />
 
       <group ref={ringRef}>
         {flavors.map((flavor, index) => (
@@ -539,7 +510,15 @@ export default function CanScene({ flavors }: { flavors: HomeFlavor[] }) {
       <Canvas
         frameloop={stageVisible || footerActive ? "always" : "demand"}
         dpr={[1, maxDpr]}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          // Khronos PBR Neutral statt ACES: hält die Etikettfarben nah an der
+          // Druckvorlage, ACES dunkelt Pink und Grün ab und verschiebt den Farbton.
+          toneMapping: THREE.NeutralToneMapping,
+        }}
+        scene={{ environmentIntensity: ENVIRONMENT_INTENSITY }}
         camera={{ fov: CAMERA_FOV, near: 0.1, far: 60, position: [0, 0, CAMERA_BASE_Z] }}
         onCreated={({ gl }) => {
           gl.domElement.addEventListener(
