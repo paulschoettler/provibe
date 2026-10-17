@@ -10,6 +10,7 @@ import { FaqSection, LmivSections } from "@/components/catalog/ProductDetails";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { ProductGallery, type GallerySlide } from "@/components/catalog/ProductGallery";
 import { ProductPurchase } from "@/components/catalog/ProductPurchase";
+import { ProductReviews } from "@/components/reviews/ProductReviews";
 import { TrackProductView } from "@/components/tracking/views";
 import {
   getProductByHandle,
@@ -22,6 +23,8 @@ import {
   type ShippingInfo,
 } from "@/lib/catalog/products";
 import { formatEur } from "@/lib/money";
+import { reviewsLd } from "@/lib/reviews/ld";
+import { getProductReviews } from "@/lib/reviews/queries";
 import { getSubscriptionOffer } from "@/lib/subscriptions/offer";
 
 /**
@@ -73,6 +76,8 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const { handle } = await params;
   const [product, shipping] = await Promise.all([getProductByHandle(handle), getShippingInfo()]);
   if (!product) notFound();
+  // Freigegebene Bewertungen (Paket Bewertungen, Cache-Tag "reviews")
+  const reviews = await getProductReviews(product.id);
 
   const isDrink = product.type === "sorte" || product.type === "mixed";
   const isBundle = product.type === "bundle";
@@ -97,7 +102,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   ];
 
   const ld: Record<string, unknown>[] = [
-    productLd(product),
+    { ...productLd(product), ...reviewsLd(reviews.summary, reviews.reviews) },
     breadcrumbLd([
       { name: "Shop", path: "/pages/shop" },
       ...(collection ? [{ name: collection.title, path: collection.url }] : []),
@@ -269,6 +274,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       <div className="flex flex-col gap-12 pb-16 lg:gap-16 lg:pb-24">
         <LmivSections product={product} />
         <FaqSection faq={faq} />
+        <ProductReviews data={reviews} />
 
         {product.related.length ? (
           <section

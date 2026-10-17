@@ -53,8 +53,9 @@ export function evaluateDiscount(
   const rejection = validateDiscount(rule, subtotal, now);
   if (rejection) return { ...none, reason: rejection };
 
+  // undefined = ganze Bestellung; eine (auch leere) Liste begrenzt den Rabatt auf genau diese Produkte
   const eligible = lines.map((l) =>
-    !rule.productIds || rule.productIds.length === 0 ? true : rule.productIds.includes(l.productId),
+    rule.productIds === undefined ? true : rule.productIds.includes(l.productId),
   );
   const eligibleGross = lineGross.map((g, i) => (eligible[i] ? g : 0));
   const eligibleSubtotal = eligibleGross.reduce((a, b) => a + b, 0);

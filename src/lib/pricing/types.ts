@@ -15,7 +15,7 @@ export interface DiscountRule {
   usageLimitPerCustomer?: number | null;
   customerUsageCount?: number;
   isActive: boolean;
-  /** Einschränkung auf Produkte: Liste von Produkt-IDs, leer = ganze Bestellung */
+  /** Einschränkung auf Produkte: undefined = ganze Bestellung, Liste = nur diese Produkte (leer = keines) */
   productIds?: string[];
 }
 

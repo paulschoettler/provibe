@@ -8,6 +8,7 @@ import { integrations } from "@/lib/integrations";
 import type { MockPaymentProvider } from "@/lib/integrations/payments/mock";
 import { checkRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/security/rate-limit";
 import { buildCheckoutEvent, emitTrackingEvent } from "@/lib/tracking/events";
+import { BLOCKED_CUSTOMER_MESSAGE, isCustomerBlocked } from "./customer-guard";
 import { asJson, checkoutDb } from "./db";
 import { DISCOUNT_MESSAGES, findDiscountByCode, setCartDiscount, toRule } from "./discount";
 import { processPaymentEvent, type PaymentDetails } from "./finalize";
@@ -344,6 +345,14 @@ async function beginPayment(formData: FormData) {
   const state = await loadCheckoutState();
   if (!state) redirect(ROUTE("/cart"));
   if (!state.session?.shipping_address) redirect(ROUTE("/checkout"));
+
+  // Im Backoffice gesperrte Kunden (Task 16): Prüfung direkt vor der Zahlung
+  if (await isCustomerBlocked(state.session.email)) {
+    return {
+      ok: false as const,
+      state: { status: "error", message: BLOCKED_CUSTOMER_MESSAGE } satisfies FormState,
+    };
+  }
 
   // Hat sich der Warenkorb seit dem Laden der Seite geändert, zeigen wir die Übersicht neu
   const shownTotal = Number(formData.get("shownTotal") ?? NaN);

@@ -161,4 +161,28 @@ describe("Warenkorbsummen", () => {
       { rateBp: 700, grossCents: 1070, taxCents: 70 },
     ]);
   });
+
+  it("begrenzt den Rabatt auf die genannten Produkte; eine leere Liste trifft nichts", () => {
+    const onlyCup = calculateCartTotals({
+      lines: [wildberry9, cup],
+      discount: { ...presale10, productIds: ["p-cup"] },
+      shippingRates: deRates,
+    });
+    expect(onlyCup.lines.map((l) => l.discountCents)).toEqual([0, 199]);
+
+    const nothing = calculateCartTotals({
+      lines: [wildberry9, cup],
+      discount: { ...presale10, productIds: [] },
+      shippingRates: deRates,
+    });
+    expect(nothing.discountCents).toBe(0);
+    expect(nothing.discountReason).toBe("not_applicable");
+
+    const whole = calculateCartTotals({
+      lines: [wildberry9, cup],
+      discount: presale10,
+      shippingRates: deRates,
+    });
+    expect(whole.discountCents).toBe(460);
+  });
 });

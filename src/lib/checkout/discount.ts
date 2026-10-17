@@ -1,5 +1,6 @@
 import "server-only";
 import type { DiscountRejection, DiscountRule } from "@/lib/pricing";
+import { getCollection } from "@/lib/catalog/products";
 import { checkoutDb } from "./db";
 
 /**
@@ -91,17 +92,34 @@ export async function toRule(row: DiscountRow, email: string | null): Promise<Lo
   };
 }
 
-/** applies_to: {"scope":"order"} | {"scope":"products","ids":[...]} | {"scope":"collections","ids":[...]} */
+/**
+ * applies_to: {"scope":"order"} | {"scope":"products","ids":[...]} | {"scope":"collections","ids":[...]}
+ * Rückgabe undefined = ganze Bestellung. Ein Produkt- oder Kollektionsbereich ohne Treffer ergibt
+ * eine leere Liste, also keinen Rabatt (vorher galt er versehentlich für alles). Kollektionen
+ * umfassen manuelle Zuordnungen (collection_products) und regelbasierte Kollektionen über den
+ * Katalog (src/lib/catalog/collection-rules.ts), damit Storefront und Kasse dieselbe Menge sehen.
+ */
 async function productScope(appliesTo: unknown): Promise<string[] | undefined> {
-  const scope = appliesTo as { scope?: string; ids?: string[] } | null;
-  if (!scope || scope.scope === "order" || !scope.ids?.length) return undefined;
-  if (scope.scope === "products") return scope.ids;
+  const scope = appliesTo as { scope?: string; ids?: unknown } | null;
+  if (!scope || !scope.scope || scope.scope === "order") return undefined;
+  const ids = Array.isArray(scope.ids)
+    ? scope.ids.filter((x): x is string => typeof x === "string")
+    : [];
+  if (scope.scope === "products") return ids;
   if (scope.scope === "collections") {
-    const { data } = await checkoutDb()
-      .from("collection_products")
-      .select("product_id")
-      .in("collection_id", scope.ids);
-    return [...new Set((data ?? []).map((r) => r.product_id))];
+    if (ids.length === 0) return [];
+    const db = checkoutDb();
+    const [manual, collections] = await Promise.all([
+      db.from("collection_products").select("product_id").in("collection_id", ids),
+      db.from("collections").select("handle, kind").in("id", ids),
+    ]);
+    const result = new Set((manual.data ?? []).map((r) => r.product_id));
+    const automatic = (collections.data ?? []).filter((c) => c.kind === "automatic");
+    for (const c of automatic) {
+      const page = await getCollection(c.handle);
+      for (const p of page?.products ?? []) result.add(p.id);
+    }
+    return [...result];
   }
   return undefined;
 }

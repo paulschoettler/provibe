@@ -1,5 +1,6 @@
 import "server-only";
-import { createHash, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
+import { hashReviewToken } from "@/lib/reviews/token";
 import { renderCrmTemplate, type CrmTemplateKey } from "@/emails";
 import { asJson, crmDb, dbError } from "@/lib/admin/customers/crm-db";
 import {
@@ -440,7 +441,7 @@ export async function runReviewRequest(runId: string): Promise<void> {
   if (!(await applyDecision(runId, decision)) || !order || !consent) return;
   // Bewertungslink: Token nur als Hash in automation_runs.token_hash (Prüfung im Bewertungsformular)
   const token = randomBytes(24).toString("base64url");
-  const tokenHash = createHash("sha256").update(token).digest("hex");
+  const tokenHash = hashReviewToken(token);
   const sent = await sendAutomationMail({
     runId,
     key: "review_request",
