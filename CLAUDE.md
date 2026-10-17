@@ -6,6 +6,7 @@ Weitere Projektdokumente:
 
 - `docs/analyse.md`: Inventar des bestehenden Shopify-Shops (URLs, Funktionen, Assets, Gap-Liste)
 - `docs/plan.md`: Phasenplan mit Status
+- `docs/seitenplan.md`: alle Routen von Storefront und Backoffice mit Vorlagen, Status und Abnahme-Screens
 - `docs/decisions.md`: Architekturentscheidungen (kurze ADRs)
 - `docs/setup.md`: Einmalige Einrichtung von Werkzeugen und Zugängen
 - `docs/fragen.md`: Offene Fragen mit Empfehlungen und nachgetragenen Antworten

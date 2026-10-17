@@ -1,0 +1,74 @@
+# Seitenplan: alle Unterseiten des neuen Shops
+
+Stand: 17.10.2026. Quelle: URL-Inventar in `docs/analyse.md` (Abschnitt 2), Briefing Abschnitte 3, 4 und 8. Jede Zeile ist eine Route, die es geben muss. "Vorlage" bündelt Routen mit gleichem Aufbau, dafür entsteht je ein Screen für Mobil und Desktop. Status: gebaut, offen, Redirect.
+
+## 1. Storefront (kundenseitig, alles im Server-HTML)
+
+| Route                                                      | Vorlage              | Inhalt                                                                                                                                 | Status                    |
+| ---------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `/`                                                        | Startseite           | Hero mit 3D-Karussell, Sequenz, Sorten, Banner, Bundles, Logo-Zoom, Footer                                                             | gebaut                    |
+| `/pages/shop`                                              | Shop-Übersicht       | "get the vibe", alle kaufbaren Produkte, Einstieg in Kollektionen                                                                      | offen                     |
+| `/collections`                                             | Kollektionsübersicht | Karten für Alle, Eistee, Founder Bundles, Merch                                                                                        | offen                     |
+| `/collections/all`, `/alle-produkte`, `/eistee`, `/aktion` | Kollektion           | Produktgrid mit Filter und Sortierung, Grundpreis und Pfand je Karte                                                                   | offen                     |
+| `/products/wildberry`, `/peach`, `/raspberry-lime`         | Produktseite Sorte   | Galerie oder 3D-Dose, Packgrößen 9 bis 48, Preis, Pfand, Grundpreis, Zutaten, Nährwerte, LMIV, FAQ, JSON-LD                            | offen                     |
+| `/products/provibe-eistee-mixed`                           | Produktseite Mixed   | wie Sorte, mit Größenwahl und Sortenmix                                                                                                | offen                     |
+| `/products/founder-bundle-i`, `-ii`, `-iii-1`              | Produktseite Bundle  | Komponentenliste, Shirt-Größe, "Einzeln: X €", Lieferzeit                                                                              | offen                     |
+| `/products/provibe-shirt`, `/provibe-clear-cup`            | Produktseite Merch   | Größen bzw. Einzelartikel, ohne LMIV                                                                                                   | offen                     |
+| `/search`, `/search?q=`                                    | Suche                | servergerenderte Ergebnisse (Produkte, Seiten), leerer Zustand, Vorschläge                                                             | offen                     |
+| `/cart`                                                    | Warenkorb            | Positionen, Mengen, Pfand, Grundpreis, Versandschwelle, Rabattcode, Zur Kasse                                                          | gebaut (Rabattcode offen) |
+| `/checkout`                                                | Checkout             | ein Flow in Schritten: Kontakt, Adresse, Versand, Zahlung (Stripe Payment Element), Übersicht mit Button "Zahlungspflichtig bestellen" | offen                     |
+| `/checkout/danke/[token]`                                  | Bestellbestätigung   | Zusammenfassung, Zahlstatus, Konto anlegen, Newsletter                                                                                 | offen                     |
+| `/account/login`                                           | Login                | Magic Link oder Passwort, Konto aktivieren für Shopify-Bestandskunden                                                                  | offen                     |
+| `/account`                                                 | Konto-Übersicht      | letzte Bestellungen, Adressen, Daten, Newsletter-Einstellung                                                                           | offen                     |
+| `/account/bestellungen`, `/account/bestellungen/[nummer]`  | Bestellungen         | Liste, Detail mit Status, Tracking, Rechnungsdownload, Widerruf                                                                        | offen                     |
+| `/account/adressen`                                        | Adressen             | anlegen, bearbeiten, Standard                                                                                                          | offen                     |
+| `/account/daten`                                           | Persönliche Daten    | Name, E-Mail, Passwort, Newsletter, Konto löschen                                                                                      | offen                     |
+| `/pages/uber-uns`                                          | Inhaltsseite Story   | drei Blöcke mit Bildern, H1 ergänzen                                                                                                   | offen                     |
+| `/pages/partner`                                           | Partner (B2B)        | Vorteile, Formular (Lead-Liste), partner@                                                                                              | offen                     |
+| `/pages/contact`                                           | Kontakt              | Formular (contact_messages), hello@, 24-Stunden-Hinweis                                                                                | offen                     |
+| `/pages/messe`                                             | Investoren (noindex) | Pitch-Inhalt 1:1                                                                                                                       | offen                     |
+| `/pages/impressum`                                         | Rechtstext           | aus `legal_documents`, versioniert, LUCID-Feld                                                                                         | offen                     |
+| `/pages/allgemeine-geschaftsbedingungen`                   | Rechtstext           | AGB, Änderungen laut `docs/rechtstexte-aenderungen.md`                                                                                 | offen                     |
+| `/pages/ruckgabe-und-wiederrufsbelehrung`                  | Rechtstext           | Widerrufsbelehrung mit Musterformular                                                                                                  | offen                     |
+| `/pages/versand`                                           | Rechtstext           | Versand und Zahlung                                                                                                                    | offen                     |
+| `/policies/privacy-policy`                                 | Rechtstext           | Datenschutzerklärung (Shopify-Passagen ersetzt)                                                                                        | offen                     |
+| `/pages/widerruf-formular`                                 | Widerruf-Formular    | eigenes Formular, schreibt `withdrawal_requests`, Bestätigungsmail                                                                     | offen                     |
+| `/newsletter/bestaetigen`                                  | Newsletter-Status    | Double-Opt-in-Bestätigung                                                                                                              | gebaut                    |
+| `/newsletter/abmelden`                                     | Newsletter-Status    | Abmeldung per Token, Grund optional                                                                                                    | offen                     |
+| `/blogs/news`, `/blogs/news/[slug]`                        | Blog                 | Liste und Artikel, leer und `noindex` bis zum ersten Beitrag                                                                           | offen                     |
+| 404                                                        | Fehlerseite          | Suche, Sorten, Links                                                                                                                   | offen                     |
+
+Redirects (bereits in `netlify.toml`, keine eigenen Seiten): `/pages/qr-code-page-investoren` → `/pages/messe`, `/pages/qrcode` → `/pages/shop`, `/pages/provibe-paket` und `/pages/provibe-founder-paket` → Ziel laut Frage F12, `/pages/datenschutzerklarung` → `/policies/privacy-policy`, `/pages/widerrufsbutton` → `/pages/widerruf-formular`, `/products/founder-bundle-iii` → `/products/founder-bundle-iii-1`, `/policies/terms-of-service` und weitere `/policies/*` → die jeweiligen `/pages/*`, `/customer_authentication/*` und `/account/*` von Shopify → `/account/login`.
+
+Screens für die Abnahme (je Mobil und Desktop): Shop-Übersicht, Kollektion, Produktseite Sorte, Produktseite Bundle, Suche, Checkout (zwei Schritte: Adresse und Zahlung mit Übersicht), Bestellbestätigung, Login, Konto-Übersicht, Bestelldetail, Story-Seite, Partner, Kontakt, Rechtstext, 404. Das sind 15 Vorlagen, 30 Artboards. Mixed, Merch, Kollektionsübersicht, Adressen, Daten, Newsletter-Status und Blog leiten sich daraus ab und werden ohne eigenen Screen gebaut.
+
+## 2. Backoffice `/admin` (Briefing Abschnitt 8)
+
+| Route                                  | Inhalt                                                                                                        | Status |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
+| `/admin/login`, `/admin/2fa`           | Supabase Auth, Pflicht zur Zwei-Faktor-Authentifizierung, Rollen Owner, Admin, Support, Fulfillment           | offen  |
+| `/admin`                               | Dashboard: Umsatz, Bestellungen, Warenkorbwert, Conversion, Top-Produkte, Neu- gegen Bestandskunden, Bestände | offen  |
+| `/admin/bestellungen`, `/[id]`         | Liste mit Filtern, Detail mit Statusfluss, Erstattung, Rechnung und Lieferschein, Tracking, Notizen, CSV      | offen  |
+| `/admin/bestellungen/neu`              | manuelle Bestellung                                                                                           | offen  |
+| `/admin/produkte`, `/[id]`, `/neu`     | Produkte, Varianten, Bundles, Bilder, LMIV, Pfand, Steuer, SEO, Kollektionen                                  | offen  |
+| `/admin/kollektionen`, `/[id]`         | manuell und regelbasiert                                                                                      | offen  |
+| `/admin/bestand`                       | Übersicht, Korrekturen mit Grund, Historie, Warnschwellen                                                     | offen  |
+| `/admin/rabatte`, `/[id]`              | Codes, Regeln, Nutzung                                                                                        | offen  |
+| `/admin/kunden`, `/[id]`               | Mini-CRM: Profil, Bestellungen, Umsatz, Newsletter-Nachweis, Tags, Notizen, Timeline                          | offen  |
+| `/admin/segmente`                      | gespeicherte Filter als Zielgruppen                                                                           | offen  |
+| `/admin/leads`, `/[id]`                | Partner- und B2B-Anfragen mit Status                                                                          | offen  |
+| `/admin/newsletter`, `/kampagnen/[id]` | Kontakte, Kampagnen mit Block-Editor, Testversand, Planung, Kennzahlen                                        | offen  |
+| `/admin/automationen`                  | Willkommen, Warenkorbabbrecher, Bewertungsanfrage, je abschaltbar                                             | offen  |
+| `/admin/emails`                        | transaktionale Vorlagen einsehen, Versandprotokoll                                                            | offen  |
+| `/admin/inhalte/*`                     | Seiten, Rechtstexte (versioniert), Startseiten-Module, Announcement-Bar, Navigation, Footer, Blog             | offen  |
+| `/admin/einstellungen/*`               | Shopdaten, Versandzonen und Tarife, Steuern, Tracking-IDs, Rechnungsnummernkreis, Benutzer und Rollen         | offen  |
+| `/admin/protokoll`                     | Audit-Log                                                                                                     | offen  |
+
+Screens für die Abnahme (je Mobil und Desktop): Login mit 2FA, Dashboard, Bestellliste, Bestelldetail, Produktliste, Produkt-Editor, Kundenprofil, Newsletter-Kampagne, Inhalte-Editor (Rechtstext mit Versionen), Einstellungen. Das sind 10 Vorlagen, 20 Artboards; die übrigen Admin-Seiten folgen demselben Listen- und Detailmuster.
+
+## 3. Reihenfolge
+
+1. Hero-Richtung festlegen (Entwürfe auf dem Design-Canvas), damit Typo, Flächen und Wellen für alle Seiten feststehen.
+2. Screens der Storefront-Vorlagen, dann Abnahme.
+3. Screens des Backoffice, dann Abnahme.
+4. Bau in parallelen Arbeitspaketen (Opus-Subagenten): Katalogseiten, Inhalts- und Rechtsseiten, Suche und 404, Checkout mit Stripe-Testmodus, Konto, Backoffice-Grundgerüst mit Auth, Backoffice-Module.
