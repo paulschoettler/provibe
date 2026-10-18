@@ -326,7 +326,11 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       startY = event.clientY;
       axis = null;
       mode = stage.dataset.facts === "true" ? "spin" : "ring";
-      freeAxis = mode === "spin" && event.pointerType === "mouse";
+      // Maus: frei in jede Richtung. Finger: nur auf dem Griff über der Dose (dort scrollt der
+      // Browser nicht), sonst entscheidet die Richtung zwischen Drehen und Scrollen.
+      const onHandle =
+        event.target instanceof Element && event.target.closest(".pv-spin-handle") !== null;
+      freeAxis = mode === "spin" && (event.pointerType === "mouse" || onHandle);
     };
 
     const onPointerMove = (event: PointerEvent) => {

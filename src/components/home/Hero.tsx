@@ -104,6 +104,10 @@ export default function Hero({ flavors }: { flavors: HomeFlavor[] }) {
           ))}
         </div>
 
+        {/* Griff über der vorderen Dose im Zutaten-Schritt: Auf ihm scrollt der Browser nicht
+            (touch-action none), das Ziehen dreht die Dose; daneben scrollt die Seite normal. */}
+        <div className="pv-spin-handle" aria-hidden="true" />
+
         <HeroDeco flavors={flavors} />
 
         <div className="pv-stage__top">

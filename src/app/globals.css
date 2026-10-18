@@ -1859,6 +1859,30 @@ html[data-js]:not([data-tier="static"]) .pv-cans {
   filter: url(#pv-can-solid) var(--shadow-can);
   will-change: transform, opacity;
 }
+/* Griff über der vorderen Dose (Hero.tsx): gleiche Lage wie das aktive Dosen-PNG. Nur im
+   Zutaten-Schritt anfassbar; touch-action none hält dort das Scrollen an, damit der Finger die
+   Dose dreht statt die Seite zu schieben (Feedback 18.10.2026). Daneben scrollt alles normal. */
+.pv-spin-handle {
+  position: absolute;
+  left: 50%;
+  top: var(--pv-can-top);
+  width: calc(var(--pv-can-h) * 0.56);
+  height: var(--pv-can-h);
+  z-index: 2;
+  transform: translate(-50%, -50%) translate(var(--pv-x), var(--pv-y)) scale(var(--pv-k));
+  pointer-events: none;
+  touch-action: none;
+}
+.pv-stage[data-facts="true"] .pv-spin-handle {
+  pointer-events: auto;
+  cursor: grab;
+}
+.pv-stage[data-dragging="true"] .pv-spin-handle {
+  cursor: grabbing;
+}
+:is(html:not([data-js]), html[data-flat], html[data-tier="static"]) .pv-spin-handle {
+  display: none;
+}
 .pv-can[data-active="true"] {
   opacity: 1;
   visibility: visible;
