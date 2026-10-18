@@ -6,7 +6,14 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { FlavorPalette } from "@/lib/catalog/home";
 import { useHomeStore } from "@/lib/home/store";
 import { heroGeometry } from "./hero-geometry";
-import { HERO_DRAG_END_EVENT, HERO_DRAG_EVENT, type HeroDragDetail } from "./hero-drag";
+import {
+  HERO_DRAG_END_EVENT,
+  HERO_DRAG_EVENT,
+  HERO_SPIN_END_EVENT,
+  HERO_SPIN_EVENT,
+  type HeroDragDetail,
+  type HeroSpinDetail,
+} from "./hero-drag";
 
 /**
  * Interaktivität des Heros (Arbeitspaket A). Rendert nichts, hängt sich an die
@@ -286,9 +293,19 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
     let startY = 0;
     let axis: "x" | "y" | null = null;
     let dragged = false;
+    /**
+     * "ring": Wischen wechselt die Sorte (Hero-Ansicht). "spin": Im Zutaten-Schritt dreht das
+     * Ziehen die vordere Dose selbst; mit der Maus in jede Richtung, mit dem Finger nur, wenn
+     * die Geste waagerecht beginnt, senkrecht scrollt die Seite weiter.
+     */
+    let mode: "ring" | "spin" = "ring";
+    let freeAxis = false;
 
     const sendDrag = (name: string, detail: HeroDragDetail) => {
       window.dispatchEvent(new CustomEvent<HeroDragDetail>(name, { detail }));
+    };
+    const sendSpin = (name: string, detail: HeroSpinDetail) => {
+      window.dispatchEvent(new CustomEvent<HeroSpinDetail>(name, { detail }));
     };
 
     const endDrag = () => {
@@ -308,6 +325,8 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       startX = event.clientX;
       startY = event.clientY;
       axis = null;
+      mode = stage.dataset.facts === "true" ? "spin" : "ring";
+      freeAxis = mode === "spin" && event.pointerType === "mouse";
     };
 
     const onPointerMove = (event: PointerEvent) => {
@@ -316,7 +335,7 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       const deltaY = event.clientY - startY;
       if (axis === null) {
         if (Math.abs(deltaX) < AXIS_LOCK && Math.abs(deltaY) < AXIS_LOCK) return;
-        axis = Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
+        axis = freeAxis || Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
         if (axis === "x") {
           dragged = true;
           stage.dataset.dragging = "true";
@@ -330,6 +349,13 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       if (axis !== "x") return;
       // Verhindert, dass die Maus beim Ziehen Text markiert.
       if (event.cancelable) event.preventDefault();
+      if (mode === "spin") {
+        sendSpin(HERO_SPIN_EVENT, {
+          x: deltaX / window.innerWidth,
+          y: deltaY / window.innerHeight,
+        });
+        return;
+      }
       sendDrag(HERO_DRAG_EVENT, { progress: deltaX / window.innerWidth, settled: false });
     };
 
@@ -337,8 +363,13 @@ export default function HeroExperience({ flavors }: { flavors: HeroFlavorView[] 
       if (pointerId !== event.pointerId) return;
       const deltaX = event.clientX - startX;
       const wasDragging = axis === "x";
+      const wasSpin = mode === "spin";
       endDrag();
       if (!wasDragging) return;
+      if (wasSpin) {
+        sendSpin(HERO_SPIN_END_EVENT, { x: 0, y: 0 });
+        return;
+      }
       const switches = Math.abs(deltaX) >= SWIPE_THRESHOLD;
       sendDrag(HERO_DRAG_END_EVENT, { progress: 0, settled: switches });
       if (!switches) return;

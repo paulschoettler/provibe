@@ -22,7 +22,13 @@ import {
   DRAG_MAX_STEP,
   HERO_DRAG_END_EVENT,
   HERO_DRAG_EVENT,
+  HERO_SPIN_END_EVENT,
+  HERO_SPIN_EVENT,
+  SPIN_GAIN_X,
+  SPIN_GAIN_Y,
+  SPIN_MAX_PITCH,
   type HeroDragDetail,
+  type HeroSpinDetail,
 } from "@/components/home/hero-drag";
 import CanLighting, { ENVIRONMENT_INTENSITY } from "./CanLighting";
 import { CAN_FRONT_ROTATION_Y, prepareCanMaterial } from "./can-material";
@@ -52,11 +58,23 @@ const RING_EASE = "power3.inOut";
 /** Grunddrehung um die Y-Achse: Etikett frontal (Herleitung in can-material.ts). */
 const CAN_BASE_ROTATION_Y = CAN_FRONT_ROTATION_Y;
 /**
- * Erst um die eigene Achse drehen, dann in der Bildebene kippen. Mit der
- * three-Vorgabe "XYZ" würde die Kippung mitgedreht: Bei einer frontal stehenden
- * Dose (rund 90 Grad Grunddrehung) kippte sie dann zur Kamera statt zur Seite.
+ * Reihenfolge der Drehungen (three wendet die Buchstaben von hinten an): erst um die eigene
+ * Achse (Y), dann nach vorn oder hinten kippen (X, nur beim Ziehen im Zutaten-Schritt), zuletzt
+ * in der Bildebene (Z). Mit der three-Vorgabe "XYZ" würde die Kippung mitgedreht: Bei einer
+ * frontal stehenden Dose (rund 90 Grad Grunddrehung) kippte sie dann zur Kamera statt zur Seite.
  */
-const CAN_EULER_ORDER: THREE.EulerOrder = "ZYX";
+const CAN_EULER_ORDER: THREE.EulerOrder = "ZXY";
+/**
+ * Drehung der vorderen Dose im Zutaten-Schritt: einmal halb herum plus 45 Grad nach rechts,
+ * damit nicht das Pfandzeichen in der Mitte steht, aber eine andere Seite als im Hero zu sehen
+ * ist (Feedback 18.10.2026).
+ */
+const FACTS_TURN = Math.PI + 45 * DEG;
+/** Rückfedern nach dem Ziehen: zügig, mit kleinem Überschwingen, danach wackelt sie wieder. */
+const SPIN_RETURN_DURATION = 0.75;
+const SPIN_RETURN_EASE = "back.out(1.4)";
+/** Während des Ziehens folgt die Dose dem Zeiger mit leichter Dämpfung (Anteil je Bild). */
+const SPIN_FOLLOW = 0.28;
 /** Blickrichtung einer Dose ohne Drehung: lokale +z-Achse, also zur Kamera. */
 const FORWARD = new THREE.Vector3(0, 0, 1);
 
@@ -263,6 +281,13 @@ function Scene({ flavors, mobileModels }: SceneProps) {
   const ringAngle = useRef({ value: 0 });
   /** Zusatzwinkel, solange der Finger oder die Maus den Ring zieht. */
   const dragAngle = useRef({ value: 0 });
+  /**
+   * Ziehen im Zutaten-Schritt: Zielwinkel aus dem Zeiger, tatsächlicher Winkel (gedämpft) und
+   * Gewicht des Wackelns (0 während des Ziehens, danach langsam zurück auf 1).
+   */
+  const spinTarget = useRef({ yaw: 0, pitch: 0 });
+  const spinState = useRef({ yaw: 0, pitch: 0, idle: 1 });
+  const spinning = useRef(false);
   const lastIndex = useRef(useHomeStore.getState().flavorIndex);
   const heroVisible = useRef(true);
   const reduced = useRef(false);
@@ -378,6 +403,60 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     };
   }, [flavors.length, invalidate]);
 
+  // Ziehen im Zutaten-Schritt: Die vordere Dose dreht und kippt mit dem Zeiger. Beim Loslassen
+  // federt sie zügig in die Grundstellung zurück, das Wackeln blendet danach langsam wieder ein.
+  useEffect(() => {
+    const target = spinTarget.current;
+    const current = spinState.current;
+
+    const onSpin = (event: Event) => {
+      const detail = (event as CustomEvent<HeroSpinDetail>).detail;
+      if (!detail) return;
+      gsap.killTweensOf(current);
+      spinning.current = true;
+      target.yaw = detail.x * SPIN_GAIN_X;
+      target.pitch = Math.max(-SPIN_MAX_PITCH, Math.min(SPIN_MAX_PITCH, detail.y * SPIN_GAIN_Y));
+      current.idle = Math.max(0, current.idle - 0.2);
+      invalidate();
+    };
+
+    const onSpinEnd = () => {
+      spinning.current = false;
+      target.yaw = 0;
+      target.pitch = 0;
+      gsap.killTweensOf(current);
+      if (reduced.current) {
+        current.yaw = 0;
+        current.pitch = 0;
+        current.idle = 1;
+        invalidate();
+        return;
+      }
+      gsap.to(current, {
+        yaw: 0,
+        pitch: 0,
+        duration: SPIN_RETURN_DURATION,
+        ease: SPIN_RETURN_EASE,
+        onUpdate: invalidate,
+      });
+      gsap.to(current, {
+        idle: 1,
+        duration: 1.8,
+        delay: SPIN_RETURN_DURATION * 0.6,
+        ease: "power1.inOut",
+        onUpdate: invalidate,
+      });
+    };
+
+    window.addEventListener(HERO_SPIN_EVENT, onSpin);
+    window.addEventListener(HERO_SPIN_END_EVENT, onSpinEnd);
+    return () => {
+      gsap.killTweensOf(current);
+      window.removeEventListener(HERO_SPIN_EVENT, onSpin);
+      window.removeEventListener(HERO_SPIN_END_EVENT, onSpinEnd);
+    };
+  }, [invalidate]);
+
   // Das Karussell verschwindet, sobald die Hero- und Sequenz-Bühne aus dem Bild ist.
   useEffect(() => {
     const stage = document.getElementById("pv-sequence") ?? document.getElementById("pv-hero");
@@ -477,6 +556,20 @@ function Scene({ flavors, mobileModels }: SceneProps) {
     const spread = mix(1, geometry.neighborSpreadZoom, zoom);
     const base = ringAngle.current.value + dragAngle.current.value;
 
+    // Gezogene Dose: dem Zeiger gedämpft hinterher, solange gezogen wird.
+    const twist = spinState.current;
+    if (spinning.current) {
+      const target = spinTarget.current;
+      twist.yaw += (target.yaw - twist.yaw) * SPIN_FOLLOW;
+      twist.pitch += (target.pitch - twist.pitch) * SPIN_FOLLOW;
+      if (
+        Math.abs(target.yaw - twist.yaw) > 0.0005 ||
+        Math.abs(target.pitch - twist.pitch) > 0.0005
+      ) {
+        invalidate();
+      }
+    }
+
     for (let index = 0; index < slotRefs.current.length; index += 1) {
       const slot = slotRefs.current[index];
       if (!slot) continue;
@@ -491,18 +584,23 @@ function Scene({ flavors, mobileModels }: SceneProps) {
       slot.position.x = sin * geometry.ringRadiusX * spread;
       slot.position.z = cos * geometry.ringRadiusZ;
 
-      const float = still ? 0 : Math.sin(time * 0.8) * 0.018 * front;
+      const float = still ? 0 : Math.sin(time * 0.8) * 0.018 * front * twist.idle;
       slot.position.y = float * geometry.canHeight;
 
-      const idle = still ? 0 : Math.sin(time * 0.45) * 8 * DEG * front;
+      const idle = still ? 0 : Math.sin(time * 0.45) * 8 * DEG * front * twist.idle;
       // Nachbardosen kippen nach außen: links gegen, rechts mit dem Uhrzeigersinn.
       slot.rotation.order = CAN_EULER_ORDER;
       slot.rotation.z = -sin * CAN_TILT_Z_DEG * DEG;
       // Nachbardosen drehen sich leicht zur Kamera (rechts negativ, links positiv),
       // damit auch bei ihnen Schriftzug und Früchte zu sehen sind. Der Anteil hängt
       // am Ringwinkel: Eine einfahrende Dose dreht sich dabei von selbst auf frontal.
+      slot.rotation.x = twist.pitch * front;
       slot.rotation.y =
-        CAN_BASE_ROTATION_Y - sin * CAN_YAW_DEG * DEG + idle + spin * Math.PI * front;
+        CAN_BASE_ROTATION_Y -
+        sin * CAN_YAW_DEG * DEG +
+        idle +
+        spin * FACTS_TURN * front +
+        twist.yaw * front;
       slot.scale.setScalar(geometry.canHeight * mix(geometry.neighborScale, 1, front));
 
       // Beim Zoom treten die Nachbardosen zurück, bleiben aber sichtbar.
